@@ -1,0 +1,104 @@
+body
+{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Comfortaa', cursive;
+    text-align: center;
+    background-attachment: fixed;
+    background-color: #eef8ff;
+}
+@font-face { /* Définition d'une nouvelle police nommée CAC Champagne */
+
+    font-family: 'Comfortaa';
+
+    src: url('Comfortaa-webfont.eot');
+
+    src: url('Comfortaa-webfont.eot?#iefix') format('embedded-opentype'),
+
+         url('Comfortaa-webfont.woff') format('woff'),
+
+         url('Comfortaa-webfont.ttf') format('truetype'),
+
+         url('Comfortaa-webfont.svg#Comfortaa') format('svg');
+
+}
+input[type="text"], input[type="email"], input[type="password"]
+{
+    display: block;
+    padding: 10px;
+    margin: 20px auto;
+    width: 300px;
+    border-radius: 5px;
+    border: 1.5px black solid;
+    outline: none; 
+}
+input[type="text"]:hover, input[type="email"]:hover, input[type="password"]:hover
+{
+    background-color: #dfdfdf;
+}
+input[type="submit"]
+{
+    color: #fff;
+    padding: 10px;
+    background: #0098cb;
+    width: 320px;
+    margin: 20px auto;
+    margin-top: 0px;
+    border: 0px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+input[type="submit"]:hover
+{
+    background: #00b8eb;
+}
+
+.se_connecter
+{
+    text-decoration: none;
+}
+.se_connecter:hover
+{
+    text-decoration: underline;
+}
+
+.se_inscrire
+{
+    text-decoration: none;
+}
+.se_inscrire:hover
+{
+    text-decoration: underline;
+}
+
+.choix_inscription
+{
+    text-decoration: none;
+}
+.choix_inscription:hover
+{
+    text-decoration: underline;
+}
+
+.retourner_accueil
+{
+    text-decoration: none;
+    color: #0098cb;
+}
+.retourner_accueil:hover
+{
+    text-decoration: underline;
+    color: #00b8eb;
+}
+.condition_general
+{
+    font-size: 10px;
+}
+.lien_condition_general
+{
+    text-decoration: none;
+}
+.lien_condition_general:hover
+{
+    text-decoration: underline;
+}
