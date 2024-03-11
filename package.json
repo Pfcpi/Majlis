@@ -1,18 +1,17 @@
 {
   
-  "name": "test-app",
-  "version": "1.1.0",
-  "description": "help please j'en peux plus",
+  "name": "Projet de gestion de conseil de discipline",
+  "version": "1.0.0",
+  "description": "Cette application sert à gérer les étudiants admis en conseil de discipline.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "build": "electron-builder",
-    "msi": "node msi-creator.js"
+    "build": "electron-builder"
   },
-  "appId": "com.myapp",
+  "appId": "com.conseil",
   "build": {
-    "appId": "com.myapp",
+    "appId": "com.conseil",
     "files": [
       "**/*"
     ],
@@ -24,7 +23,7 @@
       "installerIcon": "../assets/icons/app.ico"
     }
   },
-  "author": "Mouhcine",
+  "author": "Abdelmoumene Mouhcine, Badache Radhi, Salah Oussam, Benabi Mohammed, Aboura Yacine, Major Amir",
   "license": "ISC",
   "devDependencies": {
     "electron": "^29.1.0",
