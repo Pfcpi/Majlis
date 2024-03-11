@@ -1,0 +1,64 @@
+p
+{
+	font-family: arial;
+	
+}
+span
+{
+	color: red;
+}
+div
+{
+	font-size: 18px;
+	font-family: verdana;
+
+}
+a
+{
+	font-size: 50px;
+	text-decoration: none;
+	color: black;
+	transition-duration: 0.2s; 
+}
+a:hover
+{
+	text-decoration: underline;
+	color: red;
+	transition-delay: 0.2s;
+	transition-property: 0.2s;
+}
+h2
+{
+	font-weight: bold;
+	font-family: Arial;
+	border: 2px black ridge;
+	color: red;
+	font-size: 25px;
+	transition-duration: 0.3s;
+	
+}
+h2:hover
+{
+	color: #258A29;
+	transition-delay: 0.3s;
+	transition-property: 0.3s;
+}
+body
+{
+	background-color: #EDEDED;
+}
+th
+{
+    border: 3px solid black;
+    
+}
+td
+{
+    border: 3px solid black;
+    color: red;
+    text-align: center;
+}
+table
+{
+    border-collapse: collapse;
+}
