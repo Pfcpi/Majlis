@@ -17,6 +17,7 @@ To create a setup for our electron application use the following:
 ```Bash
 npm create @quick-start/electron@latest
 ```
+- Set as follwing:
 1. project name: pfcpi.
 2. choose react.
 3. select NO.
