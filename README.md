@@ -34,7 +34,7 @@ npm run dev
 ```
 
 Build your app!
-NOTE: make sure to run VSCODE as an administrator
+- NOTE: make sure to run VSCODE as an administrator
 
 ```Bash
 npm run build:win
