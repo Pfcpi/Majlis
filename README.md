@@ -1,5 +1,17 @@
 # Electron-vite
 
+## Prerequisites: 
+- make sure that node and npm are installed by running the following commands
+
+```Bash
+node -v
+npm -v
+```
+
+NOTE: install them if they are not installed.
+
+## Create the Setup
+
 To create a setup for our electron application use the following:
 
 ```Bash
