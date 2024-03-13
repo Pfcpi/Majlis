@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Application de gestion des étudiants traduits en conseil de discipline du département d'informatique.",
   "main": "./out/main/index.js",
-  "author": "Badache Radi, Abdelmoumene Mouhcine, Aboura Yacine, Salah Oussam, Madjor Amir, Bennabi Mohammed",
+  "author": "Badache Radi, Abdelmoumene Mouhcine, Aboura Yacine, Salah Oussam, Madjour Amir, Bennabi Mohammed",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
@@ -44,6 +44,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwindcss": "^3.4.1",
+    "electron-vite": "^2.0.0",
     "vite": "^5.0.12"
   }
 }
