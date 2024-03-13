@@ -28,4 +28,4 @@ NOTE: make sure to run VSCODE as an administrator
 npm run build:win
 ```
 
-Congratulations
+🎉 :tada: 
