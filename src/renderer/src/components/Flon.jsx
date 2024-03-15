@@ -3,9 +3,11 @@ import './components_css/comp.css'
 
 function Flon() {
   return (
-    <label class="switch">
+    <label className="toggle">
       <input type="checkbox" />
-      <span class="slider round"></span>
+      <div className="slider">
+        <div className="ball"></div>
+      </div>
     </label>
   )
 }

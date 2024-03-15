@@ -1,62 +1,91 @@
-/* The switch - the box around the slider */
-.switch {
+:root {
+  --animation-duration: 0.5s;
+  --border-radius-toggle: 17px;
+  --grey-color: grey;
+  --white-color: white;
+  --margin-ultra-small: 2px;
+}
+
+.toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.toggle input {
   position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {
   opacity: 0;
-  width: 0;
   height: 0;
+  width: 0;
 }
 
-/* The slider */
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+  height: 34px;
+  width: 80px;
+  background-color: var(--grey-color);
+  border-top-left-radius: var(--border-radius-toggle);
+  border-top-right-radius: var(--border-radius-toggle);
+  border-bottom-left-radius: var(--border-radius-toggle);
+  border-bottom-right-radius: var(--border-radius-toggle);
+  display: flex;
+  align-items: center;
 }
 
-.slider:before {
+.ball {
   position: absolute;
-  content: "";
-  height: 26px;
   width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+  height: 26px;
+  margin-left: var(--margin-ultra-small);
+  background-color: var(--white-color);
+  border-radius: 100%;
+  transition: var(--animation-duration);
+  animation: flon-reverse var(--animation-duration) forwards;
 }
 
-input:checked + .slider {
-  background-color: #2196F3;
+input:checked + .slider > .ball {
+  transition: var(--animation-duration);
+  animation: flon var(--animation-duration) forwards;
 }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+@keyframes flon-reverse {
+  0% {
+    transform: translateX(48px);
+    width: 26px;
+    height: 26px;
+  }
+  30% {
+    width: 38px;
+    height: 22px;
+  }
+  60% {
+    width: 18px;
+    height: 29px;
+    transform: translateX(1px);
+  }
+  100% {
+    width: 26px;
+    height: 26px;
+    transform: translateX(2px);
+  }
 }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
+@keyframes flon {
+  0% {
+    transform: translateX(2px);
+    width: 26px;
+    height: 26px;
+  }
+  30% {
+    width: 38px;
+    height: 22px;
+  }
+  78% {
+    width: 18px;
+    height: 29px;
+    transform: translateX(56px);
+  }
+  100% {
+    width: 26px;
+    height: 26px;
+    transform: translateX(48px);
+  }
 }
