@@ -1,4 +1,5 @@
 import Versions from './components/Versions'
+import Flon from './components/Flon'
 import electronLogo from './assets/electron.svg'
 
 function App() {
@@ -26,10 +27,10 @@ function App() {
           </a>
         </div>
       </div>
+      <Flon/>
       <Versions></Versions>
     </>
   )
 }
 
 export default App
-
