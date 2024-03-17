@@ -1,4 +1,6 @@
+import "./sidebar_componentscss.css"
+
 function ConseilDiscipline() {
-  return <h1>ConseilDiscipline</h1>
+  return <h1 className="section">ConseilDiscipline</h1>
 }
 export default ConseilDiscipline 

@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .link_btn_dark {
+    @apply  text-white bg-[#ddeff423];
+  }
+  .link_btn {
+    @apply h-10 w-[214px] rounded-[10px] font-normal text-[18px] flex items-center pl-[9px] font-poppins;
+  }
+  .link_btn > img {
+    @apply pr-[15px];
+  }
+}
