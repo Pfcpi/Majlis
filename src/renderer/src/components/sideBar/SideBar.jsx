@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import Home from "./Home"
-import ConseilDiscipline from "./ConseilDiscipline"
-import AjouterDossier from "./AjouterDossier"
-import Administration from "./Administration"
-import Planning from "./Planning"
-import Recours from "./Recours"
-import Documentation from "./Documentation"
+import Home from "./sidebar_components/Home"
+import ConseilDiscipline from "./sidebar_components/ConseilDiscipline"
+import AjouterDossier from "./sidebar_components/AjouterDossier"
+import Administration from "./sidebar_components/Administration"
+import Planning from "./sidebar_components/Planning"
+import Recours from "./sidebar_components/Recours"
+import Documentation from "./sidebar_components/Documentation"
 
 function SideBar() {
   return (
@@ -20,8 +20,8 @@ function SideBar() {
         <Route path="/Recours" element={<Recours/>} />
         <Route path="/Documentation" element={<Documentation/>} />
       </Routes>
-      <div className='flex flex-col'>
-        <Link to="/" >Home</Link> 
+      <div className='flex flex-col dark:bg-[#111111]'>
+        <Link to="/">Home</Link> 
         <Link to="/ConseilDiscipline">Conseil Discipline</Link>
         <Link to="/AjouterDossier">Ajouter Dossier</Link>
         <Link to="/Administration">Administration</Link>
