@@ -1,4 +1,6 @@
+import "./sidebar_componentscss.css"
+
 function Recours() {
-  return <h1>Recours</h1>
+  return <h1 className="section">Recours</h1>
 }
 export default Recours 

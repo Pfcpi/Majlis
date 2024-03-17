@@ -3,7 +3,12 @@
 @tailwind utilities;
 
 @layer components {
+<<<<<<< HEAD
   .link_button_not_clicked {
+=======
+  .link_btn_dark {
+<<<<<<< HEAD
+>>>>>>> 3f02c4e (Create Side Bar and Router)
     @apply  text-white;
   }
   .link_button_not_clicked path{
@@ -11,6 +16,9 @@
   }
   .link_btn {
     @apply h-10 w-5/6 rounded-[10px] border border-transparent text-[18px] flex items-center pl-[9px] font-poppins font-medium;
+  }
+  .link_btn {
+    @apply h-10 w-[214px] rounded-[10px] font-normal text-[18px] flex items-center pl-[9px] font-poppins;
   }
   .link_btn > img {
     @apply pr-[15px];
