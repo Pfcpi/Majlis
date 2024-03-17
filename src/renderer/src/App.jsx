@@ -1,6 +1,4 @@
-import Versions from './components/Versions'
 import Flon from './components/Flon'
-import electronLogo from './assets/electron.svg'
 import "./index.css" 
 
 function App() {
