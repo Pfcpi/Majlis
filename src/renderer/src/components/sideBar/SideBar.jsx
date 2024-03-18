@@ -48,7 +48,7 @@ import PlanningSVG from './../../assets/Planning.svg'
 import RecoursSVG from './../../assets/Recours.svg'
 import DocumentationSVG from './../../assets/Documentation.svg'
 
-import "./SideBarcss.css"
+import './SideBarcss.css'
 
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
