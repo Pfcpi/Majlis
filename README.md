@@ -67,5 +67,5 @@ git pull
 and then install all dependencies if any
 
 ```Bash
-$ npm install
+npm install
 ```
