@@ -4,6 +4,6 @@
 
 @layer components {
   .section {
-    @apply inline-block absolute left-[244px] top-[44px];
+    @apply block;
   }
 }

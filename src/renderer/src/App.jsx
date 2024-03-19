@@ -5,11 +5,9 @@ import './index.css'
 
 function App() {
   return (
-    <div className="flex h-screen w-screen relative">
+    <div className="flex flex-col h-screen w-screen relative">
+      <NavBar></NavBar>
       <SideBar></SideBar>
-      <div className="flex flex-col h-full w-full relative">
-        <NavBar></NavBar>
-      </div>
     </div>
   )
 }

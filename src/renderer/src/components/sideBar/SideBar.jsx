@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import Home from './sidebar_components/Home'
 import ConseilDiscipline from './sidebar_components/ConseilDiscipline'
@@ -20,19 +20,10 @@ import './SideBarcss.css'
 
 function SideBar() {
   return (
-    <div className="w-[244px] h-full shrink-0">
+    <div className="flex h-full w-full">
       <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/ConseilDiscipline" element={<ConseilDiscipline />} />
-          <Route path="/AjouterDossier" element={<AjouterDossier />} />
-          <Route path="/Administration" element={<Administration />} />
-          <Route path="/Planning" element={<Planning />} />
-          <Route path="/Recours" element={<Recours />} />
-          <Route path="/Documentation" element={<Documentation />} />
-        </Routes>
-        <div className="flex flex-col w-full h-full pt-[120px] gap-[200px] justify-start items-center dark:bg-[#111111]">
-          <div className='flex flex-col w-full h-fit justify-center items-center gap-5'>
+        <div className="flex flex-col shrink-0 w-[244px] h-full pt-[120px] gap-[200px] justify-start items-center dark:bg-[#111111]">
+          <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
             <Link className="link_btn dark:link_btn_dark" to="/">
               Home
             </Link>
@@ -55,6 +46,17 @@ function SideBar() {
           <Link className="link_btn dark:link_btn_dark" to="/Documentation">
             <img src={DocumentationSVG}></img>Documentation
           </Link>
+        </div>
+        <div className="grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/ConseilDiscipline" element={<ConseilDiscipline />} />
+            <Route path="/AjouterDossier" element={<AjouterDossier />} />
+            <Route path="/Administration" element={<Administration />} />
+            <Route path="/Planning" element={<Planning />} />
+            <Route path="/Recours" element={<Recours />} />
+            <Route path="/Documentation" element={<Documentation />} />
+          </Routes>
         </div>
       </Router>
     </div>
