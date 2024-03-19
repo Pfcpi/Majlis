@@ -3,12 +3,7 @@
 @tailwind utilities;
 
 @layer components {
-<<<<<<< HEAD
   .link_button_not_clicked {
-=======
-  .link_btn_dark {
-<<<<<<< HEAD
->>>>>>> 3f02c4e (Create Side Bar and Router)
     @apply  text-white;
   }
   .link_button_not_clicked path{
