@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import axios from 'axios'
 
 import Home from './sidebar_components/Home'
 import ConseilDiscipline from './sidebar_components/ConseilDiscipline'
@@ -19,6 +20,13 @@ import DocumentationSVG from './../../assets/Documentation.svg'
 import './SideBarcss.css'
 
 function SideBar() {
+  useEffect(() => {
+    axios
+      .get('http://localhost:3000/')
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err))
+  }, [])
+
   return (
     <div className="flex h-full w-full">
       <Router>

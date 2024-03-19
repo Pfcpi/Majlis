@@ -55,3 +55,17 @@ npm run build:win
 ```
 
 🎉 :tada: Congratulations
+
+## When the main branch on github is ahead of the main branch on your local pc
+
+pull the latest changes to your local pc by using
+
+```Bash
+git pull
+```
+
+and then install all dependencies if any
+
+```Bash
+npm install
+```

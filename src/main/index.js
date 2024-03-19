@@ -1,6 +1,7 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
 
 function createWindow() {
@@ -49,10 +50,11 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   createWindow()
+
+  ExpressApp.listen(3000, () => {
+    console.log('Express server running on port 3000')
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
