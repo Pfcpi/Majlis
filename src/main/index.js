@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 'use strict'
 
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-=======
-import { app, shell, BrowserWindow } from 'electron'
->>>>>>> 7798ee3 (Backend connection successful)
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const ExpressApp = require('../../Backend/ExpressApp.js')
