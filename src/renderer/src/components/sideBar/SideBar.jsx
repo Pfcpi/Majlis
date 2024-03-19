@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react'
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import axios from 'axios'
+=======
+import { useState } from 'react'
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
+>>>>>>> a81e8d2 (Update Route to HashRouter)
 
 import Accueil from './sidebar_components/Accueil'
 import Commission from './sidebar_components/Commission'
