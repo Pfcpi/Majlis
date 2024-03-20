@@ -69,3 +69,15 @@ and then install all dependencies if any
 ```Bash
 npm install
 ```
+
+## Just starting off..
+
+clone the repo into your local pc
+```Bash
+git clone https://github.com/Pfcpi/prepaproject.git 
+```
+
+install dependencies
+```Bash
+npm install
+```
