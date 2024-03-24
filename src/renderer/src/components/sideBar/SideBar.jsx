@@ -45,7 +45,7 @@ import ConseilDisciplineSVG from './../../assets/ConseilDiscipline.svg'
 import AjouterDossierSVG from './../../assets/AjouterDossier.svg'
 import AdministrationSVG from './../../assets/Administration.svg'
 import PlanningSVG from './../../assets/Planning.svg'
-import RecoursSVG from './../../assets/Recours.svg'
+import AccueilSVG from './../../assets/Accueil.svg'
 import DocumentationSVG from './../../assets/Documentation.svg'
 
 import './SideBarcss.css'
