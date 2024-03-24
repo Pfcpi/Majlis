@@ -4,6 +4,6 @@
 
 @layer components {
   .section {
-    @apply block;
+    @apply block text-white font-poppins;
   }
 }
