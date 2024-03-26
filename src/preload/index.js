@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -18,3 +18,14 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   window.api = api
 }
+
+contextBridge.exposeInMainWorld('electronAPI', {
+ printComponent: async (url, callback) => {
+  let response = await ipcRenderer.invoke('printComponent', url);
+  callback(response);
+ },
+ previewComponent: async (url, callback) => {
+    let response = await ipcRenderer.invoke("previewComponent", url);
+    callback(response);
+  },
+});

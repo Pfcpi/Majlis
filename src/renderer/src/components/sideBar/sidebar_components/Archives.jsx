@@ -1,6 +1,5 @@
 import { useState, useRef, Component } from 'react'
 import { useReactToPrint } from 'react-to-print'
-import { electronAPI } from '@electron-toolkit/preload'
 
 import './sidebar_com_css/archives.css'
 
@@ -17,7 +16,7 @@ function Archives() {
   //false for rapport, true for Dossier
   const [rapportdossier, setRapportDossier] = useState(false)
   const ref = useRef(null)
-  const printComponent = useRef()
+  const printComponent = useRef(null)
   function handleRowChecked() {
     var label = ref.current
     label.click()
@@ -27,14 +26,27 @@ function Archives() {
     return new Promise(() => {
       console.log('forwarding print request to the main process...')
 
-      // convert the iframe into data url
-      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
       let data = printComponent.current
-      //console.log(data);
+      console.log(data)
       var blob = new Blob([data], { type: 'text/html' })
       var url = URL.createObjectURL(blob)
 
       window.electronAPI.printComponent(url, (response) => {
+        console.log('Main: ', response)
+      })
+    })
+  }
+
+  const handlePreview = () => {
+    return new Promise(() => {
+      console.log('forwarding print preview request...')
+
+      const data = printComponent.current
+      console.log(data);
+      const blob = new Blob([data], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+
+      window.electronAPI.previewComponent(url, (response) => {
         console.log('Main: ', response)
       })
     })
@@ -74,7 +86,7 @@ function Archives() {
                 <img src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
               </div>
             </button>
-            <button className="text-blue">
+            <button onClick={handlePreview} className="text-blue">
               <div className="deletePdfImprimer">
                 <img src={PdfSVG} alt="pdf icon"></img>Enregistrer PDF
               </div>
@@ -110,7 +122,7 @@ function Archives() {
             data-rapportdossier={rapportdossier}
             className="w-1/4 data-[rapportdossier=true]:w-1/5 data-[rapportdossier=false]:border-x-[1px]"
           >
-            <div ref={printComponent}>
+            <div>
               Nom Etudiant
               <img src={UpDownSVG} alt="filter"></img>
             </div>
@@ -159,6 +171,7 @@ function Archives() {
             </label>
           </td>
           <td
+            ref={printComponent}
             data-rapportdossier={rapportdossier}
             className="data-[rapportdossier=false]:border-x-[1px]"
           >

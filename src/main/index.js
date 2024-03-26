@@ -1,4 +1,6 @@
-import { app, shell, BrowserWindow } from 'electron'
+'use strict'
+
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const ExpressApp = require('../../Backend/ExpressApp.js')
@@ -19,7 +21,7 @@ function createWindow() {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow.maximize()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -74,3 +76,65 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+//handle print
+const printOptions = {
+  silent: false,
+  printBackground: true,
+  color: true,
+  margin: {
+    marginType: 'printableArea'
+  },
+  landscape: false,
+  pagesPerSheet: 1,
+  collate: false,
+  copies: 1,
+  header: 'Page header',
+  footer: 'Page footer'
+}
+
+ipcMain.handle('printComponent', (event, url) => {
+  let win = new BrowserWindow({ show: false })
+  win.loadURL(url)
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.print(printOptions, (success, failureReason) => {
+      console.log('Print Initiated in Main...')
+      if (!success) console.log(failureReason)
+    })
+  })
+  return 'done with main'
+})
+
+//handle preview
+ipcMain.handle('previewComponent', async (event, url) => {
+  let win = new BrowserWindow({
+    title: 'Print Preview',
+    show: false,
+    autoHideMenuBar: true
+  })
+
+  win.webContents.once('did-finish-load', () => {
+    win.webContents
+      .printToPDF(printOptions)
+      .then((data) => {
+        const buf = Buffer.from(data)
+        data = buf.toString('base64')
+        const url = 'data:application/pdf;base64,' + data
+
+        win.webContents.on('ready-to-show', () => {
+          win.once('page-title-updated', (e) => e.preventDefault())
+          win.show()
+        })
+
+        win.webContents.on('closed', () => (win = null))
+        win.loadURL(url)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  })
+
+  await win.loadURL(url)
+  return 'shown preview window'
+})
