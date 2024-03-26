@@ -23,9 +23,9 @@ function SideBar() {
   return (
     <div className="flex h-full w-full">
       <Router>
-        <div className="flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[200px] justify-start items-center dark:bg-[#111111]">
+        <div className="flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[200px] justify-start items-center dark:bg-dark-gray">
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
-            <img className="mb-[40px]" src={OutilConseilSVG} alt="Outil pour le conseil Discipline"/>
+            <img className="mb-[40px] p-0" src={OutilConseilSVG} alt="Outil pour le conseil Discipline"/>
             <Link className="link_btn dark:link_btn_dark" to="/">
               <img src={AccueilSVG}></img>
               Accueil
@@ -47,7 +47,7 @@ function SideBar() {
             <img src={DocumentationSVG}></img>Documentation
           </Link>
         </div>
-        <div className="grow bg-gray">
+        <div className="grow dark:bg-gray">
           <Routes>
             <Route path="/" element={<Accueil />} />
             <Route path="/ConseilDiscipline" element={<ConseilDiscipline />} />

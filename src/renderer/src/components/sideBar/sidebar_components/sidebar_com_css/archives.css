@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  th {
+    @apply dark:bg-dark-gray;
+  }
+  th > div {
+    @apply font-poppins flex py-4;
+  }
+  td {
+    @apply py-3;
+  }
+  div > img {
+    @apply pl-2;
+  }
+  table th,
+  table td, 
+  tr {
+    @apply pl-5 border-white/50;
+  }
+  .deletePdfImprimer {
+    @apply flex dark:bg-gray p-2 rounded-[10px] font-bold;
+  }
+  .deletePdfImprimer > img {
+    @apply pr-2;
+  }
+}
