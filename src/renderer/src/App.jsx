@@ -1,15 +1,14 @@
 import SideBar from './components/sideBar/SideBar.jsx'
 import NavBar from './components/NavBar.jsx'
 import authJPG from './assets/auth.jpg'
-import { useState, useRef } from 'react'
+import { useState} from 'react'
 
 import './index.css'
 //not completed
-//password management, continue button, changing password.
+//zustand variable
 function App() {
   const [auth, setAuth] = useState(false)
   const [account, setAccount] = useState('')
-  const pass = useRef(null)
   return (
     <div>
       {!auth && (
@@ -19,7 +18,7 @@ function App() {
             <h1 className="text-dark-gray text-[64px] font-bold">Se Connecter</h1>
             <p>Veulliez choisir une session</p>
             <button
-              className="w-3/5 py-3 border rounded-[10px]"
+              className="w-3/5 py-3 border rounded-[10px] hover:bg-blue/15"
               onClick={() => {
                 setAccount('chef')
               }}
@@ -31,7 +30,7 @@ function App() {
               Chef département
             </button>
             <button
-              className="w-3/5 py-3 border rounded-[10px]"
+              className="w-3/5 py-3 border rounded-[10px] hover:bg-blue/15"
               onClick={() => {
                 setAccount('president')
               }}
@@ -43,19 +42,10 @@ function App() {
               Président du conseil
             </button>
             <hr className="bg-light-gray w-3/5"></hr>
-            <input
-              className="w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-clear-blue placeholder:text-light-gray"
-              type="password"
-              placeholder="entrer votre mot de passe"
-              ref={pass}
-            ></input>
             <button
               className="w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white"
               onClick={() => {
-                const input = pass.current
-                if (input.value === 'password') {
-                  setAuth(true)
-                }
+                setAuth(true)
               }}
             >
               Continuer
