@@ -173,7 +173,6 @@ function Archives() {
             </label>
           </td>
           <td
-            ref={printComponent}
             data-rapportdossier={rapportdossier}
             className="data-[rapportdossier=false]:border-x-[1px]"
           >
