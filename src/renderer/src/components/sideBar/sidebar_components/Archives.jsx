@@ -12,6 +12,8 @@ import PdfSVG from './../../../assets/pdf.svg'
 import ImprimerSVG from './../../../assets/imprimer.svg'
 import SupprimerSVG from './../../../assets/supprimer.svg'
 
+//Need to modify:
+//Clicking on modify and review will enable the checkmark
 function Archives() {
   //false for rapport, true for Dossier
   const [rapportdossier, setRapportDossier] = useState(false)
@@ -25,12 +27,12 @@ function Archives() {
   const handlePrint = () => {
     return new Promise(() => {
       console.log('forwarding print request to the main process...')
-
+    
       let data = printComponent.current
       console.log(data)
       var blob = new Blob([data], { type: 'text/html' })
       var url = URL.createObjectURL(blob)
-
+    
       window.electronAPI.printComponent(url, (response) => {
         console.log('Main: ', response)
       })
@@ -53,7 +55,7 @@ function Archives() {
   }
 
   return (
-    <div className="text-white flex flex-col font-poppins">
+    <div ref={printComponent} className="text-white flex flex-col font-poppins">
       <div className="flex w-full">
         <button
           data-rapportdossier={rapportdossier}
@@ -171,7 +173,6 @@ function Archives() {
             </label>
           </td>
           <td
-            ref={printComponent}
             data-rapportdossier={rapportdossier}
             className="data-[rapportdossier=false]:border-x-[1px]"
           >

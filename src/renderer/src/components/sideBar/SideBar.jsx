@@ -20,30 +20,65 @@ import DocumentationSVG from './../../assets/Documentation.svg'
 import './SideBarcss.css'
 
 function SideBar() {
+  const [nav, setNav] = useState('Accueil')
   return (
     <div className="flex h-full w-full">
       <Router>
         <div className="flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[200px] justify-start items-center dark:bg-dark-gray">
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
-            <img className="mb-[40px] p-0" src={OutilConseilSVG} alt="Outil pour le conseil Discipline"/>
-            <Link className="link_btn dark:link_btn_dark" to="/">
+            <img
+              className="mb-[40px] p-0"
+              src={OutilConseilSVG}
+              alt="Outil pour le conseil Discipline"
+            />
+            <Link
+              className="link_btn dark:link_btn_dark"
+              to="/"
+              style={{ backgroundColor: nav === 'Accueil' ? '#2B81B8' : '' }}
+              onClick={() => {setNav('Accueil')}}
+            >
               <img src={AccueilSVG}></img>
               Accueil
             </Link>
-            <Link className="link_btn dark:link_btn_dark" to="/ConseilDiscipline">
+            <Link
+              className="link_btn dark:link_btn_dark"
+              to="/ConseilDiscipline"
+              style={{ backgroundColor: nav === 'ConseilDiscipline' ? '#2B81B8' : '' }}
+              onClick={() => {setNav('ConseilDiscipline')}}
+            >
               <img src={ConseilDisciplineSVG}></img>Conseil Discipline
             </Link>
-            <Link className="link_btn dark:link_btn_dark" to="/AjouterDossier">
+            <Link
+              className="link_btn dark:link_btn_dark"
+              to="/AjouterDossier"
+              style={{ backgroundColor: nav === 'AjouterDossier' ? '#2B81B8' : '' }}
+              onClick={() => {setNav('AjouterDossier')}}
+            >
               <img src={AjouterDossierSVG}></img>Ajouter Dossier
             </Link>
-            <Link className="link_btn dark:link_btn_dark" to="/Administration">
+            <Link
+              className="link_btn dark:link_btn_dark"
+              to="/Administration"
+              style={{ backgroundColor: nav === 'Administration' ? '#2B81B8' : '' }}
+              onClick={() => {setNav('Administration')}}
+            >
               <img src={AdministrationSVG}></img>Administration
             </Link>
-            <Link className="link_btn dark:link_btn_dark" to="/Archives">
+            <Link
+              className="link_btn dark:link_btn_dark"
+              to="/Archives"
+              style={{ backgroundColor: nav === 'Archives' ? '#2B81B8' : '' }}
+              onClick={() => {setNav('Archives')}}
+            >
               <img src={PlanningSVG}></img>Archives
             </Link>
           </div>
-          <Link className="link_btn dark:link_btn_dark" to="/Documentation">
+          <Link
+            className="link_btn dark:link_btn_dark"
+            to="/Documentation"
+            style={{ backgroundColor: nav === 'Documentation' ? '#2B81B8' : '' }}
+            onClick={() => {setNav('Documentation')}}
+          >
             <img src={DocumentationSVG}></img>Documentation
           </Link>
         </div>
