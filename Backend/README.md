@@ -64,7 +64,7 @@ app.get("/data", (req, res) => {
 - do not worry, i'll be in charge of displaying the data in the frontend.
 
 ## Summery:
-- Learn about:
+- Learn about:(mouhssin, ouss, mouhamed, Badi)
   - Restful api.
   - routing.
   - managing the database.
