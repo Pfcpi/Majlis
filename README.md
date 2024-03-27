@@ -77,6 +77,10 @@ clone the repo into your local pc
 git clone https://github.com/Pfcpi/prepaproject.git 
 ```
 
+```Bash
+cd pfcpi
+```
+
 install dependencies
 ```Bash
 npm install
