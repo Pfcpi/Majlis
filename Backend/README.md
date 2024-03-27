@@ -11,7 +11,7 @@
 
 - How to make a restfull api.
 - How to create, read, update and delete data from the database.
-- You do not need to fully understand the code written in the frontend.
+- You do not need to fully understand the frontend code.
 
 ## But how ??
 
