@@ -11,11 +11,7 @@
 
 - How to make a restfull api.
 - How to create, read, update and delete data from the database.
-<<<<<<< HEAD
 - You do not need to fully understand the frontend code.
-=======
-- You do not need to fully understand the code written in the frontend.
->>>>>>> ea142a5 (Create README.md for backend)
 
 ## But how ??
 
