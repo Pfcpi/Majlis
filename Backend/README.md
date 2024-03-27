@@ -46,15 +46,18 @@ app.listen(PORT, () => console.log(`server running on PORT ${PORT}`))
 - Defining a route for reading data
 
 ```javascript
-app.get("/data", (req, res)) {
+app.get("/data", (req, res) => {
   res.send("Your data");
-}
+})
 ```
 
-- There are several methods like, post, patch, delete...
-- "/data" can be any route like "/" , "/you", "/link"...
-
-and inside you handle the job of getting the data from the database
+- `app`is our express app.
+-  `.get` is an http method, it means read the data.
+  - There are several methods like, post, patch, delete...
+- `/data` can be any route like `/` , `/you`, `/link`...
+- `req` and `res` are the request and response object, you will get the request and you will send the back the response. 
+- `res.send("Your data")`: sending back to the client the data that he is requesting.
+  - what is inside the function is you job.
 
 ### 🚀 it is that simple
 
