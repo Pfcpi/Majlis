@@ -4,7 +4,11 @@
 
 @layer components {
   th {
+<<<<<<< HEAD
     @apply bg-side-bar-white-theme-color dark:bg-dark-gray;
+=======
+    @apply dark:bg-dark-gray;
+>>>>>>> 1f834b1 (A)
   }
   th > div {
     @apply font-poppins flex py-4;
@@ -12,13 +16,21 @@
   td {
     @apply py-3;
   }
+<<<<<<< HEAD
   .imgp  {
+=======
+  div > img {
+>>>>>>> 1f834b1 (A)
     @apply pl-2;
   }
   table th,
   table td, 
   tr {
+<<<<<<< HEAD
     @apply pl-5 border-table-border-white-theme-color dark:border-white/20;
+=======
+    @apply pl-5 border-white/50;
+>>>>>>> 1f834b1 (A)
   }
   .deletePdfImprimer {
     @apply flex dark:bg-gray p-2 rounded-[10px] font-bold;

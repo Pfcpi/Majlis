@@ -55,7 +55,7 @@ app.get("/data", (req, res) => {
 -  `.get` is an http method, it means read the data.
   - There are several methods like, post, patch, delete...
 - `/data` can be any route like `/` , `/you`, `/link`...
-- `req` and `res` are the request and response object, you will get the request and you will send the back the response. 
+- `req` and `res` are the request and response objects, you will get the request and then you'll send back the response. 
 - `res.send("Your data")`: sending back to the client the data that he is requesting.
   - what is inside the function is you job.
 
