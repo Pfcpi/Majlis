@@ -1,9 +1,23 @@
 /* eslint-disable no-unused-vars */
-const Database = require('better-sqlite3')
+const Database = require('mysql')
 
-const db = new Database('Backend/config/test.db')
+// Aws rds database login
+const db = Database.createConnection({
+  host: 'projet.c9ewe6uqqsev.eu-west-3.rds.amazonaws.com',
+  port: '3306',
+  user: 'admin',
+  password: '%pfcpiprojet%',
+  database: 'projet'
+})
 
-db.pragma('journal_mode = WAL')
+// Connect to the aws rds database
+db.connect((err) => {
+  if (err) {
+    console.log(err.message)
+    return
+  }
+  console.log('database connected')
+})
 
 // Define the SQL statement to create the table
 const createTableQuery = `
@@ -15,16 +29,16 @@ const createTableQuery = `
 `
 
 // Execute the SQL statement to create the table
-db.exec(createTableQuery)
+db.query(createTableQuery)
 
 // Function to add a user to the table "my_table"
 function InsertUser(id, name, age) {
   id = Number(id)
   name = String(name)
   age = Number(age)
-  const existingUser = db.prepare(`SELECT * FROM my_table WHERE id = ?`).get(id)
+  const existingUser = db.query(`SELECT * FROM my_table WHERE id = ?`).get(id)
   if (existingUser) return true // User already exists
-  db.prepare(`INSERT INTO my_table (id, name, age) VALUES (?, ?, ?)`).run(id, name, age)
+  db.query(`INSERT INTO my_table (id, name, age) VALUES (?, ?, ?)`).run(id, name, age)
   return false
 }
 
