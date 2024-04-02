@@ -1,6 +1,6 @@
-import './sidebar_com_css/ajouterDossier.css'
+import './sidebar_com_css/ajouterRapport.css'
 
-function AjouterDossier() {
+function AjouterRapport() {
   return (
     <div className="text-white h-full w-full flex flex-col justify-center items-center font-poppins">
       <form className="flex flex-col justify-center items-center rounded-xl dark:bg-dark-gray w-1/2">
@@ -10,7 +10,7 @@ function AjouterDossier() {
           <lable className="label_dossier">Etudiant</lable>
           <div className="flex flex-col w-full gap-6 mb-4">
             <input className="input_dossier" placeholder="Nom et prenom" required></input>
-            <input className="input_dossier" placeholder="email" type='email' required></input>
+            <input className="input_dossier" placeholder="email" type="email" required></input>
             <input className="input_dossier" placeholder="Niveau" required></input>
           </div>
           <lable className="label_dossier">Plaignant</lable>
@@ -25,10 +25,10 @@ function AjouterDossier() {
         </div>
         <hr className="w-full dark:text-gray"></hr>
         <div className="flex justify-between w-5/6 py-6">
-          <button className="button_dossier text-red-900" type='reset'>
+          <button className="button_dossier text-red-900" type="reset">
             Annuler
           </button>
-          <button className="button_dossier text-blue" type='submit'>
+          <button className="button_dossier text-blue" type="submit">
             Créer
           </button>
         </div>
@@ -36,4 +36,4 @@ function AjouterDossier() {
     </div>
   )
 }
-export default AjouterDossier
+export default AjouterRapport

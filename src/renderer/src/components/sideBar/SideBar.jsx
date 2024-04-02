@@ -3,92 +3,164 @@ import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import axios from 'axios'
 
 import Accueil from './sidebar_components/Accueil'
-import ConseilDiscipline from './sidebar_components/ConseilDiscipline'
-import AjouterDossier from './sidebar_components/AjouterDossier'
-import Administration from './sidebar_components/Administration'
-import Archives from './sidebar_components/Archives'
+import Commission from './sidebar_components/Commission'
+import AjouterRapport from './sidebar_components/AjouterRapport'
+import AjouterPV from './sidebar_components/AjouterPV'
+import Archive from './sidebar_components/Archive'
 import Documentation from './sidebar_components/Documentation'
 
-import OutilConseilSVG from './../../assets/OutilConseil.svg'
-import ConseilDisciplineSVG from './../../assets/ConseilDiscipline.svg'
-import AjouterDossierSVG from './../../assets/AjouterDossier.svg'
-import AdministrationSVG from './../../assets/Administration.svg'
-import PlanningSVG from './../../assets/Planning.svg'
 import AccueilSVG from './../../assets/Accueil.svg'
+import CommissionSVG from './../../assets/Commission.svg'
+import AjouterRapportSVG from './../../assets/AjouterRapport.svg'
+import AjouterPVSVG from './../../assets/AjouterPV.svg'
+import ArchiveSVG from './../../assets/Archive.svg'
 import DocumentationSVG from './../../assets/Documentation.svg'
+
+import AccueilBlueSVG from './../../assets/BlueSvgs/AccueilBlue.svg'
+import CommissionBlueSVG from './../../assets/BlueSvgs/CommissionBlue.svg'
+import AjouterRapportBlueSVG from './../../assets/BlueSvgs/AjouterRapportBlue.svg'
+import AjouterPVBlueSVG from './../../assets/BlueSvgs/AjouterPVBlue.svg'
+import ArchiveBlueSVG from './../../assets/BlueSvgs/ArchiveBlue.svg'
+import DocumentationBlueSVG from './../../assets/BlueSvgs/DocumentationBlue.svg'
+
+import USTOLogo from './../../assets/USTO-MB_logo2.svg'
+import ConseilDisciplineText from './../../assets/ConseilDisciplineText.svg'
+import ConseilDisciplineTextWhite from './../../assets/ConseilDisciplineTextWhite.svg'
 
 import './SideBarcss.css'
 
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
+  const [cliped, setCliped] = useState(false)
+  const [darkmode, setDarkmode] = useState(document.documentElement.classList.contains('dark'))
+
   return (
     <div className="flex h-full w-full">
       <Router>
-        <div className="flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[200px] justify-start items-center dark:bg-dark-gray">
+        <div
+          className={
+            cliped
+              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[10%] justify-start items-center dark:bg-dark-gray'
+              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[10%] justify-start items-center dark:bg-dark-gray'
+          }
+        >
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
-            <img
-              className="mb-[40px] p-0"
-              src={OutilConseilSVG}
-              alt="Outil pour le conseil Discipline"
-            />
+            <div
+              className="flex mb-10 w-full justify-evenly px-6"
+              onClick={() => {
+                setCliped((prev) => !prev)
+                console.log(document.documentElement.classList.contains('dark'))
+              }}
+            >
+              {!cliped && darkmode && (
+                <img className="w-1/2 bg-blue" src={ConseilDisciplineTextWhite}></img>
+              )}
+              <img
+                data-cliped={cliped}
+                className="p-0 w-1/3 aspect-square data-[cliped=true]:w-full"
+                src={USTOLogo}
+                alt="Outil pour le conseil Discipline"
+              />
+            </div>
             <Link
-              className="link_btn dark:link_btn_dark"
+              data-cliped={cliped}
+              className={
+                nav === 'Accueil'
+                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+              }
               to="/"
-              style={{ backgroundColor: nav === 'Accueil' ? '#2B81B8' : '' }}
-              onClick={() => {setNav('Accueil')}}
+              onClick={(e) => {
+                setNav('Accueil')
+              }}
             >
-              <img src={AccueilSVG}></img>
-              Accueil
+              <img src={nav === 'Accueil' ? AccueilBlueSVG : AccueilSVG}></img>
+              {!cliped && <p>Accueil</p>}
             </Link>
             <Link
-              className="link_btn dark:link_btn_dark"
-              to="/ConseilDiscipline"
-              style={{ backgroundColor: nav === 'ConseilDiscipline' ? '#2B81B8' : '' }}
-              onClick={() => {setNav('ConseilDiscipline')}}
+              data-cliped={cliped}
+              className={
+                nav === 'Commission'
+                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+              }
+              to="/Commission"
+              onClick={() => {
+                setNav('Commission')
+              }}
             >
-              <img src={ConseilDisciplineSVG}></img>Conseil Discipline
+              <img src={nav === 'Commission' ? CommissionBlueSVG : CommissionSVG}></img>
+              {!cliped && <p>Commission</p>}
             </Link>
             <Link
-              className="link_btn dark:link_btn_dark"
-              to="/AjouterDossier"
-              style={{ backgroundColor: nav === 'AjouterDossier' ? '#2B81B8' : '' }}
-              onClick={() => {setNav('AjouterDossier')}}
+              data-cliped={cliped}
+              className={
+                nav === 'AjouterRapport'
+                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+              }
+              to="/AjouterRapport"
+              onClick={() => {
+                setNav('AjouterRapport')
+              }}
             >
-              <img src={AjouterDossierSVG}></img>Ajouter Dossier
+              <img src={nav === 'AjouterRapport' ? AjouterRapportBlueSVG : AjouterRapportSVG}></img>
+              {!cliped && <p>Ajouter Rapport</p>}
             </Link>
             <Link
-              className="link_btn dark:link_btn_dark"
-              to="/Administration"
-              style={{ backgroundColor: nav === 'Administration' ? '#2B81B8' : '' }}
-              onClick={() => {setNav('Administration')}}
+              data-cliped={cliped}
+              className={
+                nav === 'AjouterPV'
+                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+              }
+              to="/AjouterPV"
+              onClick={() => {
+                setNav('AjouterPV')
+              }}
             >
-              <img src={AdministrationSVG}></img>Administration
+              <img src={nav === 'AjouterPV' ? AjouterPVBlueSVG : AjouterPVSVG}></img>
+              {!cliped && <p>Ajouter PV</p>}
             </Link>
             <Link
-              className="link_btn dark:link_btn_dark"
-              to="/Archives"
-              style={{ backgroundColor: nav === 'Archives' ? '#2B81B8' : '' }}
-              onClick={() => {setNav('Archives')}}
+              data-cliped={cliped}
+              className={
+                nav === 'Archive'
+                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+              }
+              to="/Archive"
+              onClick={() => {
+                setNav('Archive')
+              }}
             >
-              <img src={PlanningSVG}></img>Archives
+              <img src={nav === 'Archive' ? ArchiveBlueSVG : ArchiveSVG}></img>
+              {!cliped && <p>Archive</p>}
             </Link>
           </div>
           <Link
-            className="link_btn dark:link_btn_dark"
+            data-cliped={cliped}
+            className={
+              nav === 'Documentation'
+                ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+            }
             to="/Documentation"
-            style={{ backgroundColor: nav === 'Documentation' ? '#2B81B8' : '' }}
-            onClick={() => {setNav('Documentation')}}
+            onClick={() => {
+              setNav('Documentation')
+            }}
           >
-            <img src={DocumentationSVG}></img>Documentation
+            <img src={nav === 'Documentation' ? DocumentationBlueSVG : DocumentationSVG}></img>
+            {!cliped && <p>Documentation</p>}
           </Link>
         </div>
         <div className="grow dark:bg-gray">
           <Routes>
             <Route path="/" element={<Accueil />} />
-            <Route path="/ConseilDiscipline" element={<ConseilDiscipline />} />
-            <Route path="/AjouterDossier" element={<AjouterDossier />} />
-            <Route path="/Administration" element={<Administration />} />
-            <Route path="/Archives" element={<Archives />} />
+            <Route path="/Commission" element={<Commission />} />
+            <Route path="/AjouterRapport" element={<AjouterRapport />} />
+            <Route path="/AjouterPV" element={<AjouterPV />} />
+            <Route path="/Archive" element={<Archive />} />
             <Route path="/Documentation" element={<Documentation />} />
           </Routes>
         </div>

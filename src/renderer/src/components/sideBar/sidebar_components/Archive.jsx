@@ -14,7 +14,7 @@ import SupprimerSVG from './../../../assets/supprimer.svg'
 
 //Need to modify:
 //Clicking on modify and review will enable the checkmark
-function Archives() {
+function Archive() {
   //false for rapport, true for Dossier
   const [rapportdossier, setRapportDossier] = useState(false)
   const ref = useRef(null)
@@ -76,7 +76,7 @@ function Archives() {
         <div className="flex px-12 justify-between h-16 items-center dark:bg-dark-gray">
           <button className="text-blue">Tout</button>
           <button className="flex bg-blue px-2 py-1 rounded-lg">
-            <img src={SearchSVG} alt="Search icon"></img>Rapport
+            <img className="imgp" src={SearchSVG} alt="Search icon"></img>Rapport
           </button>
         </div>
       )}
@@ -85,22 +85,22 @@ function Archives() {
           <div className="w-1/2 flex justify-between">
             <button onClick={handlePrint} className="text-blue">
               <div className="deletePdfImprimer">
-                <img src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
+                <img className="imgp" src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
               </div>
             </button>
             <button onClick={handlePreview} className="text-blue">
               <div className="deletePdfImprimer">
-                <img src={PdfSVG} alt="pdf icon"></img>Enregistrer PDF
+                <img className="imgp" src={PdfSVG} alt="pdf icon"></img>Enregistrer PDF
               </div>
             </button>
             <button className="text-pink">
               <div className="deletePdfImprimer bg-brown">
-                <img src={SupprimerSVG} alt="supprimer icon"></img>Supprimer
+                <img className="imgp" src={SupprimerSVG} alt="supprimer icon"></img>Supprimer
               </div>
             </button>
           </div>
           <div className="flex has-[:focus]:border-blue border dark:border-gray dark:bg-gray rounded-[10px]">
-            <img className="*:fill-blue" src={BlueSearchSVG} alt="search icon"></img>
+            <img className="*:fill-blue imgp" src={BlueSearchSVG} alt="search icon"></img>
             <input
               className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
               aria-label="search input"
@@ -117,7 +117,7 @@ function Archives() {
           >
             <div>
               Rapport
-              <img src={UpDownSVG} alt="filter"></img>
+              <img className="imgp" src={UpDownSVG} alt="filter"></img>
             </div>
           </th>
           <th
@@ -126,7 +126,7 @@ function Archives() {
           >
             <div>
               Nom Etudiant
-              <img src={UpDownSVG} alt="filter"></img>
+              <img className="imgp" src={UpDownSVG} alt="filter"></img>
             </div>
           </th>
           <th
@@ -135,7 +135,7 @@ function Archives() {
           >
             <div>
               Date de l'infraction
-              <img src={UpDownSVG} alt="filter"></img>
+              <img className="imgp" src={UpDownSVG} alt="filter"></img>
             </div>
           </th>
           {!rapportdossier && (
@@ -146,14 +146,14 @@ function Archives() {
           {rapportdossier && (
             <th className="w-1/5">
               <div>
-                Date de Conseil<img src={UpDownSVG} alt="filter"></img>
+                Date de Conseil<img className='imgp' src={UpDownSVG} alt="filter"></img>
               </div>
             </th>
           )}
           {rapportdossier && (
             <th className="w-1/5">
               <div>
-                Sanction<img src={UpDownSVG} alt="filter"></img>
+                Sanction<img className="imgp" src={UpDownSVG} alt="filter"></img>
               </div>
             </th>
           )}
@@ -201,4 +201,4 @@ function Archives() {
     </div>
   )
 }
-export default Archives
+export default Archive

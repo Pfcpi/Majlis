@@ -36,7 +36,9 @@ function DarkLightTheme() {
           <div className="ball"></div>
         </div>
       </label>
-      <button onClick={SysPrefrence}>System prefrence</button>
+      <button className="dark:text-white" onClick={SysPrefrence}>
+        System
+      </button>
     </>
   )
 }

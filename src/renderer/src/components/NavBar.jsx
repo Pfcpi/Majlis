@@ -3,6 +3,8 @@ import BulbSVG from '../assets/BulbOutlined.svg'
 import SettingSVG from '../assets/SettingOutlined.svg'
 import SearchSVG from "../assets/Search.svg"
 
+import DarkLightTheme from "../components/DarkLightTheme/DarkLightTheme"
+
 function NavBar() {
   return (
     <div className="h-[44px] w-full flex items-center justify-between bg-[#333333] px-5">
@@ -12,6 +14,7 @@ function NavBar() {
         <img src={BellSVG}></img>
         <img src={BulbSVG}></img>
         <img src={SettingSVG}></img>
+        <DarkLightTheme></DarkLightTheme>
       </div>
     </div>
   )

@@ -12,7 +12,7 @@
   td {
     @apply py-3;
   }
-  div > img {
+  .imgp  {
     @apply pl-2;
   }
   table th,

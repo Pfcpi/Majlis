@@ -13,6 +13,7 @@ export default {
         blue: '#2B81B8',
         gray: '#242529',
         "light-blue": "rgba(15, 68, 102, 0.78)",
+        "0.08-blue":"rgba(51, 160, 231, 0.08)"
       },
     },
     fontFamily: {
