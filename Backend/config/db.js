@@ -2,21 +2,22 @@
 const Database = require('mysql')
 
 // Aws rds database login
-const db = Database.createConnection({
+const connection = Database.createConnection({
   host: 'projet.c9ewe6uqqsev.eu-west-3.rds.amazonaws.com',
   port: '3306',
   user: 'admin',
-  password: '%pfcpiprojet%',
-  database: 'db'
+  password: 'pfcpiprojet',
+  database: 'projet'
 })
 
 // Connect to the aws rds database
-db.connect((err) => {
+connection.connect((err) => {
   if (err) {
-    console.log(err.message)
+    console.error('Error connecting to MySQL RDS: ' + err.message)
+    console.error(err.stack)
     return
   }
-  console.log('database connected')
+  console.log('Connected to MySQL RDS as ID ' + connection.threadId)
 })
 
-module.exports = { db }
+module.exports = { connection }
