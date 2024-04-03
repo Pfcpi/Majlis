@@ -2,7 +2,6 @@ import SideBar from './components/sideBar/SideBar.jsx'
 import NavBar from './components/NavBar.jsx'
 import authJPG from './assets/auth.jpg'
 import USTOLogo from './assets/USTO-MB_logo2.svg'
-import ConseilDisciplineText from './assets/ConseilDisciplineText.svg'
 import { useState } from 'react'
 
 import './index.css'
@@ -17,9 +16,9 @@ function App() {
         <div className="flex h-full w-full font-poppins text-[24px]">
           <img className="w-1/2 p-0 max-h-[100vh] object-cover" src={authJPG}></img>
           <div className="flex flex-col relative w-1/2 items-center justify-center gap-3 text-light-gray">
-            <div className="absolute flex top-4 w-full justify-between px-6">
+            <div className="absolute flex top-4 w-full justify-between items-center px-6">
               <img className="w-20 aspect-square" src={USTOLogo}></img>
-              <img className="w-30 h-24" src={ConseilDisciplineText}></img>
+              <p className='font-cutive w-36 text-center'>Conseil Descipline</p>
             </div>
             <h1 className="text-dark-gray text-[64px] font-bold">Se Connecter</h1>
             <p>Veulliez choisir une session</p>

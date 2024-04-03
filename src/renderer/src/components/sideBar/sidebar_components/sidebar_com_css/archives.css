@@ -18,7 +18,7 @@
   table th,
   table td, 
   tr {
-    @apply pl-5 border-white/50;
+    @apply pl-5 border-white/20;
   }
   .deletePdfImprimer {
     @apply flex dark:bg-gray p-2 rounded-[10px] font-bold;

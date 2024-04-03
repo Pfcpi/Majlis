@@ -17,7 +17,8 @@ export default {
       },
     },
     fontFamily: {
-      poppins: ['Poppins', 'sans-serif']
+      poppins: ['Poppins', 'sans-serif'],
+      cutive: ['Cutive', 'sans-serif']
     },
   },
   plugins: []

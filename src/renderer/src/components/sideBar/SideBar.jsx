@@ -24,15 +24,12 @@ import ArchiveBlueSVG from './../../assets/BlueSvgs/ArchiveBlue.svg'
 import DocumentationBlueSVG from './../../assets/BlueSvgs/DocumentationBlue.svg'
 
 import USTOLogo from './../../assets/USTO-MB_logo2.svg'
-import ConseilDisciplineText from './../../assets/ConseilDisciplineText.svg'
-import ConseilDisciplineTextWhite from './../../assets/ConseilDisciplineTextWhite.svg'
 
 import './SideBarcss.css'
 
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
   const [cliped, setCliped] = useState(false)
-  const [darkmode, setDarkmode] = useState(document.documentElement.classList.contains('dark'))
 
   return (
     <div className="flex h-full w-full">
@@ -46,15 +43,12 @@ function SideBar() {
         >
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
             <div
-              className="flex mb-10 w-full justify-evenly px-6"
+              className="flex mb-10 w-full justify-evenly px-6 items-center"
               onClick={() => {
                 setCliped((prev) => !prev)
-                console.log(document.documentElement.classList.contains('dark'))
               }}
             >
-              {!cliped && darkmode && (
-                <img className="w-1/2 bg-blue" src={ConseilDisciplineTextWhite}></img>
-              )}
+              <p className="font-cutive w-36 dark:text-white text-center">Conseil Descipline</p>
               <img
                 data-cliped={cliped}
                 className="p-0 w-1/3 aspect-square data-[cliped=true]:w-full"
