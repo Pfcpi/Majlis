@@ -2,13 +2,14 @@ import SideBar from './components/sideBar/SideBar.jsx'
 import NavBar from './components/NavBar.jsx'
 import authJPG from './assets/auth.jpg'
 import USTOLogo from './assets/USTO-MB_logo2.svg'
+import useAuth from './zustand/auth.js'
 import { useState } from 'react'
 
 import './index.css'
 //not completed
 //zustand variable
 function App() {
-  const [auth, setAuth] = useState(false)
+  const { auth, authentificate, logOut } = useAuth()
   const [account, setAccount] = useState('')
   return (
     <div>
@@ -18,7 +19,7 @@ function App() {
           <div className="flex flex-col relative w-1/2 items-center justify-center gap-3 text-light-gray">
             <div className="absolute flex top-4 w-full justify-between items-center px-6">
               <img className="w-20 aspect-square" src={USTOLogo}></img>
-              <p className='font-cutive w-36 text-center'>Conseil Descipline</p>
+              <p className="font-cutive w-36 text-center">Conseil Descipline</p>
             </div>
             <h1 className="text-dark-gray text-[64px] font-bold">Se Connecter</h1>
             <p>Veulliez choisir une session</p>
@@ -50,7 +51,7 @@ function App() {
             <button
               className="w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white"
               onClick={() => {
-                setAuth(true)
+                authentificate()
               }}
             >
               Continuer
@@ -59,7 +60,7 @@ function App() {
         </div>
       )}
       {auth && (
-        <div className="flex flex-col h-screen w-screen relative">
+        <div className="flex flex-col h-screen w-screen relative text-primary-white-theme-text-color dark:text-white">
           <NavBar></NavBar>
           <SideBar></SideBar>
         </div>

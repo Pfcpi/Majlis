@@ -1,27 +1,20 @@
 import { useState } from 'react'
-import './comp.css'
+import useDark from '../../zustand/dark'
+
+import MoonSVG from './../../assets/moon.svg'
+import SunSVG from './../../assets/sun.svg'
 
 function DarkLightTheme() {
-  function DarkLight(e) {
-    if (e.target.checked === false) {
+  const { dark, toggleTheme } = useDark()
+
+  function DarkLight() {
+    if (dark == false) {
       localStorage.theme = 'light'
     } else {
       localStorage.theme = 'dark'
     }
 
-    if (
-      localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }
-
-  function SysPrefrence() {
-    localStorage.removeItem('theme')
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (localStorage.theme === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
@@ -29,17 +22,15 @@ function DarkLightTheme() {
   }
 
   return (
-    <>
-      <label className="toggle">
-        <input type="checkbox" onChange={DarkLight} />
-        <div className="slider">
-          <div className="ball"></div>
-        </div>
-      </label>
-      <button className="dark:text-white" onClick={SysPrefrence}>
-        System
-      </button>
-    </>
+    <button
+      onClick={() => {
+        toggleTheme()
+        DarkLight()
+      }}
+      className="w-7 p-1 rounded-md aspect-square flex items-center justify-center border border-blue"
+    >
+      <img src={dark ? SunSVG : MoonSVG}></img>
+    </button>
   )
 }
 export default DarkLightTheme

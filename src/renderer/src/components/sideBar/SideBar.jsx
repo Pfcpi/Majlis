@@ -15,6 +15,7 @@ import AjouterRapportSVG from './../../assets/AjouterRapport.svg'
 import AjouterPVSVG from './../../assets/AjouterPV.svg'
 import ArchiveSVG from './../../assets/Archive.svg'
 import DocumentationSVG from './../../assets/Documentation.svg'
+import LogOutSVG from './../../assets/LogOut.svg'
 
 import AccueilBlueSVG from './../../assets/BlueSvgs/AccueilBlue.svg'
 import CommissionBlueSVG from './../../assets/BlueSvgs/CommissionBlue.svg'
@@ -22,14 +23,19 @@ import AjouterRapportBlueSVG from './../../assets/BlueSvgs/AjouterRapportBlue.sv
 import AjouterPVBlueSVG from './../../assets/BlueSvgs/AjouterPVBlue.svg'
 import ArchiveBlueSVG from './../../assets/BlueSvgs/ArchiveBlue.svg'
 import DocumentationBlueSVG from './../../assets/BlueSvgs/DocumentationBlue.svg'
+import LogOutBlueSVG from './../../assets/BlueSvgs/LogOutBlue.svg'
 
 import USTOLogo from './../../assets/USTO-MB_logo2.svg'
+
+import useCliped from './../../zustand/cliped'
+import useAuth from '../../zustand/auth'
 
 import './SideBarcss.css'
 
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
-  const [cliped, setCliped] = useState(false)
+  const { cliped, setCliped } = useCliped()
+  const { auth, authentificate, logOut } = useAuth()
 
   return (
     <div className="flex h-full w-full">
@@ -37,18 +43,20 @@ function SideBar() {
         <div
           className={
             cliped
-              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[10%] justify-start items-center dark:bg-dark-gray'
-              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[10%] justify-start items-center dark:bg-dark-gray'
+              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[10%] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
+              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[10%] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
           }
         >
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
             <div
               className="flex mb-10 w-full justify-evenly px-6 items-center"
               onClick={() => {
-                setCliped((prev) => !prev)
+                setCliped()
               }}
             >
-              <p className="font-cutive w-36 dark:text-white text-center">Conseil Descipline</p>
+              {!cliped && (
+                <p className="font-cutive w-36 dark:text-white text-center">Conseil Descipline</p>
+              )}
               <img
                 data-cliped={cliped}
                 className="p-0 w-1/3 aspect-square data-[cliped=true]:w-full"
@@ -132,21 +140,31 @@ function SideBar() {
               {!cliped && <p>Archive</p>}
             </Link>
           </div>
-          <Link
-            data-cliped={cliped}
-            className={
-              nav === 'Documentation'
-                ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
-            }
-            to="/Documentation"
-            onClick={() => {
-              setNav('Documentation')
-            }}
-          >
-            <img src={nav === 'Documentation' ? DocumentationBlueSVG : DocumentationSVG}></img>
-            {!cliped && <p>Documentation</p>}
-          </Link>
+          <div className="w-full flex flex-col items-center gap-5">
+            <Link
+              data-cliped={cliped}
+              className={
+                nav === 'Documentation'
+                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+              }
+              to="/Documentation"
+              onClick={() => {
+                setNav('Documentation')
+              }}
+            >
+              <img src={nav === 'Documentation' ? DocumentationBlueSVG : DocumentationSVG}></img>
+              {!cliped && <p>Documentation</p>}
+            </Link>
+            <button
+              data-cliped={cliped}
+              onClick={logOut}
+              className="link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped"
+            >
+              <img src={LogOutSVG}></img>
+              {!cliped && <p>Se deconnecter</p>}
+            </button>
+          </div>
         </div>
         <div className="grow dark:bg-gray">
           <Routes>
