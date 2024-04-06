@@ -10,6 +10,7 @@ export default {
         'clear-blue': 'rgba(152, 160, 164, 0.22)',
         pink: '#FF8C8C',
         brown: '#443434',
+        red: '#FF8C8C',
         blue: '#2B81B8',
         gray: '#242529',
         'light-blue': 'rgba(15, 68, 102, 0.78)',

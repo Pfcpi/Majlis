@@ -27,12 +27,12 @@ function Archive() {
   const handlePrint = () => {
     return new Promise(() => {
       console.log('forwarding print request to the main process...')
-    
+
       let data = printComponent.current
       console.log(data)
       var blob = new Blob([data], { type: 'text/html' })
       var url = URL.createObjectURL(blob)
-    
+
       window.electronAPI.printComponent(url, (response) => {
         console.log('Main: ', response)
       })
@@ -44,7 +44,7 @@ function Archive() {
       console.log('forwarding print preview request...')
 
       const data = printComponent.current
-      console.log(data);
+      console.log(data)
       const blob = new Blob([data], { type: 'text/html' })
       const url = URL.createObjectURL(blob)
 
@@ -55,33 +55,39 @@ function Archive() {
   }
 
   return (
-    <div ref={printComponent} className="text-white flex flex-col font-poppins">
+    <div ref={printComponent} className="flex flex-col font-poppins">
       <div className="flex w-full">
         <button
           data-rapportdossier={rapportdossier}
-          className="w-1/2 text-2xl border-white/50 py-4 rounded-xl data-[rapportdossier=false]:bg-blue data-[rapportdossier=true]:border"
+          className="w-1/2 text-2xl  py-4 rounded-xl data-[rapportDossier=false]:text-blue data-[rapportdossier=false]:bg-0.08-blue data-[rapportdossier=false]:border data-[rapportdossier=false]:border-blue"
           onClick={() => setRapportDossier(false)}
         >
           Rapport
         </button>
         <button
           data-rapportdossier={rapportdossier}
-          className="w-1/2 text-2xl border-white/50 py-4 rounded-xl data-[rapportdossier=true]:bg-blue data-[rapportdossier=false]:border"
+          className="w-1/2 text-2xl py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
           onClick={() => setRapportDossier(true)}
         >
           Dossier
         </button>
       </div>
       {!rapportdossier && (
-        <div className="flex px-12 justify-between h-16 items-center dark:bg-dark-gray">
+        <div className="flex px-4 justify-between h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
           <button className="text-blue">Tout</button>
-          <button className="flex bg-blue px-2 py-1 rounded-lg">
-            <img className="imgp" src={SearchSVG} alt="Search icon"></img>Rapport
-          </button>
+          <div className="flex has-[:focus]:border-blue border dark:border-gray bg-white dark:bg-gray rounded-[10px]">
+            <img className="*:fill-blue imgp" src={BlueSearchSVG} alt="search icon"></img>
+            <input
+              className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
+              aria-label="search input"
+              type="search"
+              placeholder="Rapport"
+            ></input>
+          </div>
         </div>
       )}
       {rapportdossier && (
-        <div className="h-16 px-4 flex items-center justify-between dark:bg-dark-gray">
+        <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
           <div className="w-1/2 flex justify-between">
             <button onClick={handlePrint} className="text-blue">
               <div className="deletePdfImprimer">
@@ -99,11 +105,12 @@ function Archive() {
               </div>
             </button>
           </div>
-          <div className="flex has-[:focus]:border-blue border dark:border-gray dark:bg-gray rounded-[10px]">
+          <div className="flex has-[:focus]:border-blue border bg-white dark:border-gray dark:bg-gray rounded-[10px]">
             <img className="*:fill-blue imgp" src={BlueSearchSVG} alt="search icon"></img>
             <input
               className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
               aria-label="search input"
+              type="search"
               placeholder="Dossier"
             ></input>
           </div>
@@ -146,7 +153,7 @@ function Archive() {
           {rapportdossier && (
             <th className="w-1/5">
               <div>
-                Date de Conseil<img className='imgp' src={UpDownSVG} alt="filter"></img>
+                Date de Conseil<img className="imgp" src={UpDownSVG} alt="filter"></img>
               </div>
             </th>
           )}

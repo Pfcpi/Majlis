@@ -3,6 +3,7 @@ import NavBar from './components/NavBar.jsx'
 import authJPG from './assets/auth.jpg'
 import USTOLogo from './assets/USTO-MB_logo2.svg'
 import useAuth from './zustand/auth.js'
+import useAccount from './zustand/account.js'
 import { useState } from 'react'
 
 import './index.css'
@@ -10,7 +11,8 @@ import './index.css'
 //zustand variable
 function App() {
   const { auth, authentificate, logOut } = useAuth()
-  const [account, setAccount] = useState('')
+  const { account, setChef, setPresident } = useAccount()
+  const [Msg, setMsg] = useState()
   return (
     <div>
       {!auth && (
@@ -26,7 +28,7 @@ function App() {
             <button
               className="w-3/5 py-3 border rounded-[10px] hover:bg-blue/15"
               onClick={() => {
-                setAccount('chef')
+                setChef()
               }}
               style={{
                 borderColor: account === 'chef' ? '#2B81B8' : '',
@@ -38,7 +40,7 @@ function App() {
             <button
               className="w-3/5 py-3 border rounded-[10px] hover:bg-blue/15"
               onClick={() => {
-                setAccount('president')
+                setPresident()
               }}
               style={{
                 borderColor: account === 'president' ? '#2B81B8' : '',
@@ -51,11 +53,15 @@ function App() {
             <button
               className="w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white"
               onClick={() => {
-                authentificate()
+                if (account == 'chef' || account == 'president') {
+                  authentificate()
+                  setMsg('')
+                } else setMsg('selectionner un compte')
               }}
             >
               Continuer
             </button>
+            {Msg && <p className="text-red">{Msg}</p>}
           </div>
         </div>
       )}

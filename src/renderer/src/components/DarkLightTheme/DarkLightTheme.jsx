@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useDark from '../../zustand/dark'
 
 import MoonSVG from './../../assets/moon.svg'
@@ -8,7 +8,7 @@ function DarkLightTheme() {
   const { dark, toggleTheme } = useDark()
 
   function DarkLight() {
-    if (dark == false) {
+    if (!dark === false) {
       localStorage.theme = 'light'
     } else {
       localStorage.theme = 'dark'
@@ -29,7 +29,7 @@ function DarkLightTheme() {
       }}
       className="w-7 p-1 rounded-md aspect-square flex items-center justify-center border border-blue"
     >
-      <img src={dark ? SunSVG : MoonSVG}></img>
+      <img src={dark ? MoonSVG : SunSVG}></img>
     </button>
   )
 }

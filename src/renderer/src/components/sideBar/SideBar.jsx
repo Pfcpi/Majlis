@@ -25,10 +25,19 @@ import ArchiveBlueSVG from './../../assets/BlueSvgs/ArchiveBlue.svg'
 import DocumentationBlueSVG from './../../assets/BlueSvgs/DocumentationBlue.svg'
 import LogOutBlueSVG from './../../assets/BlueSvgs/LogOutBlue.svg'
 
+import AccueilWhiteSVG from './../../assets/BlueSvgs/AccueilWhite.svg'
+import CommissionWhiteSVG from './../../assets/BlueSvgs/CommissionWhite.svg'
+import AjouterRapportWhiteSVG from './../../assets/BlueSvgs/AjouterRapportWhite.svg'
+import AjouterPVWhiteSVG from './../../assets/BlueSvgs/AjouterPVWhite.svg'
+import ArchiveWhiteSVG from './../../assets/BlueSvgs/ArchiveWhite.svg'
+import DocumentationWhiteSVG from './../../assets/BlueSvgs/DocumentationWhite.svg'
+import LogOutWhiteSVG from './../../assets/BlueSvgs/LogOutWhite.svg'
+
 import USTOLogo from './../../assets/USTO-MB_logo2.svg'
 
 import useCliped from './../../zustand/cliped'
 import useAuth from '../../zustand/auth'
+import useDark from '../../zustand/dark'
 
 import './SideBarcss.css'
 
@@ -36,6 +45,7 @@ function SideBar() {
   const [nav, setNav] = useState('Accueil')
   const { cliped, setCliped } = useCliped()
   const { auth, authentificate, logOut } = useAuth()
+  const { dark } = useDark()
 
   return (
     <div className="flex h-full w-full">
@@ -76,7 +86,9 @@ function SideBar() {
                 setNav('Accueil')
               }}
             >
-              <img src={nav === 'Accueil' ? AccueilBlueSVG : AccueilSVG}></img>
+              <img
+                src={nav === 'Accueil' ? AccueilBlueSVG : dark ? AccueilWhiteSVG : AccueilSVG}
+              ></img>
               {!cliped && <p>Accueil</p>}
             </Link>
             <Link
@@ -91,7 +103,15 @@ function SideBar() {
                 setNav('Commission')
               }}
             >
-              <img src={nav === 'Commission' ? CommissionBlueSVG : CommissionSVG}></img>
+              <img
+                src={
+                  nav === 'Commission'
+                    ? CommissionBlueSVG
+                    : dark
+                      ? CommissionWhiteSVG
+                      : CommissionSVG
+                }
+              ></img>
               {!cliped && <p>Commission</p>}
             </Link>
             <Link
@@ -106,7 +126,15 @@ function SideBar() {
                 setNav('AjouterRapport')
               }}
             >
-              <img src={nav === 'AjouterRapport' ? AjouterRapportBlueSVG : AjouterRapportSVG}></img>
+              <img
+                src={
+                  nav === 'AjouterRapport'
+                    ? AjouterRapportBlueSVG
+                    : dark
+                      ? AjouterRapportWhiteSVG
+                      : AjouterRapportSVG
+                }
+              ></img>
               {!cliped && <p>Ajouter Rapport</p>}
             </Link>
             <Link
@@ -121,7 +149,11 @@ function SideBar() {
                 setNav('AjouterPV')
               }}
             >
-              <img src={nav === 'AjouterPV' ? AjouterPVBlueSVG : AjouterPVSVG}></img>
+              <img
+                src={
+                  nav === 'AjouterPV' ? AjouterPVBlueSVG : dark ? AjouterPVWhiteSVG : AjouterPVSVG
+                }
+              ></img>
               {!cliped && <p>Ajouter PV</p>}
             </Link>
             <Link
@@ -136,7 +168,9 @@ function SideBar() {
                 setNav('Archive')
               }}
             >
-              <img src={nav === 'Archive' ? ArchiveBlueSVG : ArchiveSVG}></img>
+              <img
+                src={nav === 'Archive' ? ArchiveBlueSVG : dark ? ArchiveWhiteSVG : ArchiveSVG}
+              ></img>
               {!cliped && <p>Archive</p>}
             </Link>
           </div>
@@ -153,7 +187,15 @@ function SideBar() {
                 setNav('Documentation')
               }}
             >
-              <img src={nav === 'Documentation' ? DocumentationBlueSVG : DocumentationSVG}></img>
+              <img
+                src={
+                  nav === 'Documentation'
+                    ? DocumentationBlueSVG
+                    : dark
+                      ? DocumentationWhiteSVG
+                      : DocumentationSVG
+                }
+              ></img>
               {!cliped && <p>Documentation</p>}
             </Link>
             <button
@@ -161,7 +203,7 @@ function SideBar() {
               onClick={logOut}
               className="link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped"
             >
-              <img src={LogOutSVG}></img>
+              <img src={dark ? LogOutWhiteSVG : LogOutSVG}></img>
               {!cliped && <p>Se deconnecter</p>}
             </button>
           </div>
