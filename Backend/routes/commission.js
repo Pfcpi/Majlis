@@ -1,21 +1,22 @@
+/* eslint-disable no-unused-vars */
 const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
 
 router.get('/getCommission', (req, res) => {
-    //placeholder
+  //placeholder
 })
 
 router.post('/addCommission', (req, res) => {
-    //placeholder
+  //placeholder
 })
 
 router.patch('/editCommission', (req, res) => {
-    //placeholder
+  //placeholder
 })
 
 router.delete('/deleteCommission', (req, res) => {
-    //placeholder
+  //placeholder
 })
 
 module.exports = router

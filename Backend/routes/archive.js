@@ -3,20 +3,30 @@ const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
 
-router.get('/getPv', (req, res) => {
+router.get('getRapportArchive', (req, res) => {
     //placeholder
 })
 
-router.patch('/editPv', (req, res) => {
+router.get('getDossierArchive', (req, res) => {
     //placeholder
 })
 
-router.get('/printPv', (req, res) => {
+router.delete('deleteDossierArchive', (req, res) => {
     //placeholder
 })
 
-router.delete('/delPv', (req, res) => {
+router.delete('deleteRapportArchive', (req, res) => {
     //placeholder
 })
+
+router.
+
+
+
+
+
+
+
+
 
 module.exports = router
