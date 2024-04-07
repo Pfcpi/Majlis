@@ -11,6 +11,7 @@ export default {
         pink: '#FF8C8C',
         brown: '#443434',
         red: '#FF8C8C',
+        "0.36-red": "rgba(255, 100, 100, 0.35)",
         blue: '#2B81B8',
         gray: '#242529',
         'light-blue': 'rgba(15, 68, 102, 0.78)',
