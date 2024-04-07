@@ -33,7 +33,7 @@ function AjouterRapport() {
           </div>
         </div>
       )}
-      <form className="flex flex-col justify-center items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray w-1/2">
+      <form className="overflow-y-auto flex flex-col justify-center items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray w-1/2 max-h-[84vh] min-w-[500px] ">
         <h1 className="text-[36px] py-4">Detail du rapport</h1>
         <hr className="w-full dark:text-gray"></hr>
         {step == 1 && (
@@ -43,7 +43,9 @@ function AjouterRapport() {
               <input className="input_dossier" placeholder="Matricule" required></input>
               <input className="input_dossier" placeholder="Nom" required></input>
               <input className="input_dossier" placeholder="Prenom" required></input>
-              <input className="input_dossier" placeholder="Niveau, Groupe et Section" required></input>
+              <input className="input_dossier" placeholder="Niveau" required></input>
+              <input className="input_dossier" placeholder="Groupe" required></input>
+              <input className="input_dossier" placeholder="Section" required></input>
             </div>
           </div>
         )}
