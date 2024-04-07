@@ -3,19 +3,23 @@ const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
 
-router.get('/getPv', (req, res) => {
+router.get('/get', (req, res) => {
     //placeholder
 })
 
-router.patch('/editPv', (req, res) => {
+router.patch('/edit', (req, res) => {
     //placeholder
 })
 
-router.get('/printPv', (req, res) => {
+router.get('/print', (req, res) => {
     //placeholder
 })
 
-router.delete('/delPv', (req, res) => {
+router.delete('/delete', (req, res) => {
+    //placeholder
+})
+
+router.get('/save', (req, res) => {
     //placeholder
 })
 

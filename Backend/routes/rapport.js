@@ -3,44 +3,34 @@ const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
 
-router.get('/getRapport', (req, res) => {
+router.get('/get', (req, res) => {
   //placeholder
 })
 
-router.get('/getRapportDetail', (req, res) => {
+router.get('/gets', (req, res) => {
   //placeholder
 })
 
-router.patch('/editRapport', (req, res) => {
-  let matriculeE = req.body.matriculeE
-  let nomE = req.body.nomE
-  let filliereE = req.body.filliereE
-  let groupeE = req.body.groupeE
-  let matriculeP = req.body.matriculeP
-  let nomP = req.body.nomP
-  let dateI = req.body.dateI
-  let lieuI = req.body.lieuI
-  let motifI = req.body.motifI
-  let descI = req.body.descI
+router.patch('/edit', (req, res) => {
+  let object = req.body
   //placeholder
 })
 
-router.delete('/deleteRapport', (req, res) => {
+router.delete('/delete', (req, res) => {
   let numR = req.body.numR
   //placeholder
 })
 
-router.post('/addRapport', (req, res) => {
-  let matriculeE = req.body.matriculeE
-  let nomE = req.body.nomE
-  let filliereE = req.body.filliereE
-  let groupeE = req.body.groupeE
-  let matriculeP = req.body.matriculeP
-  let nomP = req.body.nomP
-  let dateI = req.body.dateI
-  let lieuI = req.body.lieuI
-  let motifI = req.body.motifI
-  let descI = req.body.descI
+router.post('/add', (req, res) => {
+  let object = req.body
+  //placeholder
+})
+
+router.get('/print', (req, res) => {
+  //placeholder
+})
+
+router.get('/save', (req, res) => {
   //placeholder
 })
 

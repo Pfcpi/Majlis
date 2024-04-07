@@ -3,19 +3,19 @@ const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
 
-router.get('/getCommission', (req, res) => {
+router.get('/get', (req, res) => {
   //placeholder
 })
 
-router.post('/addCommission', (req, res) => {
+router.post('/add', (req, res) => {
   //placeholder
 })
 
-router.patch('/editCommission', (req, res) => {
+router.patch('/edit', (req, res) => {
   //placeholder
 })
 
-router.delete('/deleteCommission', (req, res) => {
+router.delete('/delete', (req, res) => {
   //placeholder
 })
 

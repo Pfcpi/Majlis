@@ -1,9 +1,9 @@
 {
   "name": "pfcpi",
   "version": "1.0.0",
-  "description": "An Electron application with React",
+  "description": "Application de gestion des étudiants traduits en conseil de discipline du département d'informatique.",
   "main": "./out/main/index.js",
-  "author": "Amir Madjour, Radhi Baddache, Ouss, Benabi Mohamed, Abora, Mouhssin",
+  "author": "Badache Radi, Abdelmoumene Mouhcine, Aboura Yacine, Salah Oussam, Madjor Amir, Bennabi Mohammed",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
