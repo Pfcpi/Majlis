@@ -25,7 +25,7 @@ function AjouterRapport() {
         <div className="absolute w-full h-full bg-[rgba(0,0,0,0.4)] top-0 left-0 z-20"></div>
       )}
       {step == 4 && (
-        <div ref={ref} className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 text-white dark:text-black bg-dark-gray dark:bg-white">
+        <div ref={ref} className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
           Confirmer la création du rapport
           <div className='flex w-full justify-between px-8'>
           <button className='flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red'>Annuler</button>
