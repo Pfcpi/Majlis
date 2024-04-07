@@ -6,6 +6,16 @@ router.get('/getCommission', (req, res) => {
     //placeholder
 })
 
-router.get('/')
+router.post('/addCommission', (req, res) => {
+    //placeholder
+})
+
+router.patch('/editCommission', (req, res) => {
+    //placeholder
+})
+
+router.delete('/deleteCommission', (req, res) => {
+    //placeholder
+})
 
 module.exports = router

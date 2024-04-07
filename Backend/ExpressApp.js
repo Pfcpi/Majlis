@@ -5,6 +5,7 @@ const db = require('./config/db')
 const ExpressApp = express()
 const rapportRouter = require('./routes/rapport')
 const commissionRouter = require('./routes/commission')
+const pvRouter = require('./routes/pv')
 
 ExpressApp.use(cors())
 
@@ -13,7 +14,8 @@ ExpressApp.get('/', (req, res) => {
   res.send('Hello from Express with CORS!')
 })
 
-ExpressApp.use("/rapport", rapportRouter)
-ExpressApp.use("/commission", commissionRouter)
+ExpressApp.use('/rapport', rapportRouter)
+ExpressApp.use('/commission', commissionRouter)
+ExpressApp.use('/pv', pvRouter)
 
 module.exports = ExpressApp
