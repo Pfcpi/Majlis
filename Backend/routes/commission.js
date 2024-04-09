@@ -19,4 +19,8 @@ router.delete('/delete', (req, res) => {
   //placeholder
 })
 
+router.post('/send', (req, res) => {
+  //placeholder sending mail commission.
+})
+
 module.exports = router

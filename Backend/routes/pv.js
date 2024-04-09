@@ -23,4 +23,8 @@ router.get('/save', (req, res) => {
     //placeholder
 })
 
+router.post('/add', (req, res) => {
+    //placeholder
+})
+
 module.exports = router
