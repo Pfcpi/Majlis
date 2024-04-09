@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
 const express = require('express')
 const router = express.Router()
@@ -20,7 +21,7 @@ router.delete('/delete', (req, res) => {
 })
 
 router.post('/send', (req, res) => {
-  //placeholder sending mail commission.
+  //placeholder sending mail commission
 })
 
 module.exports = router
