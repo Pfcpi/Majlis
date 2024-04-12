@@ -21,4 +21,5 @@ db.connect((err) => {
   console.log('Connected to MySQL RDS as ID ' + db.threadId)
 })
 
+// Export the database connection
 module.exports = { db }

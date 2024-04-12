@@ -8,6 +8,7 @@ const commissionRouter = require('./routes/commission')
 const pvRouter = require('./routes/pv')
 
 ExpressApp.use(cors())
+ExpressApp.use(express.json())
 
 // Your routes and other middleware
 ExpressApp.get('/', (req, res) => {
