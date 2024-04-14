@@ -1,6 +1,6 @@
 # pfcpi
 
-An Electron application with React
+An Electron application with React 
 
 ## Recommended IDE Setup
 
