@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState, useRef } from 'react'
 
 import './sidebar_com_css/archives.css'
@@ -232,18 +231,3 @@ function Archive() {
   )
 }
 export default Archive
-=======
-import './sidebar_componentscss.css'
-
-import Slogan from '../../Slogan'
-
-function Accueil() {
-  return (
-    <>
-      <Slogan />
-      <h1 className="section text-3xl">Rapport à traiter</h1>
-    </>
-  )
-}
-export default Accueil
->>>>>>> 1f834b1 (A)

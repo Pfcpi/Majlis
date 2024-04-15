@@ -23,7 +23,6 @@ import AjouterRapportBlueSVG from './../../assets/BlueSvgs/AjouterRapportBlue.sv
 import AjouterPVBlueSVG from './../../assets/BlueSvgs/AjouterPVBlue.svg'
 import ArchiveBlueSVG from './../../assets/BlueSvgs/ArchiveBlue.svg'
 import DocumentationBlueSVG from './../../assets/BlueSvgs/DocumentationBlue.svg'
-import LogOutBlueSVG from './../../assets/BlueSvgs/LogOutBlue.svg'
 
 import AccueilWhiteSVG from './../../assets/BlueSvgs/AccueilWhite.svg'
 import CommissionWhiteSVG from './../../assets/BlueSvgs/CommissionWhite.svg'
@@ -188,13 +187,7 @@ function SideBar() {
               }}
             >
               <img
-                src={
-                  nav === 'Documentation'
-                    ? DocumentationBlueSVG
-                    : dark
-                      ? DocumentationWhiteSVG
-                      : DocumentationSVG
-                }
+                src={nav === 'Documentation' ? DocumentationBlueSVG : dark ? DocumentationWhiteSVG : DocumentationSVG}
               ></img>
               {!cliped && <p>Documentation</p>}
             </Link>

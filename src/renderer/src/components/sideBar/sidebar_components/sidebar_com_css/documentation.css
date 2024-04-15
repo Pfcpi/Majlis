@@ -4,11 +4,7 @@
 
 @layer components {
   .switchDoc {
-<<<<<<< HEAD
     @apply rounded-xl p-3 border w-2/3 border-dotted dark:hover:bg-dark-gray;
-=======
-    @apply rounded-xl p-3 border w-2/3 border-white border-dotted dark:hover:bg-dark-gray;
->>>>>>> 1f834b1 (A)
   }
   li {
     @apply pb-7 text-justify;
