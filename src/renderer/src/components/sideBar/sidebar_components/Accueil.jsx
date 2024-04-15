@@ -1,4 +1,4 @@
-import { useState, useRef, Component } from 'react'
+import { useState, useRef } from 'react'
 
 import './sidebar_com_css/archives.css'
 import './sidebar_com_css/scroll.css'
@@ -25,14 +25,20 @@ import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 function Archive() {
   //false for rapport, true for Dossier
   const ref = useRef(null)
+
   const { cliped, setCliped } = useCliped()
   const { dark, toggleTheme } = useDark()
+  
   const [view, setView] = useState(false)
+
   const classNames = (array) => array?.filter(Boolean).join(' ')
+
+
   function handleRowChecked() {
     var label = ref.current
     label.click()
   }
+
 
   return (
     <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
