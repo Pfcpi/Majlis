@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import './sidebar_com_css/archives.css'
 import './sidebar_com_css/scroll.css'
@@ -19,6 +19,7 @@ import PdfSVG from './../../../assets/pdf.svg'
 import ImprimerSVG from './../../../assets/imprimer.svg'
 import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
+import axios from 'axios'
 
 //Need to modify:
 //Clicking on modify and review will enable the checkmark
@@ -28,17 +29,22 @@ function Archive() {
 
   const { cliped, setCliped } = useCliped()
   const { dark, toggleTheme } = useDark()
-  
+
   const [view, setView] = useState(false)
 
   const classNames = (array) => array?.filter(Boolean).join(' ')
-
 
   function handleRowChecked() {
     var label = ref.current
     label.click()
   }
 
+  useEffect(() => {
+    axios
+      .get('http://localhost:3000/rapport/get')
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err))
+  }, [])
 
   return (
     <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">

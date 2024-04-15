@@ -21,7 +21,7 @@ function App() {
           <div className="flex flex-col relative w-1/2 items-center justify-center gap-3 text-light-gray">
             <div className="absolute flex top-4 w-full justify-between items-center px-6">
               <img className="w-20 aspect-square" src={USTOLogo}></img>
-              <p className="font-cutive w-36 text-center">Conseil Descipline</p>
+              <p className="font-cutive w-36 text-center">Conseil Discipline</p>
             </div>
             <h1 className="text-dark-gray text-[64px] font-bold">Se Connecter</h1>
             <p>Veulliez choisir une session</p>

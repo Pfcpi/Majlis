@@ -19,7 +19,7 @@
     @apply pr-[15px];
   }
   .link_button_hover {
-    @apply hover:dark:bg-gray hover:dark:border-gray;
+    @apply hover:bg-0.08-blue hover:dark:bg-gray;
   }
   .link_button_clicked {
     @apply border-blue text-blue bg-0.08-blue;

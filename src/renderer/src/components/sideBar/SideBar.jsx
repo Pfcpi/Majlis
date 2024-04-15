@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import axios from 'axios'
 
@@ -46,6 +46,14 @@ function SideBar() {
   const { auth, authentificate, logOut } = useAuth()
   const { dark } = useDark()
 
+  const ref = useRef(null)
+
+  useEffect(() =>{
+    var defaultPage = ref.current
+
+    defaultPage.click()
+}, [])
+
   return (
     <div className="flex h-full w-full">
       <Router>
@@ -64,7 +72,7 @@ function SideBar() {
               }}
             >
               {!cliped && (
-                <p className="font-cutive w-36 dark:text-white text-center">Conseil Descipline</p>
+                <p className="font-cutive w-36 dark:text-white text-center">Conseil Discipline</p>
               )}
               <img
                 data-cliped={cliped}
@@ -78,10 +86,11 @@ function SideBar() {
               className={
                 nav === 'Accueil'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/"
-              onClick={(e) => {
+              ref={ref}
+              onClick={() => {
                 setNav('Accueil')
               }}
             >
@@ -95,7 +104,7 @@ function SideBar() {
               className={
                 nav === 'Commission'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/Commission"
               onClick={() => {
@@ -118,7 +127,7 @@ function SideBar() {
               className={
                 nav === 'AjouterRapport'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/AjouterRapport"
               onClick={() => {
@@ -141,7 +150,7 @@ function SideBar() {
               className={
                 nav === 'AjouterPV'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/AjouterPV"
               onClick={() => {
@@ -160,7 +169,7 @@ function SideBar() {
               className={
                 nav === 'Archive'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/Archive"
               onClick={() => {
@@ -179,7 +188,7 @@ function SideBar() {
               className={
                 nav === 'Documentation'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/Documentation"
               onClick={() => {
@@ -194,7 +203,7 @@ function SideBar() {
             <button
               data-cliped={cliped}
               onClick={logOut}
-              className="link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped"
+              className="link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped"
             >
               <img src={dark ? LogOutWhiteSVG : LogOutSVG}></img>
               {!cliped && <p>Se deconnecter</p>}
