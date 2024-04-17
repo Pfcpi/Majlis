@@ -26,11 +26,14 @@ import axios from 'axios'
 function Archive() {
   //false for rapport, true for Dossier
   const ref = useRef(null)
+  const api = 'http://localhost:3000'
 
   const { cliped, setCliped } = useCliped()
   const { dark, toggleTheme } = useDark()
 
   const [view, setView] = useState(false)
+  const [etudiants, setEtudiants] = useState([])
+  const [currentViewedEtudiant, setCurrentViewedEtudiant] = useState({})
 
   const classNames = (array) => array?.filter(Boolean).join(' ')
 
@@ -41,10 +44,51 @@ function Archive() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/rapport/get')
-      .then((res) => console.log(res))
+      .get(api + '/rapport/get')
+      .then((res) => {
+        setEtudiants(res.data)
+      })
       .catch((err) => console.log(err))
   }, [])
+
+  const tableEtu = etudiants.map((etudiant) => (
+    <tr className="border-y dark:hover:bg-dark-gray">
+      <td className="border-x">
+        <label className="" id="DossierCheck">
+          <input className="mr-2" type="checkbox"></input>
+          <span>{etudiant.num_r}</span>
+        </label>
+      </td>
+      <td className="font-medium border-x">{[etudiant.nom_e, ' ', etudiant.prenom_e]}</td>
+      <td className="border-x">{etudiant.date_i.slice(0, etudiant.date_i.indexOf('T'))}</td>
+      {!view && (
+        <td className="border-x">
+          <button
+            className="mr-10"
+            onClick={() => {
+              if (!cliped) setCliped()
+              setView(true)
+              axios
+                .post(api + '/rapport/gets', { numR: etudiant.num_r })
+                .then((res) => {
+                  console.log("current student: ", res.data[0])
+                  setCurrentViewedEtudiant(res.data[0])
+                })
+                .catch((err) => console.log(err))
+            }}
+          >
+            <img src={VoirDossierSVG} alt="voir dossier icon"></img>
+          </button>
+          <button>
+            <img
+              src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
+              alt="modifier dossier icon"
+            ></img>
+          </button>
+        </td>
+      )}
+    </tr>
+  ))
 
   return (
     <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
@@ -99,7 +143,7 @@ function Archive() {
           </div>
         </div>
       )}
-      {view && (
+      {view && !!currentViewedEtudiant && (
         <div className="w-1/2 bg-side-bar-white-theme-color dark:bg-dark-gray h-full flex flex-col">
           <button
             className="w-10 aspect-square"
@@ -115,34 +159,38 @@ function Archive() {
             <div className="flex flex-col gap-4">
               <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
               <div className="flex flex-col gap-3">
-                <p>Matricule : 22220358439</p>
-                <p>Nom : Badache Radi</p>
-                <p>Filière : Informatique (ingénieur)</p>
-                <p>Groupe : 2</p>
+                <p>Matricule : {currentViewedEtudiant.matricule_e}</p>
+                <p>Nom : {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}</p>
+                <p>Filière : {currentViewedEtudiant.niveau_e}</p>
+                <p>Groupe : {currentViewedEtudiant.groupe_e}</p>
               </div>
             </div>
             <div className="flex flex-col gap-4">
               <h3 className="text-blue text-2xl">Informations du plaignant</h3>
               <div className="flex flex-col gap-3">
-                <p>Matricule : 22220358439</p>
-                <p>Nom : Reguig Hichem</p>
+                <p>Nom : {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}</p>
               </div>
             </div>
             <div className="flex flex-col gap-4">
               <h3 className="text-blue text-2xl">Informations globales</h3>
               <div className="flex flex-col gap-3">
-                <p>Date de l’infraction : 22/03/2023</p>
-                <p>Lieu : Salle B</p>
-                <p>Motif : Tentative de fraude</p>
+                <p>
+                  Date de l’infraction :{' '}
+                  {currentViewedEtudiant.date_i
+                    ? currentViewedEtudiant.date_i.slice(
+                        0,
+                        currentViewedEtudiant.date_i.indexOf('T')
+                      )
+                    : 'not found'}
+                </p>
+                <p>Lieu : {currentViewedEtudiant.lieu_i}</p>
+                <p>Motif : {currentViewedEtudiant.motif_i}</p>
               </div>
             </div>
             <div className="flex flex-col gap-4">
               <h3 className="text-blue text-2xl">Description:</h3>
               <div className="flex flex-col gap-3">
-                <p>
-                  l’etudiant a en plus manquer de respact a l’enseignt on disant le terme”sale
-                  arabe” ou encore”مناطق الظل”
-                </p>
+                <p>{currentViewedEtudiant.description_i}</p>
               </div>
             </div>
             <div className="flex justify-evenly">
@@ -162,10 +210,10 @@ function Archive() {
       <div className={classNames(['flex flex-col mt-[8vh]', view ? 'w-1/2' : 'w-3/4'])}>
         <div className="flex items-center w-fit px-4 gap-4 py-2 text-blue bg-blue/15 border border-blue rounded-lg">
           <img className="w-7 aspect-square" src={NotificationsSVG}></img>
-          <p>8 Nouveax rapports ajoutés...</p>
+          <p>{etudiants.length} Nouveax rapports ajoutés...</p>
         </div>
         <h1 className="text-3xl py-4">Rapport a traiter</h1>
-        <div className="flex px-12 justify-end h-16 items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
+        <div className="flex px-12 justify-end h-16 w-[calc(100%-8px)] items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
           <div className="flex bg-white dark:bg-light-gray rounded-lg">
             <img className="px-2" src={SearchSVG} alt="Search icon"></img>
             <input
@@ -175,63 +223,36 @@ function Archive() {
             ></input>
           </div>
         </div>
-        <table className="">
-          <tr className="border-t">
-            <th className="w-1/4 border-x">
-              <div>
-                Rapport
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-            <th className="w-1/4 border-x">
-              <div>
-                Nom Etudiant
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-            <th className="w-1/4 border-x">
-              <div>
-                Date de l'infraction
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-            {!view && (
+        <div className="max-h-[56vh] overflow-y-auto w-[calc(100%-8px)]">
+          <table className="w-full">
+            <tr className="border-t">
               <th className="w-1/4 border-x">
-                <div>Action</div>
+                <div>
+                  Rapport
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
               </th>
-            )}
-          </tr>
-          <tr className="border-y dark:hover:bg-dark-gray" onClick={handleRowChecked}>
-            <td className="border-x">
-              <label className="" ref={ref} id="DossierCheck">
-                <input className="mr-2" type="checkbox"></input>
-                <span>1000</span>
-              </label>
-            </td>
-            <td className="font-medium border-x">Aboura yacine</td>
-            <td className="border-x">22 Jan 2023</td>
-            {!view && (
-              <td className="border-x">
-                <button
-                  className="mr-10"
-                  onClick={() => {
-                    if (!cliped) setCliped()
-                    setView(true)
-                    console.log(view)
-                  }}
-                >
-                  <img src={VoirDossierSVG} alt="voir dossier icon"></img>
-                </button>
-                <button>
-                  <img
-                    src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
-                    alt="modifier dossier icon"
-                  ></img>
-                </button>
-              </td>
-            )}
-          </tr>
-        </table>
+              <th className="w-1/4 border-x">
+                <div>
+                  Nom Etudiant
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
+              </th>
+              <th className="w-1/4 border-x">
+                <div>
+                  Date de l'infraction
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
+              </th>
+              {!view && (
+                <th className="w-1/4 border-x">
+                  <div>Action</div>
+                </th>
+              )}
+            </tr>
+            {tableEtu}
+          </table>
+        </div>
       </div>
     </div>
   )
