@@ -85,3 +85,8 @@ install dependencies
 ```Bash
 npm install
 ```
+
+## tasks:
+  - complete datafetching.
+  - check internet connection notification.
+  - print, download pdf (safisticated even if using another language like c or c++)

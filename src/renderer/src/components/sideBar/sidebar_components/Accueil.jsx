@@ -95,7 +95,7 @@ function Archive() {
       {!view && (
         <div className="flex flex-col w-1/5 mt-[4vh]">
           <h2 className="text-[1.5vw] text-center py-4">Commission Active</h2>
-          <div className="w-full h-[80vh] bg-side-bar-white-theme-color dark:bg-dark-gray snap-y snap-mandatory overflow-y-scroll scroll-pt-4 flex flex-col gap-4 rounded-lg">
+          <div className="w-full h-[80vh] bg-side-bar-white-theme-color dark:bg-dark-gray snap-y snap-mandatory overflow-y-scroll scroll-pt-1 flex flex-col gap-1 rounded-lg">
             <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
               <p className="text-xl">ZOUJKILO BATATA</p>
               <p className="text-blue">Président</p>
