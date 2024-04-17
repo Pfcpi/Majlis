@@ -4,6 +4,9 @@ import useDark from '../../../zustand/dark'
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
 
+//Tasks:
+//make the skeleton
+//fetch data
 function AjouterPV() {
   const { dark } = useDark()
   const ref = useRef(null)

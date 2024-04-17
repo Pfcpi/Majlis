@@ -19,7 +19,6 @@ import GOBackSVG from './../../../assets/GoBack.svg'
 import GOBackGraySVG from './../../../assets/BlueSvgs/GoBackGray.svg'
 
 //Need to modify:
-//Clicking on modify and review will enable the checkmark
 function Archive() {
   //false for rapport, true for Dossier
   const [rapportdossier, setRapportDossier] = useState(false)

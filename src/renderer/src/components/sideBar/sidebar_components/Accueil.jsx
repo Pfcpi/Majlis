@@ -21,8 +21,10 @@ import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import axios from 'axios'
 
-//Need to modify:
-//Clicking on modify and review will enable the checkmark
+//Tasks:
+//Edit rapport
+//What functionnality does the checkBox provide
+//Commission active (fetching data)
 function Archive() {
   //false for rapport, true for Dossier
   const ref = useRef(null)
@@ -71,7 +73,7 @@ function Archive() {
               axios
                 .post(api + '/rapport/gets', { numR: etudiant.num_r })
                 .then((res) => {
-                  console.log("current student: ", res.data[0])
+                  console.log('current student: ', res.data[0])
                   setCurrentViewedEtudiant(res.data[0])
                 })
                 .catch((err) => console.log(err))
@@ -208,10 +210,12 @@ function Archive() {
         </div>
       )}
       <div className={classNames(['flex flex-col mt-[8vh]', view ? 'w-1/2' : 'w-3/4'])}>
-        <div className="flex items-center w-fit px-4 gap-4 py-2 text-blue bg-blue/15 border border-blue rounded-lg">
-          <img className="w-7 aspect-square" src={NotificationsSVG}></img>
-          <p>{etudiants.length} Nouveax rapports ajoutés...</p>
-        </div>
+        {etudiants.length != 0 && (
+          <div className="flex items-center w-fit px-4 gap-4 py-2 text-blue bg-blue/15 border border-blue rounded-lg">
+            <img className="w-7 aspect-square" src={NotificationsSVG}></img>
+            <p>{etudiants.length} Nouveax rapports ajoutés...</p>
+          </div>
+        )}
         <h1 className="text-3xl py-4">Rapport a traiter</h1>
         <div className="flex px-12 justify-end h-16 w-[calc(100%-8px)] items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
           <div className="flex bg-white dark:bg-light-gray rounded-lg">

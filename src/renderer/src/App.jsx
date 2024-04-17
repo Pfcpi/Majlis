@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react'
 
 import './index.css'
 import axios from 'axios'
-//Completed
-//Current passwords: pres, chef (to remove)
+//not Completed
+//Add ux(hover)
 function App() {
   const { auth, authentificate } = useAuth()
   const { account, setChef, setPresident, emptyAccount } = useAccount()

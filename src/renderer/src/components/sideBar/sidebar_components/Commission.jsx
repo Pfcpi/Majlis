@@ -9,8 +9,6 @@ import useDark from '../../../zustand/dark'
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
 import SearchSVG from './../../../assets/Search.svg'
-import VoirDossierSVG from './../../../assets/VoirDossier.svg'
-import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
 import AjouterPersonneSVG from './../../../assets/AjouterPersonne.svg'
 import ModifierCommissionSVG from './../../../assets/ModifierCommission.svg'
 import SupprimerRedSVG from './../../../assets/BlueSvgs/SupprimerRed.svg'
@@ -18,7 +16,10 @@ import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 
 //Need to modify:
-//Clicking on modify and review will enable the checkmark
+//Add a checkBox
+//What functionnality does the checkBox provide
+//add, send, delete, modify member
+
 function Archive() {
   //false for rapport, true for Dossier
   const { account } = useAccount()
