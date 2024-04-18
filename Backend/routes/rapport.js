@@ -134,7 +134,7 @@ router.delete('/delete', (req, res) => {
     if (err) {
       res.status(400).send(err)
     } else {
-      res.send(result)
+      res.sendStatus(204)
     }
   })
 })
@@ -239,7 +239,7 @@ router.post('/add', (req, res) => {
                                 })
                               }
                             })
-                            res.send(result)
+                            res.status(201).send(result)
                           }
                         })
                       }
