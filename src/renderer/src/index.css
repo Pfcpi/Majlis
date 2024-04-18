@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .spreadAni {
+    @apply absolute rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-spread aspect-square;
+  }
+}

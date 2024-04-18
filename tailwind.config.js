@@ -1,3 +1,5 @@
+import { spread } from 'axios'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'selector',
@@ -11,7 +13,7 @@ export default {
         pink: '#FF8C8C',
         brown: '#443434',
         red: '#FF8C8C',
-        "0.36-red": "rgba(255, 100, 100, 0.35)",
+        '0.36-red': 'rgba(255, 100, 100, 0.35)',
         blue: '#2B81B8',
         gray: '#242529',
         'light-blue': 'rgba(15, 68, 102, 0.78)',
@@ -24,6 +26,15 @@ export default {
     fontFamily: {
       poppins: ['Poppins', 'sans-serif'],
       cutive: ['Cutive', 'sans-serif']
+    },
+    keyframes: {
+      spread: {
+        '0%': { width: '10px', opacity: '0.5' },
+        '100%': { width: '100%', opacity: '0' }
+      }
+    },
+    animation: {
+      spread: 'spread .5s linear'
     }
   },
   plugins: []

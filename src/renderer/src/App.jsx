@@ -31,6 +31,81 @@ function App() {
     setBlurBg(true)
     setTimeout(() => setBlurBg(false), 1000)
   }, [ChangePassword])
+
+  function handleClick(e, color) {
+    let y = e.clientY - e.target.offsetTop
+    let x = e.clientX - e.target.offsetLeft - screen.availWidth / 2
+
+    let spread = document.createElement('div')
+    spread.classList.add('spreadAni')
+    spread.style.left = x + 'px'
+    spread.style.top = y + 'px'
+    spread.style.backgroundColor = color
+    e.target.appendChild(spread)
+
+    setTimeout(() => {
+      spread.remove()
+    }, 1000)
+  }
+
+  function handleContinue() {
+    if (account == '') {
+      setMsg('Aucun comple est selectionné')
+    } else if (password == '') {
+      setMsg('Mot de pass est vide')
+    } else if (account == 'chef') {
+      if (!ChangePassword) {
+        axios
+          .post(api + '/auth/chef', { pass: password })
+          .then((res) => {
+            console.log(res)
+            if (res.data == 'Correct pass') {
+              authentificate()
+            } else {
+              setMsg('Mot de passe incorrect')
+            }
+          })
+          .catch((err) => console.log(err))
+      } else {
+        axios
+          .patch(api + '/auth/cedit', { pass: password })
+          .then((res) => {
+            if (res.data == 'Password changed') {
+              setChangePassword(false)
+              setTimeout(() => setMsg(`Mot de pass a ete changer pour ${account}`), 500)
+              setTimeout(() => setMsg(''), 3000)
+            }
+          })
+          .catch((err) => console.log(err))
+      }
+    } else {
+      if (!ChangePassword) {
+        axios
+          .post(api + '/auth/pres', { pass: password })
+          .then((res) => {
+            console.log(res)
+            if (res.data == 'Correct pass') {
+              authentificate()
+            } else {
+              setMsg('Mot de passe incorrect')
+            }
+          })
+          .catch((err) => console.log(err))
+      } else {
+        axios
+          .patch(api + '/auth/pedit', { pass: password })
+          .then((res) => {
+            if (res.data == 'Password changed') {
+              setChangePassword(false)
+              setTimeout(() => setMsg(`Mot de pass a ete changer pour ${account}`), 500)
+              setTimeout(() => setMsg(''), 3000)
+            }
+          })
+          .catch((err) => console.log(err))
+      }
+    }
+  }
+
   return (
     <div>
       {!auth && (
@@ -49,8 +124,9 @@ function App() {
             </h1>
             <p>Veulliez choisir une session</p>
             <button
-              className="w-3/5 py-3 border rounded-[10px] hover:bg-blue/15"
-              onClick={() => {
+              className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
+              onClick={(e) => {
+                handleClick(e, "#2B81B8")
                 setChef()
               }}
               style={{
@@ -61,8 +137,9 @@ function App() {
               Chef département
             </button>
             <button
-              className="w-3/5 py-3 border rounded-[10px] hover:bg-blue/15"
-              onClick={() => {
+              className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
+              onClick={(e) => {
+                handleClick(e, "#2B81B8")
                 setPresident()
               }}
               style={{
@@ -83,63 +160,10 @@ function App() {
             ></input>
             <hr className="bg-light-gray w-3/5"></hr>
             <button
-              className="w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white"
-              onClick={() => {
-                if (account == '') {
-                  setMsg('Aucun comple est selectionné')
-                } else if (password == '') {
-                  setMsg('Mot de pass est vide')
-                } else if (account == 'chef') {
-                  if (!ChangePassword) {
-                    axios
-                      .post(api + '/auth/chef', { pass: password })
-                      .then((res) => {
-                        console.log(res)
-                        if (res.data == 'Correct pass') {
-                          authentificate()
-                        } else {
-                          setMsg('incorrect password')
-                        }
-                      })
-                      .catch((err) => console.log(err))
-                  } else {
-                    axios
-                      .patch(api + '/auth/cedit', { pass: password })
-                      .then((res) => {
-                        if (res.data == 'Password changed') {
-                          setChangePassword(false)
-                          setTimeout(() => setMsg(`Mot de pass a ete changer pour ${account}`), 500)
-                          setTimeout(() => setMsg(''), 3000)
-                        }
-                      })
-                      .catch((err) => console.log(err))
-                  }
-                } else {
-                  if (!ChangePassword) {
-                    axios
-                      .post(api + '/auth/pres', { pass: password })
-                      .then((res) => {
-                        console.log(res)
-                        if (res.data == 'Correct pass') {
-                          authentificate()
-                        } else {
-                          setMsg('incorrect password')
-                        }
-                      })
-                      .catch((err) => console.log(err))
-                  } else {
-                    axios
-                      .patch(api + '/auth/pedit', { pass: password })
-                      .then((res) => {
-                        if (res.data == 'Password changed') {
-                          setChangePassword(false)
-                          setTimeout(() => setMsg(`Mot de pass a ete changer pour ${account}`), 500)
-                          setTimeout(() => setMsg(''), 3000)
-                        }
-                      })
-                      .catch((err) => console.log(err))
-                  }
-                }
+              className="relative w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white hover:opacity-80 overflow-hidden"
+              onClick={(e) => {
+                handleClick(e, "#fff")
+                handleContinue()
               }}
             >
               Continuer
