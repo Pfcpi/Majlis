@@ -11,7 +11,8 @@ router.get('/get', (req, res) => {
   FROM Rapport r
   JOIN Etudiant e ON r.matricule_e = e.matricule_e
   JOIN Infraction i ON r.num_i = i.num_i
-  ORDER BY i.date_i DESC`
+  ORDER BY i.date_i DESC
+  WHERE r.est_traite = FALSE`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -87,7 +88,7 @@ router.patch('/edit', (req, res) => {
       i.motif_i = ?,
       i.description_i = ?,
       i.degre_i = ?,
-      r.matricule_e = ?,
+      r.matricule_e = ?
   WHERE r.num_r = ?`
   let values = [
     object.matriculeE,
@@ -104,13 +105,12 @@ router.patch('/edit', (req, res) => {
     object.descI,
     object.degreI,
     object.matriculeE,
-    object.matriculeP,
     object.numR
   ]
 
   db.query(sqlquery, values, (err, result) => {
     if (err) {
-      res.status(400).send(err.errno) //if error number is 1062 that means that there is duplicate of either a etudiant or plaignant
+      res.sendStatus(err.errno) //if error number is 1062 that means that there is duplicate of either a etudiant or plaignant
     } else {
       res.send(result)
     }
@@ -226,8 +226,7 @@ router.post('/add', (req, res) => {
                                 })
                                 const mailOptions = {
                                   from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                  //to: result[0].email_m,
-                                  to: "amirmadjour133@gmail.com",
+                                  to: "result[0].email_m",
                                   subject: 'Nouveau rapport déposé.',
                                   html: '<body><img src="https://i.goopics.net/4lwi68.png"></body>'
                                 }
