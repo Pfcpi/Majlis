@@ -20,19 +20,29 @@ import GOBackGraySVG from './../../../assets/BlueSvgs/GoBackGray.svg'
 import PdfSVG from './../../../assets/pdf.svg'
 import ImprimerSVG from './../../../assets/imprimer.svg'
 import EnvoyerSVG from './../../../assets/Envoyer.svg'
+import SupprimerSVG from './../../../assets/supprimer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import axios from 'axios'
 
 //Tasks:
 //route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
-//drop down menu for degre, motif
+//dropNiveau down menu for degre, motif
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
 function Archive() {
   const niveau = useRef()
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
-  const [drop, setDrop] = useState(false)
-  const [dropValue, setDropValue] = useState('')
+  const degre = ['1', '2']
+  const motif1 = [
+    'Demande non fondée de double correction',
+    'tentative de fraude ou fraude établie'
+  ]
+  const motif2 = [
+    'Les récidives des infractions du 1er degré',
+    "l'entrave à la bonne marche de l'établissement"
+  ]
+  const [dropNiveau, setdropNiveau] = useState(false)
+  const [dropNiveauValue, setdropNiveauValue] = useState('')
   const api = 'http://localhost:3000'
 
   //false for rapport, true for Dossier
@@ -87,18 +97,18 @@ function Archive() {
 
   useEffect(() => {
     if (!modify) {
-      setDropValue('')
-      setDrop(false)
+      setdropNiveauValue('')
+      setdropNiveau(false)
     }
   }, [modify])
 
   useEffect(() => {
-    setDropValue(currentViewedEtudiant.niveau_e)
+    setdropNiveauValue(currentViewedEtudiant.niveau_e)
   }, [currentViewedEtudiant])
 
   useEffect(() => {
-    setRapport((prev) => ({ ...prev, niveauE: dropValue }))
-  }, [dropValue])
+    setRapport((prev) => ({ ...prev, niveauE: dropNiveauValue }))
+  }, [dropNiveauValue])
 
   const filteredEtudiants = useMemo(() => {
     return etudiants.filter((etudiant) => {
@@ -134,14 +144,14 @@ function Archive() {
     }, 1000)
   }
 
-  const dropdownItems = (
+  const dropNiveaudownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {niveaux.map((n) => (
         <div
           className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
           onClick={() => {
-            setDrop(false)
-            setDropValue(n)
+            setdropNiveau(false)
+            setdropNiveauValue(n)
           }}
         >
           {n}
@@ -214,8 +224,9 @@ function Archive() {
                     setSupprimer(true)
                     setCurrentDeletedStudent(etudiant.num_r)
                   }}
-                  className="bg-red w-7 aspect-square"
-                ></button>
+                >
+                  <img src={SupprimerSVG}></img>
+                </button>
               )}
             </div>
           </td>
@@ -451,15 +462,15 @@ function Archive() {
                   Annuler
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     setStep(1)
                     setModify(false)
                     console.log(rapport)
-                    axios
+                    const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
                       .catch((err) => console.log(err))
-                    axios
+                    const tache2 = await axios
                       .get(api + '/rapport/get')
                       .then((res) => {
                         setEtudiants(res.data)
@@ -484,8 +495,14 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="matriculeE"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.matricule_e}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({
+                          ...prev,
+                          matricule_e: e.target.value
+                        }))
+                      }}
+                      value={currentViewedEtudiant.matricule_e}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="matriculeE">
@@ -496,8 +513,11 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="nomE"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.nom_e}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, nom_e: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.nom_e}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="nomE">
@@ -508,8 +528,11 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="prenomE"
-                      defaultValue={currentViewedEtudiant.prenom_e}
-                      onChange={handleInputChange}
+                      value={currentViewedEtudiant.prenom_e}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, prenom_e: e.target.value }))
+                      }}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="prenomE">
@@ -521,24 +544,28 @@ function Archive() {
                       className="input_dossier"
                       name="niveauE"
                       onClick={() => {
-                        if (!drop) {
-                          setDrop(true)
+                        if (!dropNiveau) {
+                          setdropNiveau(true)
                         }
                       }}
-                      value={dropValue || currentViewedEtudiant.niveau_e}
+                      onChange={handleInputChange}
+                      value={dropNiveauValue || currentViewedEtudiant.niveau_e}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
                       Niveau
                     </label>
-                    {drop && dropdownItems}
+                    {dropNiveau && dropNiveaudownItems}
                   </div>
                   <div className="container_input_rapport">
                     <input
                       className="input_dossier"
                       name="groupeE"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.groupe_e}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, groupe_e: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.groupe_e}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
@@ -549,8 +576,11 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="sectionE"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.section_e}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, section_e: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.section_e}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
@@ -568,8 +598,11 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="nomP"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.nom_p}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, nom_p: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.nom_p}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
@@ -580,8 +613,11 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="prenomP"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.prenom_p}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, prenom_p: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.prenom_p}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
@@ -599,16 +635,22 @@ function Archive() {
                     className="input_dossier"
                     name="dateI"
                     type="date"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.date_i.substring(0, 10)}
+                    onChange={(e) => {
+                      handleInputChange(e)
+                      setCurrentViewedEtudiant((prev) => ({ ...prev, date_i: e.target.value }))
+                    }}
+                    value={currentViewedEtudiant.date_i.substring(0, 10)}
                     required
                   ></input>
                   <div className="container_input_rapport">
                     <input
                       className="input_dossier"
                       name="lieuI"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.lieu_i}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, lieu_i: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.lieu_i}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
@@ -619,8 +661,11 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="motifI"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.motif_i}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.motif_i}
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="niveauE">
@@ -631,8 +676,14 @@ function Archive() {
                     <textarea
                       className="input_dossier resize-none"
                       name="descI"
-                      onChange={handleInputChange}
-                      defaultValue={currentViewedEtudiant.description_i}
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({
+                          ...prev,
+                          description_i: e.target.value
+                        }))
+                      }}
+                      value={currentViewedEtudiant.description_i}
                       required
                     ></textarea>
                     <label className="label_rapport" htmlFor="niveauE">
