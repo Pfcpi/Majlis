@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react'
 
 import './index.css'
 import axios from 'axios'
-//not Completed
-//Add ux(hover)
+//Completed
+
 function App() {
   const { auth, authentificate } = useAuth()
   const { account, setChef, setPresident, emptyAccount } = useAccount()
@@ -21,9 +21,11 @@ function App() {
   const api = 'http://localhost:3000'
 
   useEffect(() => {
-    emptyAccount()
-    setPassword('')
-    setMsg('')
+    if (!auth) {
+      emptyAccount()
+      setPassword('')
+      setMsg('')
+    }
   }, [auth])
 
   useEffect(() => {
@@ -126,7 +128,7 @@ function App() {
             <button
               className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
               onClick={(e) => {
-                handleClick(e, "#2B81B8")
+                handleClick(e, '#2B81B8')
                 setChef()
               }}
               style={{
@@ -139,7 +141,7 @@ function App() {
             <button
               className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
               onClick={(e) => {
-                handleClick(e, "#2B81B8")
+                handleClick(e, '#2B81B8')
                 setPresident()
               }}
               style={{
@@ -162,7 +164,7 @@ function App() {
             <button
               className="relative w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white hover:opacity-80 overflow-hidden"
               onClick={(e) => {
-                handleClick(e, "#fff")
+                handleClick(e, '#fff')
                 handleContinue()
               }}
             >

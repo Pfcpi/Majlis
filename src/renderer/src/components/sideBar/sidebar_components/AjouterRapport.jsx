@@ -8,7 +8,6 @@ import axios from 'axios'
 
 function AjouterRapport() {
   const [step, setStep] = useState(1)
-  const ref = useRef(null)
   // Add a rapport
   /* Body being in the format of :
   {
@@ -35,14 +34,13 @@ function AjouterRapport() {
     niveauE: '',
     groupeE: 0,
     sectionE: null,
-    matriculeP: 0,
     nomP: '',
     prenomP: '',
     dateI: new Date().toISOString().slice(0, 19).replace('T', ' '),
     lieuI: '',
     motifI: '',
     descI: '',
-    degreI: ''
+    degreI: 1,
   })
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -156,13 +154,6 @@ function AjouterRapport() {
             <div className="flex flex-col w-full gap-6 mb-4">
               <input
                 className="input_dossier"
-                placeholder="Matricule"
-                name="matriculeP"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
                 placeholder="Nom"
                 name="nomP"
                 onChange={handleInputChange}
@@ -230,7 +221,7 @@ function AjouterRapport() {
               setStep((prev) => prev + 1)
             }}
           >
-            {step > 2 ? 'finish' : 'continue'}
+            {step > 2 ? 'terminer' : 'continue'}
           </button>
         </div>
       </form>
