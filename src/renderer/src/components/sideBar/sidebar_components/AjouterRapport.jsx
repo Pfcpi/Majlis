@@ -3,7 +3,9 @@ import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
 
 //Tasks:
-//Remove matriculeP
+//Add an animated label for each input
+//check for empty values
+//drop down menu for niveau
 //return button
 
 function AjouterRapport() {

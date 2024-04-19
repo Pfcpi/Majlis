@@ -69,7 +69,6 @@ router.post('/gets', (req, res) => {
 */
 router.patch('/edit', (req, res) => {
   let object = req.body
-  console.log(object)
   let sqlquery = `UPDATE Rapport r
   INNER JOIN Etudiant e ON r.matricule_e = e.matricule_e
   INNER JOIN Plaignant p ON r.id_p = p.id_p

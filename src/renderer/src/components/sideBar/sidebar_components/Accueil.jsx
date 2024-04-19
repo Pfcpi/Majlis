@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 
 import './sidebar_com_css/archives.css'
 import './sidebar_com_css/scroll.css'
@@ -24,8 +24,9 @@ import axios from 'axios'
 
 //Tasks:
 //route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
-//searching mecanisme
-//What functionnality does the checkBox provide
+//return button in modifier
+//imperfection of width: in td of the displayed students.
+//drop down menu for niveau
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
 function Archive() {
@@ -34,7 +35,7 @@ function Archive() {
   const api = 'http://localhost:3000'
 
   const { cliped, setCliped } = useCliped()
-  const { dark, toggleTheme } = useDark()
+  const { dark } = useDark()
   const { account } = useAccount()
 
   const [step, setStep] = useState(1)
@@ -43,6 +44,7 @@ function Archive() {
   const [supprimer, setSupprimer] = useState(false)
   const [currentDeletedStudent, setCurrentDeletedStudent] = useState(0)
   const [etudiants, setEtudiants] = useState([])
+  const [query, setQuery] = useState('')
   const [commission, setCommission] = useState([])
   const [currentViewedEtudiant, setCurrentViewedEtudiant] = useState({})
 
@@ -81,6 +83,13 @@ function Archive() {
       .catch((err) => console.log(err))
   }, [])
 
+  const filteredEtudiants = useMemo(() => {
+    console.log(query)
+    return etudiants.filter((etudiant) => {
+      return etudiant.nom_e.toLowerCase().concat(" ").concat(etudiant.prenom_e.toLowerCase()).includes(query.toLowerCase())
+    })
+  }, [etudiants, query])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setRapport((prevState) => ({
@@ -89,19 +98,16 @@ function Archive() {
     }))
   }
 
-  const tableEtu = Array.isArray(etudiants) ? (
-    etudiants.map((etudiant) => (
+  const tableEtu = Array.isArray(filteredEtudiants) ? (
+    filteredEtudiants.map((etudiant) => (
       <tr className="border-y dark:hover:bg-dark-gray">
         <td className="border-x">
-          <label className="" id="DossierCheck">
-            <input className="mr-2" type="checkbox"></input>
-            <span>{etudiant.num_r}</span>
-          </label>
+          <span>{etudiant.num_r}</span>
         </td>
         <td className="font-medium border-x">{[etudiant.nom_e, ' ', etudiant.prenom_e]}</td>
         <td className="border-x">{etudiant.date_i.slice(0, etudiant.date_i.indexOf('T'))}</td>
         {!view && (
-          <td className="flex justify-evenly px-0 border-x *:shrink-0">
+          <td className="flex justify-evenly w-full px-0 border-r *:shrink-0">
             <button
               className=""
               onClick={() => {
@@ -193,18 +199,18 @@ function Archive() {
                 Annuler
               </button>
               <button
-                onClick={() => {
-                  axios
+                onClick={async () => {
+                  const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
                     .then((res) => {
                       console.log('/rapport/delete', res)
                     })
                     .catch((err) => console.log(err))
-                  axios
+                  const tache2 = await axios
                     .get(api + '/rapport/get')
                     .then((res) => {
                       setEtudiants(res.data)
-                      console.log("worked updated students after delete")
+                      console.log('worked updated students after delete')
                     })
                     .catch((err) => console.log(err))
                   setSupprimer(false)
@@ -308,6 +314,8 @@ function Archive() {
                 <img className="px-2" src={SearchSVG} alt="Search icon"></img>
                 <input
                   className="flex justify-start items-center w-[240px] h-10 px-2 py-1 rounded-lg bg-transparent outline-none text-[#B6BCD1] dark:text-white"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   type="search"
                   placeholder="Rechercher"
                 ></input>
