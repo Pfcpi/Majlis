@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react'
 
 import './index.css'
 import axios from 'axios'
-//Completed
+//not Completed
+//responsiveness when clicked animation
 
 function App() {
   const { auth, authentificate } = useAuth()
@@ -60,7 +61,6 @@ function App() {
         axios
           .post(api + '/auth/chef', { pass: password })
           .then((res) => {
-            console.log(res)
             if (res.data == 'Correct pass') {
               authentificate()
             } else {
@@ -85,7 +85,6 @@ function App() {
         axios
           .post(api + '/auth/pres', { pass: password })
           .then((res) => {
-            console.log(res)
             if (res.data == 'Correct pass') {
               authentificate()
             } else {

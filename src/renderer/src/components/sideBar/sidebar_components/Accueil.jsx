@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 
 import './sidebar_com_css/archives.css'
 import './sidebar_com_css/scroll.css'
+import './sidebar_com_css/accueil.css'
 
 import useCliped from '../../../zustand/cliped'
 import useDark from '../../../zustand/dark'
@@ -24,16 +25,17 @@ import axios from 'axios'
 
 //Tasks:
 //route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
-//return button in modifier
-//imperfection of width: in td of the displayed students.
-//drop down menu for niveau
+//drop down menu for degre, motif
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
 function Archive() {
-  //false for rapport, true for Dossier
-  const ref = useRef(null)
+  const niveau = useRef()
+  const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const [drop, setDrop] = useState(false)
+  const [dropValue, setDropValue] = useState('')
   const api = 'http://localhost:3000'
 
+  //false for rapport, true for Dossier
   const { cliped, setCliped } = useCliped()
   const { dark } = useDark()
   const { account } = useAccount()
@@ -83,10 +85,28 @@ function Archive() {
       .catch((err) => console.log(err))
   }, [])
 
+  useEffect(() => {
+    if (!modify) {
+      setDropValue('')
+      setDrop(false)
+    }
+  }, [modify])
+
+  useEffect(() => {
+    setDropValue(currentViewedEtudiant.niveau_e)
+  }, [currentViewedEtudiant])
+
+  useEffect(() => {
+    setRapport((prev) => ({ ...prev, niveauE: dropValue }))
+  }, [dropValue])
+
   const filteredEtudiants = useMemo(() => {
-    console.log(query)
     return etudiants.filter((etudiant) => {
-      return etudiant.nom_e.toLowerCase().concat(" ").concat(etudiant.prenom_e.toLowerCase()).includes(query.toLowerCase())
+      return etudiant.nom_e
+        .toLowerCase()
+        .concat(' ')
+        .concat(etudiant.prenom_e.toLowerCase())
+        .includes(query.toLowerCase())
     })
   }, [etudiants, query])
 
@@ -98,6 +118,37 @@ function Archive() {
     }))
   }
 
+  function handleClick(e, color) {
+    let y = e.clientY - e.target.offsetTop
+    let x = e.clientX - e.target.offsetLeft
+
+    let spread = document.createElement('div')
+    spread.classList.add('spreadAni')
+    spread.style.left = x + 'px'
+    spread.style.top = y + 'px'
+    spread.style.backgroundColor = color
+    e.target.appendChild(spread)
+
+    setTimeout(() => {
+      spread.remove()
+    }, 1000)
+  }
+
+  const dropdownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {niveaux.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDrop(false)
+            setDropValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
   const tableEtu = Array.isArray(filteredEtudiants) ? (
     filteredEtudiants.map((etudiant) => (
       <tr className="border-y dark:hover:bg-dark-gray">
@@ -107,64 +158,66 @@ function Archive() {
         <td className="font-medium border-x">{[etudiant.nom_e, ' ', etudiant.prenom_e]}</td>
         <td className="border-x">{etudiant.date_i.slice(0, etudiant.date_i.indexOf('T'))}</td>
         {!view && (
-          <td className="flex justify-evenly w-full px-0 border-r *:shrink-0">
-            <button
-              className=""
-              onClick={() => {
-                if (!cliped) setCliped()
-                setView(true)
-                axios
-                  .post(api + '/rapport/gets', { numR: etudiant.num_r })
-                  .then((res) => {
-                    setCurrentViewedEtudiant(res.data[0])
-                  })
-                  .catch((err) => console.log(err))
-              }}
-            >
-              <img src={VoirDossierSVG} alt="voir dossier icon"></img>
-            </button>
-            <button
-              onClick={() => {
-                setModify(true)
-                console.log()
-                axios
-                  .post(api + '/rapport/gets', { numR: etudiant.num_r })
-                  .then((res) => {
-                    setCurrentViewedEtudiant(res.data[0])
-                    setRapport((prev) => ({
-                      ...prev,
-                      matriculeE: res.data[0].matricule_e,
-                      nomE: res.data[0].nom_e,
-                      prenomE: res.data[0].prenom_e,
-                      niveauE: res.data[0].niveau_e,
-                      groupeE: res.data[0].groupe_e,
-                      sectionE: res.data[0].section_e,
-                      nomP: res.data[0].nom_p,
-                      prenomP: res.data[0].prenom_p,
-                      dateI: res.data[0].date_i,
-                      lieuI: res.data[0].lieu_i,
-                      motifI: res.data[0].motif_i,
-                      descI: res.data[0].description_i,
-                      numR: etudiant.num_r
-                    }))
-                  })
-                  .catch((err) => console.log(err))
-              }}
-            >
-              <img
-                src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
-                alt="modifier dossier icon"
-              ></img>
-            </button>
-            {account == 'chef' && (
+          <td className="px-0 border-x">
+            <div className="flex justify-evenly *:shrink-0">
+              <button
+                className=""
+                onClick={() => {
+                  if (!cliped) setCliped()
+                  setView(true)
+                  axios
+                    .post(api + '/rapport/gets', { numR: etudiant.num_r })
+                    .then((res) => {
+                      setCurrentViewedEtudiant(res.data[0])
+                    })
+                    .catch((err) => console.log(err))
+                }}
+              >
+                <img src={VoirDossierSVG} alt="voir dossier icon"></img>
+              </button>
               <button
                 onClick={() => {
-                  setSupprimer(true)
-                  setCurrentDeletedStudent(etudiant.num_r)
+                  setModify(true)
+                  console.log()
+                  axios
+                    .post(api + '/rapport/gets', { numR: etudiant.num_r })
+                    .then((res) => {
+                      setCurrentViewedEtudiant(res.data[0])
+                      setRapport((prev) => ({
+                        ...prev,
+                        matriculeE: res.data[0].matricule_e,
+                        nomE: res.data[0].nom_e,
+                        prenomE: res.data[0].prenom_e,
+                        niveauE: res.data[0].niveau_e,
+                        groupeE: res.data[0].groupe_e,
+                        sectionE: res.data[0].section_e,
+                        nomP: res.data[0].nom_p,
+                        prenomP: res.data[0].prenom_p,
+                        dateI: res.data[0].date_i,
+                        lieuI: res.data[0].lieu_i,
+                        motifI: res.data[0].motif_i,
+                        descI: res.data[0].description_i,
+                        numR: etudiant.num_r
+                      }))
+                    })
+                    .catch((err) => console.log(err))
                 }}
-                className="bg-red w-7 aspect-square"
-              ></button>
-            )}
+              >
+                <img
+                  src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
+                  alt="modifier dossier icon"
+                ></img>
+              </button>
+              {account == 'chef' && (
+                <button
+                  onClick={() => {
+                    setSupprimer(true)
+                    setCurrentDeletedStudent(etudiant.num_r)
+                  }}
+                  className="bg-red w-7 aspect-square"
+                ></button>
+              )}
+            </div>
           </td>
         )}
       </tr>
@@ -401,9 +454,10 @@ function Archive() {
                   onClick={() => {
                     setStep(1)
                     setModify(false)
+                    console.log(rapport)
                     axios
                       .patch(api + '/rapport/edit', rapport)
-                      .then((res) => console.log(res, res.data.sql))
+                      .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
                       .catch((err) => console.log(err))
                     axios
                       .get(api + '/rapport/get')
@@ -423,57 +477,86 @@ function Archive() {
             <h1 className="text-[36px] py-4">Detail du rapport</h1>
             <hr className="w-full dark:text-gray"></hr>
             {step == 1 && (
-              <div className="flex flex-col w-5/6 my-2">
+              <div className="flex flex-col w-5/6">
                 <label className="label_dossier">Etudiant</label>
                 <div className="flex flex-col w-full gap-6 mb-4">
-                  <input
-                    className="input_dossier"
-                    placeholder="Matricule"
-                    name="matriculeE"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.matricule_e}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Nom"
-                    name="nomE"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.nom_e}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Prenom"
-                    name="prenomE"
-                    defaultValue={currentViewedEtudiant.prenom_e}
-                    onChange={handleInputChange}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Niveau"
-                    name="niveauE"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.niveau_e}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Groupe"
-                    name="groupeE"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.groupe_e}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Section"
-                    name="sectionE"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.section_e}
-                    required
-                  ></input>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="matriculeE"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.matricule_e}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="matriculeE">
+                      Matricule
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="nomE"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.nom_e}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="nomE">
+                      Nom
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="prenomE"
+                      defaultValue={currentViewedEtudiant.prenom_e}
+                      onChange={handleInputChange}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="prenomE">
+                      Prenom
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="niveauE"
+                      onClick={() => {
+                        if (!drop) {
+                          setDrop(true)
+                        }
+                      }}
+                      value={dropValue || currentViewedEtudiant.niveau_e}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Niveau
+                    </label>
+                    {drop && dropdownItems}
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="groupeE"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.groupe_e}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Groupe
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="sectionE"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.section_e}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Section
+                    </label>
+                  </div>
                 </div>
               </div>
             )}
@@ -481,22 +564,30 @@ function Archive() {
               <div className="flex flex-col w-5/6 my-2">
                 <label className="label_dossier">Plaignant</label>
                 <div className="flex flex-col w-full gap-6 mb-4">
-                  <input
-                    className="input_dossier"
-                    placeholder="Nom"
-                    name="nomP"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.nom_p}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Prenom"
-                    name="prenomP"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.prenom_p}
-                    required
-                  ></input>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="nomP"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.nom_p}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Nom
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="prenomP"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.prenom_p}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Prenom
+                    </label>
+                  </div>
                 </div>
               </div>
             )}
@@ -506,50 +597,72 @@ function Archive() {
                 <div className="flex flex-col w-full gap-6 mb-4">
                   <input
                     className="input_dossier"
-                    placeholder="Date de l'infraction"
                     name="dateI"
                     type="date"
                     onChange={handleInputChange}
                     defaultValue={currentViewedEtudiant.date_i.substring(0, 10)}
                     required
                   ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="lieu"
-                    name="lieuI"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.lieu_i}
-                    required
-                  ></input>
-                  <input
-                    className="input_dossier"
-                    placeholder="Motif"
-                    name="motifI"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.motif_i}
-                    required
-                  ></input>
-                  <textarea
-                    className="input_dossier resize-none"
-                    placeholder="Description"
-                    name="descI"
-                    onChange={handleInputChange}
-                    defaultValue={currentViewedEtudiant.description_i}
-                    required
-                  ></textarea>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="lieuI"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.lieu_i}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Lieu
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="motifI"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.motif_i}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Motif
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <textarea
+                      className="input_dossier resize-none"
+                      name="descI"
+                      onChange={handleInputChange}
+                      defaultValue={currentViewedEtudiant.description_i}
+                      required
+                    ></textarea>
+                    <label className="label_rapport" htmlFor="niveauE">
+                      Description
+                    </label>
+                  </div>
                 </div>
               </div>
             )}
             <hr className="w-full dark:text-gray"></hr>
             <div className="flex justify-between w-5/6 py-6">
-              <button className="button_dossier text-red min-w-fit" type="reset">
-                Annuler
+              <button
+                className="button_dossier text-red min-w-fit"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleClick(e, '#fff')
+                  if (step == 1) {
+                    setModify(false)
+                  } else {
+                    setStep((prev) => prev - 1)
+                  }
+                }}
+              >
+                {step >= 2 ? 'retourner' : 'annuler'}
               </button>
               <button
                 className="button_dossier text-blue min-w-fit"
-                type="submit"
                 onClick={(e) => {
                   e.preventDefault()
+                  handleClick(e, '#fff')
                   setStep((prev) => prev + 1)
                 }}
               >

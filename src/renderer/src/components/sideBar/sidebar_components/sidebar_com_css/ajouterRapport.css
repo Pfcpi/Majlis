@@ -4,12 +4,12 @@
 
 @layer components {
   .input_dossier {
-    @apply w-full border rounded-xl px-4 py-3 outline-none focus:border-blue dark:bg-gray dark:border-light-gray;
+    @apply w-full border rounded-xl h-fit px-4 py-3 outline-none focus:border-blue dark:bg-gray dark:border-light-gray;
   }
   .label_dossier {
-    @apply py-1 mb-2 font-medium text-2xl;
+    @apply py-2 mb-2 font-medium text-2xl;
   }
   .button_dossier {
-    @apply w-1/4 px-2 py-4 border dark:bg-gray rounded-xl dark:hover:bg-dark-gray;
+    @apply relative overflow-hidden w-1/4 px-2 py-4 border dark:bg-gray rounded-xl dark:hover:bg-dark-gray;
   }
 }

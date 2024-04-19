@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .container_input_rapport {
+    @apply flex flex-col relative w-full;
+  }
+  .label_rapport {
+    @apply absolute ml-4 mt-[13px] text-[#A9A9A9] dark:text-white h-fit w-fit bg-transparent transition-all duration-150 ease-linear;
+  }
+  .input_dossier:valid + .label_rapport,
+  .input_dossier:focus + .label_rapport {
+    @apply -translate-x-4 -translate-y-9 scale-90 z-10 text-dark-gray dark:text-white ;
+  }
+  .dropDown {
+    @apply w-full h-24 flex flex-col bg-blue/35;
+  }
+}
