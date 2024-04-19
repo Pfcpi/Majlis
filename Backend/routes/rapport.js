@@ -11,11 +11,10 @@ router.get('/get', (req, res) => {
   FROM Rapport r
   JOIN Etudiant e ON r.matricule_e = e.matricule_e
   JOIN Infraction i ON r.num_i = i.num_i
-  ORDER BY i.date_i DESC
-  WHERE r.est_traite = FALSE`
+  ORDER BY i.date_i DESC`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      res.send(err)
     } else {
       res.send(result)
     }
@@ -133,7 +132,7 @@ router.delete('/delete', (req, res) => {
 
   db.query(sqlquery, numr, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      res.send(err)
     } else {
       res.sendStatus(204)
     }

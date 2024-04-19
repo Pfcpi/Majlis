@@ -5,6 +5,7 @@ import './sidebar_com_css/scroll.css'
 
 import useCliped from '../../../zustand/cliped'
 import useDark from '../../../zustand/dark'
+import useAccount from '../../../zustand/account'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
@@ -22,9 +23,11 @@ import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import axios from 'axios'
 
 //Tasks:
-//Edit rapport
+//route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
+//searching mecanisme
 //What functionnality does the checkBox provide
-//Commission active (fetching data)
+//In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
+
 function Archive() {
   //false for rapport, true for Dossier
   const ref = useRef(null)
@@ -32,11 +35,15 @@ function Archive() {
 
   const { cliped, setCliped } = useCliped()
   const { dark, toggleTheme } = useDark()
+  const { account } = useAccount()
 
   const [step, setStep] = useState(1)
   const [view, setView] = useState(false)
   const [modify, setModify] = useState(false)
+  const [supprimer, setSupprimer] = useState(false)
+  const [currentDeletedStudent, setCurrentDeletedStudent] = useState(0)
   const [etudiants, setEtudiants] = useState([])
+  const [commission, setCommission] = useState([])
   const [currentViewedEtudiant, setCurrentViewedEtudiant] = useState({})
 
   const classNames = (array) => array?.filter(Boolean).join(' ')
@@ -65,6 +72,13 @@ function Archive() {
         setEtudiants(res.data)
       })
       .catch((err) => console.log(err))
+
+    axios
+      .get(api + '/commission/get')
+      .then((res) => {
+        setCommission(res.data)
+      })
+      .catch((err) => console.log(err))
   }, [])
 
   const handleInputChange = (e) => {
@@ -75,123 +89,141 @@ function Archive() {
     }))
   }
 
-  const tableEtu = etudiants.map((etudiant) => (
-    <tr className="border-y dark:hover:bg-dark-gray">
-      <td className="border-x">
-        <label className="" id="DossierCheck">
-          <input className="mr-2" type="checkbox"></input>
-          <span>{etudiant.num_r}</span>
-        </label>
-      </td>
-      <td className="font-medium border-x">{[etudiant.nom_e, ' ', etudiant.prenom_e]}</td>
-      <td className="border-x">{etudiant.date_i.slice(0, etudiant.date_i.indexOf('T'))}</td>
-      {!view && (
+  const tableEtu = Array.isArray(etudiants) ? (
+    etudiants.map((etudiant) => (
+      <tr className="border-y dark:hover:bg-dark-gray">
         <td className="border-x">
-          <button
-            className="mr-10"
-            onClick={() => {
-              if (!cliped) setCliped()
-              setView(true)
-              axios
-                .post(api + '/rapport/gets', { numR: etudiant.num_r })
-                .then((res) => {
-                  setCurrentViewedEtudiant(res.data[0])
-                })
-                .catch((err) => console.log(err))
-            }}
-          >
-            <img src={VoirDossierSVG} alt="voir dossier icon"></img>
-          </button>
-          <button
-            onClick={() => {
-              setModify(true)
-              console.log()
-              axios
-                .post(api + '/rapport/gets', { numR: etudiant.num_r })
-                .then((res) => {
-                  setCurrentViewedEtudiant(res.data[0])
-                  setRapport((prev) => ({
-                    ...prev,
-                    matriculeE: res.data[0].matricule_e,
-                    nomE: res.data[0].nom_e,
-                    prenomE: res.data[0].prenom_e,
-                    niveauE: res.data[0].niveau_e,
-                    groupeE: res.data[0].groupe_e,
-                    sectionE: res.data[0].section_e,
-                    nomP: res.data[0].nom_p,
-                    prenomP: res.data[0].prenom_p,
-                    dateI: res.data[0].date_i,
-                    lieuI: res.data[0].lieu_i,
-                    motifI: res.data[0].motif_i,
-                    descI: res.data[0].description_i,
-                    numR: etudiant.num_r
-                  }))
-                })
-                .catch((err) => console.log(err))
-            }}
-          >
-            <img
-              src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
-              alt="modifier dossier icon"
-            ></img>
-          </button>
+          <label className="" id="DossierCheck">
+            <input className="mr-2" type="checkbox"></input>
+            <span>{etudiant.num_r}</span>
+          </label>
         </td>
-      )}
-    </tr>
-  ))
+        <td className="font-medium border-x">{[etudiant.nom_e, ' ', etudiant.prenom_e]}</td>
+        <td className="border-x">{etudiant.date_i.slice(0, etudiant.date_i.indexOf('T'))}</td>
+        {!view && (
+          <td className="flex justify-evenly px-0 border-x *:shrink-0">
+            <button
+              className=""
+              onClick={() => {
+                if (!cliped) setCliped()
+                setView(true)
+                axios
+                  .post(api + '/rapport/gets', { numR: etudiant.num_r })
+                  .then((res) => {
+                    setCurrentViewedEtudiant(res.data[0])
+                  })
+                  .catch((err) => console.log(err))
+              }}
+            >
+              <img src={VoirDossierSVG} alt="voir dossier icon"></img>
+            </button>
+            <button
+              onClick={() => {
+                setModify(true)
+                console.log()
+                axios
+                  .post(api + '/rapport/gets', { numR: etudiant.num_r })
+                  .then((res) => {
+                    setCurrentViewedEtudiant(res.data[0])
+                    setRapport((prev) => ({
+                      ...prev,
+                      matriculeE: res.data[0].matricule_e,
+                      nomE: res.data[0].nom_e,
+                      prenomE: res.data[0].prenom_e,
+                      niveauE: res.data[0].niveau_e,
+                      groupeE: res.data[0].groupe_e,
+                      sectionE: res.data[0].section_e,
+                      nomP: res.data[0].nom_p,
+                      prenomP: res.data[0].prenom_p,
+                      dateI: res.data[0].date_i,
+                      lieuI: res.data[0].lieu_i,
+                      motifI: res.data[0].motif_i,
+                      descI: res.data[0].description_i,
+                      numR: etudiant.num_r
+                    }))
+                  })
+                  .catch((err) => console.log(err))
+              }}
+            >
+              <img
+                src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
+                alt="modifier dossier icon"
+              ></img>
+            </button>
+            {account == 'chef' && (
+              <button
+                onClick={() => {
+                  setSupprimer(true)
+                  setCurrentDeletedStudent(etudiant.num_r)
+                }}
+                className="bg-red w-7 aspect-square"
+              ></button>
+            )}
+          </td>
+        )}
+      </tr>
+    ))
+  ) : (
+    <></>
+  )
 
+  const ListCom = Array.isArray(commission) ? (
+    commission.map((mem) => (
+      <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
+        <p className="text-xl">{[mem.nom_m, ' ', mem.prenom_m]}</p>
+        <p className="text-blue">{mem.role_m}</p>
+      </div>
+    ))
+  ) : (
+    <></>
+  )
   return (
     <div className="flex w-full h-full">
+      {supprimer && (
+        <div className="absolute flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
+          <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
+            Confirmer la suppression du rapport
+            <div className="flex w-full justify-between px-8">
+              <button
+                onClick={() => {
+                  setSupprimer(false)
+                }}
+                className="flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => {
+                  axios
+                    .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
+                    .then((res) => {
+                      console.log('/rapport/delete', res)
+                    })
+                    .catch((err) => console.log(err))
+                  axios
+                    .get(api + '/rapport/get')
+                    .then((res) => {
+                      setEtudiants(res.data)
+                      console.log("worked updated students after delete")
+                    })
+                    .catch((err) => console.log(err))
+                  setSupprimer(false)
+                }}
+                className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {!modify && (
         <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
           {!view && (
             <div className="flex flex-col w-1/5 mt-[4vh]">
               <h2 className="text-[1.5vw] text-center py-4">Commission Active</h2>
               <div className="w-full h-[80vh] bg-side-bar-white-theme-color dark:bg-dark-gray snap-y snap-mandatory overflow-y-scroll scroll-pt-1 flex flex-col gap-1 rounded-lg">
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">Président</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">titulaire</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">titulaire</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">titulaire</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">titulaire</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">suppliant</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">suppliant</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">suppliant</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">suppliant</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">suppliant</p>
-                </div>
-                <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-                  <p className="text-xl">ZOUJKILO BATATA</p>
-                  <p className="text-blue">etudiant</p>
-                </div>
+                {ListCom}
               </div>
             </div>
           )}

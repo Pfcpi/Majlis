@@ -23,7 +23,7 @@ router.get('/get', (req, res) => {
   WHERE est_actif = TRUE`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      res.send(err)
     } else {
       res.send(result)
     }
