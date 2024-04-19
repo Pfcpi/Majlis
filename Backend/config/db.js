@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
 const Database = require('mysql2')
+require('dotenv').config()
 
-// Aws rds database login
+// Database login
 const dbConfig = {
-  host: 'eris-shared-g1.dzsecurity.net',
-  user: 'madjri81_admin',
-  password: 'pfcpiprojet',
-  database: 'madjri81_projet'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 }
 
 // Function to connect to the database with retry mechanism
