@@ -1,14 +1,35 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
 
 //Tasks:
-//Add an animated label for each input
-//check for empty values
-//drop down menu for niveau
-//return button
+//Check for matricule not duplicated between students
 
 function AjouterRapport() {
+  const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const degre = ['1', '2']
+  const motif1 = [
+    'Demande non fondée de double correction',
+    'tentative de fraude ou fraude établie',
+    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité"
+  ]
+  const motif2 = [
+    'Les récidives des infractions du 1er degré',
+    "l'entrave à la bonne marche de l'établissement",
+    'le désordre organisé',
+    'la voilance',
+    'les menaces et voies de fais',
+    'le faux',
+    "la détérioration délibérée des beins de l'établissement"
+  ]
+  const [dropNiveau, setdropNiveau] = useState(false)
+  const [dropNiveauValue, setdropNiveauValue] = useState('')
+  const [dropDegre, setDropDegre] = useState(false)
+  const [dropDegreValue, setDropDegreValue] = useState('')
+  const [dropMotif, setDropMotif] = useState(false)
+  const [dropMotifValue, setDropMotifValue] = useState('')
+
   const [step, setStep] = useState(1)
   // Add a rapport
   /* Body being in the format of :
@@ -34,7 +55,7 @@ function AjouterRapport() {
     nomE: '',
     prenomE: '',
     niveauE: '',
-    groupeE: 0,
+    groupeE: 1,
     sectionE: null,
     nomP: '',
     prenomP: '',
@@ -42,16 +63,93 @@ function AjouterRapport() {
     lieuI: '',
     motifI: '',
     descI: '',
-    degreI: 1,
+    degreI: 1
   })
+
+  useEffect(() => {
+    setRapport((prev) => ({ ...prev, niveauE: dropNiveauValue }))
+  }, [dropNiveauValue])
+
+  useEffect(() => {
+    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
+  }, [dropDegreValue])
+
+  useEffect(() => {
+    setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+  }, [dropMotifValue])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
-      setRapport((prevState) => ({
-        ...prevState,
-        [name]: value
-      }))
+    setRapport((prevState) => ({
+      ...prevState,
+      [name]: value
+    }))
   }
   const api = 'http://localhost:3000'
+
+  const dropNiveaudownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {niveaux.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setdropNiveau(false)
+            setdropNiveauValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropDegredownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {degre.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropDegre(false)
+            setDropDegreValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropMotif1downItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {motif1.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropMotif(false)
+            setDropMotifValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropMotif2downItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {motif2.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropMotif(false)
+            setDropMotifValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6">
@@ -78,6 +176,10 @@ function AjouterRapport() {
             <button
               onClick={() => {
                 setStep(1)
+                setDropDegreValue('')
+                setdropNiveauValue('')
+                setDropMotifValue('')
+                setRapport({})
               }}
               className="flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red"
             >
@@ -86,6 +188,10 @@ function AjouterRapport() {
             <button
               onClick={() => {
                 setStep(1)
+                setDropDegreValue('')
+                setdropNiveauValue('')
+                setDropMotifValue('')
+                setRapport({})
                 axios
                   .post(api + '/rapport/add', rapport)
                   .then((res) => console.log(res))
@@ -105,48 +211,84 @@ function AjouterRapport() {
           <div className="flex flex-col w-5/6 my-2">
             <label className="label_dossier">Etudiant</label>
             <div className="flex flex-col w-full gap-6 mb-4">
-              <input
-                className="input_dossier"
-                placeholder="Matricule"
-                name="matriculeE"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Nom"
-                name="nomE"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Prenom"
-                name="prenomE"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Niveau"
-                name="niveauE"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Groupe"
-                name="groupeE"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Section"
-                name="sectionE"
-                onChange={handleInputChange}
-                required
-              ></input>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="matriculeE"
+                  onChange={handleInputChange}
+                  value={rapport.matriculeE}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="matriculeE">
+                  Matricule
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="nomE"
+                  onChange={handleInputChange}
+                  value={rapport.nomE}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="nomE">
+                  Nom
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="prenomE"
+                  onChange={handleInputChange}
+                  value={rapport.prenomE}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="prenomE">
+                  Prenom
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="niveauE"
+                  onClick={() => {
+                    if (!dropNiveau) {
+                      setdropNiveau(true)
+                    }
+                  }}
+                  value={dropNiveauValue}
+                  onChange={handleInputChange}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="niveauE">
+                  Niveau
+                </label>
+                {dropNiveau && dropNiveaudownItems}
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="groupeE"
+                  onChange={handleInputChange}
+                  value={rapport.groupeE}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="GroupeE">
+                  Groupe
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="sectionE"
+                  onChange={handleInputChange}
+                  value={rapport.sectionE}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="sectionE">
+                  Section
+                </label>
+              </div>
             </div>
           </div>
         )}
@@ -154,20 +296,30 @@ function AjouterRapport() {
           <div className="flex flex-col w-5/6 my-2">
             <label className="label_dossier">Plaignant</label>
             <div className="flex flex-col w-full gap-6 mb-4">
-              <input
-                className="input_dossier"
-                placeholder="Nom"
-                name="nomP"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Prenom"
-                name="prenomP"
-                onChange={handleInputChange}
-                required
-              ></input>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="nomP"
+                  onChange={handleInputChange}
+                  value={rapport.nomP}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="nomP">
+                  Nom
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="prenomP"
+                  onChange={handleInputChange}
+                  value={rapport.prenomP}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="prenomP">
+                  Prenom
+                </label>
+              </div>
             </div>
           </div>
         )}
@@ -175,51 +327,98 @@ function AjouterRapport() {
           <div className="flex flex-col w-5/6 my-2">
             <label className="label_dossier">Informations globales</label>
             <div className="flex flex-col w-full gap-6 mb-4">
-              <input
-                className="input_dossier"
-                placeholder="Date de l'infraction"
-                name="dateI"
-                type="date"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="lieu"
-                name="lieuI"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <input
-                className="input_dossier"
-                placeholder="Motif"
-                name="motifI"
-                onChange={handleInputChange}
-                required
-              ></input>
-              <textarea
-                className="input_dossier resize-none"
-                placeholder="Description"
-                name="descI"
-                onChange={handleInputChange}
-                required
-              ></textarea>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="dateI"
+                  type="date"
+                  onChange={handleInputChange}
+                  value={rapport.dateI}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="dateI">
+                  Date
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="lieuI"
+                  onChange={handleInputChange}
+                  value={rapport.lieuI}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="lieuI">
+                  Lieu
+                </label>
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  onClick={() => {
+                    if (!dropDegre) {
+                      setDropDegre(true)
+                    }
+                  }}
+                  name="degreI"
+                  onChange={handleInputChange}
+                  value={dropDegreValue}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="degreI">
+                  Degré
+                </label>
+              {dropDegre && dropDegredownItems}
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="motifI"
+                  onClick={() => {
+                    if (!dropMotif) setDropMotif(true)
+                  }}
+                  value={dropMotifValue}
+                  onChange={handleInputChange}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="motifI">
+                  Motif
+                </label>
+                {dropMotif && dropDegreValue == 1 && dropMotif1downItems}
+                {dropMotif && dropDegreValue == 2 && dropMotif2downItems}
+              </div>
+              <div className="container_input_rapport">
+                <textarea
+                  className="input_dossier resize-none"
+                  name="descI"
+                  onChange={handleInputChange}
+                  value={rapport.descI}
+                  required
+                ></textarea>
+                <label className="label_rapport" htmlFor="descI">
+                  Description
+                </label>
+              </div>
             </div>
           </div>
         )}
         <hr className="w-full dark:text-gray"></hr>
         <div className="flex justify-between w-5/6 py-6">
-          <button className="button_dossier text-red min-w-fit" type="reset">
-            Annuler
+          <button
+            className="button_dossier text-red min-w-fit"
+            onClick={(e) => {
+              e.preventDefault()
+              if (step > 1) setStep((prev) => prev - 1)
+            }}
+            type="reset"
+          >
+            {step > 1 ? 'Retourner' : 'Annuler'}
           </button>
           <button
             className="button_dossier text-blue min-w-fit"
             type="submit"
             onClick={(e) => {
-              if (step > 2) {
-                e.preventDefault()
-                console.log('rapport a ajouter:', rapport)
-              }
+              e.preventDefault()
               setStep((prev) => prev + 1)
             }}
           >

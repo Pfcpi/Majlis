@@ -26,23 +26,31 @@ import axios from 'axios'
 
 //Tasks:
 //route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
-//dropNiveau down menu for degre, motif
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
 function Archive() {
-  const niveau = useRef()
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
   const degre = ['1', '2']
   const motif1 = [
     'Demande non fondée de double correction',
-    'tentative de fraude ou fraude établie'
+    'tentative de fraude ou fraude établie',
+    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité"
   ]
   const motif2 = [
     'Les récidives des infractions du 1er degré',
-    "l'entrave à la bonne marche de l'établissement"
+    "l'entrave à la bonne marche de l'établissement",
+    'le désordre organisé',
+    'la voilance',
+    'les menaces et voies de fais',
+    'le faux',
+    "la détérioration délibérée des beins de l'établissement"
   ]
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
+  const [dropDegre, setDropDegre] = useState(false)
+  const [dropDegreValue, setDropDegreValue] = useState('')
+  const [dropMotif, setDropMotif] = useState(false)
+  const [dropMotifValue, setDropMotifValue] = useState('')
   const api = 'http://localhost:3000'
 
   //false for rapport, true for Dossier
@@ -99,6 +107,10 @@ function Archive() {
     if (!modify) {
       setdropNiveauValue('')
       setdropNiveau(false)
+      setDropDegreValue('')
+      setDropDegre(false)
+      setDropDegreValue('')
+      setDropMotif(false)
     }
   }, [modify])
 
@@ -110,14 +122,32 @@ function Archive() {
     setRapport((prev) => ({ ...prev, niveauE: dropNiveauValue }))
   }, [dropNiveauValue])
 
+  useEffect(() => {
+    setDropDegreValue(currentViewedEtudiant.degre_i)
+  }, [currentViewedEtudiant])
+
+  useEffect(() => {
+    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
+  }, [dropDegreValue])
+
+  useEffect(() => {
+    setDropMotifValue(currentViewedEtudiant.motif_i)
+  }, [currentViewedEtudiant])
+
+  useEffect(() => {
+    setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+  }, [dropMotifValue])
+
   const filteredEtudiants = useMemo(() => {
-    return etudiants.filter((etudiant) => {
-      return etudiant.nom_e
-        .toLowerCase()
-        .concat(' ')
-        .concat(etudiant.prenom_e.toLowerCase())
-        .includes(query.toLowerCase())
-    })
+    return Array.isArray(etudiants)
+      ? etudiants.filter((etudiant) => {
+          return etudiant.nom_e
+            .toLowerCase()
+            .concat(' ')
+            .concat(etudiant.prenom_e.toLowerCase())
+            .includes(query.toLowerCase())
+        })
+      : ''
   }, [etudiants, query])
 
   const handleInputChange = (e) => {
@@ -159,6 +189,55 @@ function Archive() {
       ))}
     </div>
   )
+
+  const dropDegredownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {degre.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropDegre(false)
+            setDropDegreValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropMotif1downItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {motif1.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropMotif(false)
+            setDropMotifValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropMotif2downItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {motif2.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropMotif(false)
+            setDropMotifValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
   const tableEtu = Array.isArray(filteredEtudiants) ? (
     filteredEtudiants.map((etudiant) => (
       <tr className="border-y dark:hover:bg-dark-gray">
@@ -194,7 +273,7 @@ function Archive() {
                     .then((res) => {
                       setCurrentViewedEtudiant(res.data[0])
                       setRapport((prev) => ({
-                        ...prev,
+                        degreI: res.data[0].degre_i,
                         matriculeE: res.data[0].matricule_e,
                         nomE: res.data[0].nom_e,
                         prenomE: res.data[0].prenom_e,
@@ -313,27 +392,24 @@ function Archive() {
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
                   <div className="flex flex-col gap-3">
-                    <p>Matricule : {currentViewedEtudiant.matricule_e}</p>
-                    <p>
-                      Nom : {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}
-                    </p>
-                    <p>Filière : {currentViewedEtudiant.niveau_e}</p>
-                    <p>Groupe : {currentViewedEtudiant.groupe_e}</p>
+                    <p>Matricule: {currentViewedEtudiant.matricule_e}</p>
+                    <p>Nom: {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}</p>
+                    <p>Niveau: {currentViewedEtudiant.niveau_e}</p>
+                    <p>Groupe: {currentViewedEtudiant.groupe_e}</p>
+                    <p>Section: {currentViewedEtudiant.section_e}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                   <div className="flex flex-col gap-3">
-                    <p>
-                      Nom : {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}
-                    </p>
+                    <p>Nom: {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations globales</h3>
                   <div className="flex flex-col gap-3">
                     <p>
-                      Date de l’infraction :{' '}
+                      Date de l’infraction:{' '}
                       {currentViewedEtudiant.date_i
                         ? currentViewedEtudiant.date_i.slice(
                             0,
@@ -341,8 +417,9 @@ function Archive() {
                           )
                         : 'not found'}
                     </p>
-                    <p>Lieu : {currentViewedEtudiant.lieu_i}</p>
-                    <p>Motif : {currentViewedEtudiant.motif_i}</p>
+                    <p>Lieu: {currentViewedEtudiant.lieu_i}</p>
+                    <p>Degré: {currentViewedEtudiant.degre_i}</p>
+                    <p>Motif: {currentViewedEtudiant.motif_i}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
@@ -605,7 +682,7 @@ function Archive() {
                       value={currentViewedEtudiant.nom_p}
                       required
                     ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="nomP">
                       Nom
                     </label>
                   </div>
@@ -620,7 +697,7 @@ function Archive() {
                       value={currentViewedEtudiant.prenom_p}
                       required
                     ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="prenomP">
                       Prenom
                     </label>
                   </div>
@@ -653,24 +730,44 @@ function Archive() {
                       value={currentViewedEtudiant.lieu_i}
                       required
                     ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="lieuI">
                       Lieu
                     </label>
                   </div>
                   <div className="container_input_rapport">
                     <input
                       className="input_dossier"
-                      name="motifI"
-                      onChange={(e) => {
-                        handleInputChange(e)
-                        setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
+                      name="degreI"
+                      onChange={handleInputChange}
+                      onClick={() => {
+                        if (!dropDegre) {
+                          setDropDegre(true)
+                        }
                       }}
-                      value={currentViewedEtudiant.motif_i}
+                      value={dropDegreValue || currentViewedEtudiant.degre_i}
                       required
                     ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="degreI">
+                      Degré
+                    </label>
+                    {dropDegre && dropDegredownItems}
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="motifI"
+                      onChange={handleInputChange}
+                      onClick={() => {
+                        if (!dropMotif) setDropMotif(true)
+                      }}
+                      value={dropMotifValue || currentViewedEtudiant.motif_i}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="motifI">
                       Motif
                     </label>
+                    {dropMotif && dropDegreValue == 1 && dropMotif1downItems}
+                    {dropMotif && dropDegreValue == 2 && dropMotif2downItems}
                   </div>
                   <div className="container_input_rapport">
                     <textarea
@@ -686,7 +783,7 @@ function Archive() {
                       value={currentViewedEtudiant.description_i}
                       required
                     ></textarea>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="descI">
                       Description
                     </label>
                   </div>
