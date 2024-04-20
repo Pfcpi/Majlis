@@ -1,10 +1,13 @@
+//Tasks:
+//Check for matricule not duplicated between students
+//weird Bug (when entering 1 and then autres... in motif, you can not edit the motif)
+//autres in motif
+
 import { useState, useEffect } from 'react'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
 
-//Tasks:
-//Check for matricule not duplicated between students
 
 function AjouterRapport() {
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
@@ -12,7 +15,8 @@ function AjouterRapport() {
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
-    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité"
+    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité",
+    'autres..'
   ]
   const motif2 = [
     'Les récidives des infractions du 1er degré',
@@ -21,7 +25,8 @@ function AjouterRapport() {
     'la voilance',
     'les menaces et voies de fais',
     'le faux',
-    "la détérioration délibérée des beins de l'établissement"
+    "la détérioration délibérée des beins de l'établissement",
+    'autres...'
   ]
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
@@ -80,6 +85,7 @@ function AjouterRapport() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    console.log(name, value)
     setRapport((prevState) => ({
       ...prevState,
       [name]: value
@@ -368,7 +374,7 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="degreI">
                   Degré
                 </label>
-              {dropDegre && dropDegredownItems}
+                {dropDegre && dropDegredownItems}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -377,8 +383,13 @@ function AjouterRapport() {
                   onClick={() => {
                     if (!dropMotif) setDropMotif(true)
                   }}
-                  value={dropMotifValue}
-                  onChange={handleInputChange}
+                  value={dropMotifValue == 'autres...' ? rapport.motifI : dropMotifValue}
+                  onChange={(e) => {
+                    handleInputChange(e)
+                    console.log(dropDegreValue, motif1, motif2)
+                    setRapport((prev) => ({ ...prev, motifI: e.target.value }))
+                    if (dropMotif) setDropMotif(false)
+                  }}
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="motifI">

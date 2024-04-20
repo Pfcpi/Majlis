@@ -1,3 +1,7 @@
+//Tasks:
+//route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
+//In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
+
 import { useState, useRef, useEffect, useMemo } from 'react'
 
 import './sidebar_com_css/archives.css'
@@ -24,17 +28,14 @@ import SupprimerSVG from './../../../assets/supprimer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import axios from 'axios'
 
-//Tasks:
-//route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
-//In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
-
 function Archive() {
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
   const degre = ['1', '2']
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
-    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité"
+    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité",
+    'autres...'
   ]
   const motif2 = [
     'Les récidives des infractions du 1er degré',
@@ -43,12 +44,13 @@ function Archive() {
     'la voilance',
     'les menaces et voies de fais',
     'le faux',
-    "la détérioration délibérée des beins de l'établissement"
+    "la détérioration délibérée des beins de l'établissement",
+    'autres...'
   ]
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
   const [dropDegre, setDropDegre] = useState(false)
-  const [dropDegreValue, setDropDegreValue] = useState('')
+  const [dropDegreValue, setDropDegreValue] = useState(1)
   const [dropMotif, setDropMotif] = useState(false)
   const [dropMotifValue, setDropMotifValue] = useState('')
   const api = 'http://localhost:3000'
@@ -116,23 +118,24 @@ function Archive() {
 
   useEffect(() => {
     setdropNiveauValue(currentViewedEtudiant.niveau_e)
-  }, [currentViewedEtudiant])
+  }, [currentViewedEtudiant.niveau_e])
+
+  useEffect(() => {
+    setDropDegreValue(currentViewedEtudiant.degre_i)
+  }, [currentViewedEtudiant.degre_i])
+
+  useEffect(() => {
+    setDropMotifValue(currentViewedEtudiant.motif_i)
+  }, [currentViewedEtudiant.motif_i])
 
   useEffect(() => {
     setRapport((prev) => ({ ...prev, niveauE: dropNiveauValue }))
   }, [dropNiveauValue])
 
   useEffect(() => {
-    setDropDegreValue(currentViewedEtudiant.degre_i)
-  }, [currentViewedEtudiant])
-
-  useEffect(() => {
     setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
+    console.log('drop degre value: ', dropDegreValue)
   }, [dropDegreValue])
-
-  useEffect(() => {
-    setDropMotifValue(currentViewedEtudiant.motif_i)
-  }, [currentViewedEtudiant])
 
   useEffect(() => {
     setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
@@ -152,6 +155,7 @@ function Archive() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    console.log('handle input change: name', name, ',value:', value)
     setRapport((prevState) => ({
       ...prevState,
       [name]: value
@@ -738,7 +742,10 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="degreI"
-                      onChange={handleInputChange}
+                      onChange={() => {
+                        handleInputChange
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
+                      }}
                       onClick={() => {
                         if (!dropDegre) {
                           setDropDegre(true)
@@ -756,11 +763,19 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="motifI"
-                      onChange={handleInputChange}
+                      onChange={(e) => {
+                        handleInputChange
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
+                        if (dropMotif) setDropMotif(false)
+                      }}
                       onClick={() => {
                         if (!dropMotif) setDropMotif(true)
                       }}
-                      value={dropMotifValue || currentViewedEtudiant.motif_i}
+                      value={
+                        dropMotifValue == 'autres...'
+                          ? currentViewedEtudiant.motif_i
+                          : dropMotifValue
+                      }
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="motifI">
