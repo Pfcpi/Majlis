@@ -1,13 +1,11 @@
 //Tasks:
 //Check for matricule not duplicated between students
-//weird Bug (when entering 1 and then autres... in motif, you can not edit the motif)
 //autres in motif
 
 import { useState, useEffect } from 'react'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
-
 
 function AjouterRapport() {
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
@@ -16,7 +14,7 @@ function AjouterRapport() {
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
     "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité",
-    'autres..'
+    'autres...'
   ]
   const motif2 = [
     'Les récidives des infractions du 1er degré',
@@ -34,6 +32,7 @@ function AjouterRapport() {
   const [dropDegreValue, setDropDegreValue] = useState('')
   const [dropMotif, setDropMotif] = useState(false)
   const [dropMotifValue, setDropMotifValue] = useState('')
+  const [etudiants, setEtudiants] = useState([])
 
   const [step, setStep] = useState(1)
   // Add a rapport
@@ -72,6 +71,13 @@ function AjouterRapport() {
   })
 
   useEffect(() => {
+    axios
+      .get(api + '/rapport/get')
+      .then((res) => setEtudiants(res.data))
+      .catch((err) => console.log(err))
+  }, [])
+
+  useEffect(() => {
     setRapport((prev) => ({ ...prev, niveauE: dropNiveauValue }))
   }, [dropNiveauValue])
 
@@ -85,7 +91,6 @@ function AjouterRapport() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    console.log(name, value)
     setRapport((prevState) => ({
       ...prevState,
       [name]: value
@@ -385,8 +390,7 @@ function AjouterRapport() {
                   }}
                   value={dropMotifValue == 'autres...' ? rapport.motifI : dropMotifValue}
                   onChange={(e) => {
-                    handleInputChange(e)
-                    console.log(dropDegreValue, motif1, motif2)
+                    handleInputChange
                     setRapport((prev) => ({ ...prev, motifI: e.target.value }))
                     if (dropMotif) setDropMotif(false)
                   }}

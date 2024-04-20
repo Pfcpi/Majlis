@@ -158,7 +158,6 @@ router.delete('/delete', (req, res) => {
 */
 router.post('/add', (req, res) => {
   let object = req.body
-  console.log(object)
   // SQL queries
   let sqlqueryE =
     'INSERT INTO Etudiant (matricule_e, nom_e, prenom_e, niveau_e, groupe_e, section_e, antecedant_e) VALUES (?, ?, ?, ?, ?, ?, true)'
