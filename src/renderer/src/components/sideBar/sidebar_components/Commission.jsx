@@ -1,5 +1,6 @@
 //Tasks:
 //handle form validation
+//when submitting(add some notification to the user about incorrect inputs)
 //check for unfilled inputs
 //send email member
 import { useState, useMemo, useEffect } from 'react'
@@ -30,6 +31,12 @@ function Archive() {
   const [modifyMember, setModifyMember] = useState(false)
   const [dropRole, setDropRole] = useState(false)
   const [dropRoleValue, setDropRoleValue] = useState('')
+
+  const [nomMsg, setNomMsg] = useState('')
+  const [prenomMsg, setPrenomMsg] = useState('')
+  const [emailMsg, setEmailMsg] = useState('')
+  const [dropMsg, setDropMsg] = useState('')
+  const [dateMsg, setDateMsg] = useState('')
 
   const dataFin = new Date().toISOString().slice(0, 19).replace('T', ' ')
   const api = 'http://localhost:3000'
@@ -83,10 +90,6 @@ function Archive() {
         })
       : ''
   }, [membres, query])
-
-  console.log('new one')
-
-  console.log('filtered roles:', roles.filter(roleExistes))
 
   const dropRoledownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
@@ -224,35 +227,37 @@ function Archive() {
 
   const handleAjouter = async (e) => {
     e.preventDefault()
-    if (addMember) {
-      const tache1 = await axios
-        .post(api + '/commission/add', currentAddedMember)
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err))
-    } else {
-      console.log('modify: ', currentAddedMember)
-      const tache1 = await axios
-        .patch(api + '/commission/edit', currentAddedMember)
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err))
+    if (!nomMsg && !prenomMsg && !emailMsg && !dropMsg) {
+      if (addMember) {
+        const tache1 = await axios
+          .post(api + '/commission/add', currentAddedMember)
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err))
+      } else {
+        console.log('modify: ', currentAddedMember)
+        const tache1 = await axios
+          .patch(api + '/commission/edit', currentAddedMember)
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err))
+      }
+      setAddMember(false)
+      setModifyMember(false)
+
+      setCurrentModifiedMembres([])
+      const tache2 = await axios
+        .get(api + '/commission/get')
+        .then((res) => setMembres(res.data))
+        .catch((res) => console.log(err))
+
+      setCurrentAddedMember({
+        roleM: '',
+        nomM: '',
+        prenomM: '',
+        dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        emailM: '',
+        idM: 0
+      })
     }
-    setAddMember(false)
-    setModifyMember(false)
-
-    setCurrentModifiedMembres([])
-    const tache2 = await axios
-      .get(api + '/commission/get')
-      .then((res) => setMembres(res.data))
-      .catch((res) => console.log(err))
-
-    setCurrentAddedMember({
-      roleM: '',
-      nomM: '',
-      prenomM: '',
-      dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      emailM: '',
-      idM: 0
-    })
   }
 
   const handleModify = () => {
@@ -278,6 +283,53 @@ function Archive() {
       [name]: value
     }))
   }
+
+  function handleNomChange(e) {
+    const { value } = e.target
+    if (value.length == 0) {
+      setNomMsg('nom est vide!')
+    } else if (value.length < 3) {
+      setNomMsg('la longueur doit etre > 3')
+    } else if (value.search(/^[a-zA-Z]*$/)) {
+      setNomMsg("Uniquement les caractères (pas d'espace)")
+    } else {
+      setNomMsg('')
+    }
+  }
+
+  function handlePrenomChange(e) {
+    const { value } = e.target
+    if (value.length == 0) {
+      setPrenomMsg('Prenom est vide!')
+    } else if (value.length < 3) {
+      setPrenomMsg('la longueur doit etre > 3')
+    } else if (value.search(/^[a-zA-Z\s]*$/)) {
+      setPrenomMsg('Uniquement les caractères')
+    } else {
+      setPrenomMsg('')
+    }
+  }
+
+  function handleEmailChange(e) {
+    const { value } = e.target
+    if (value.length == 0) {
+      setEmailMsg('email est vide!')
+    } else if (value.search(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/gm)) {
+      setEmailMsg("invalid format d'email")
+    } else {
+      setEmailMsg('')
+    }
+  }
+
+  function handleRoleChange(e) {
+    const { value } = e.target
+    if (value.length == 0) {
+      setDropMsg('Role est vide!')
+    } else {
+      setDropMsg('')
+    }
+  }
+
   const membresTable = Array.isArray(filteredMembres)
     ? filteredMembres.map((m) => (
         <tr
@@ -331,11 +383,13 @@ function Archive() {
                     id="nomM"
                     onChange={handleInputChange}
                     value={currentAddedMember.nomM}
+                    onKeyUp={(e) => handleNomChange(e)}
                     required
                   ></input>
                   <label className="label_rapport" htmlFor="nomM">
                     Nom
                   </label>
+                  <p className="h-4 text-red">{nomMsg}</p>
                 </div>
                 <div className="container_input_rapport">
                   <input
@@ -344,11 +398,13 @@ function Archive() {
                     id="prenomM"
                     onChange={handleInputChange}
                     value={currentAddedMember.prenomM}
+                    onKeyUp={(e) => handlePrenomChange(e)}
                     required
                   ></input>
                   <label className="label_rapport" htmlFor="prenomM">
                     Prenom
                   </label>
+                  <p className="h-4 text-red">{prenomMsg}</p>
                 </div>
               </div>
               <div className="container_input_rapport">
@@ -359,11 +415,13 @@ function Archive() {
                   id="emailM"
                   onChange={handleInputChange}
                   value={currentAddedMember.emailM}
+                  onKeyUp={(e) => handleEmailChange(e)}
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="emailM">
                   Email
                 </label>
+                <p className="h-4 text-red">{emailMsg}</p>
               </div>
               <div className="container_input_rapport">
                 <input
@@ -373,11 +431,13 @@ function Archive() {
                   onChange={handleInputChange}
                   onClick={() => setDropRole(true)}
                   value={currentAddedMember.roleM}
+                  onKeyUp={(e) => handleRoleChange(e)}
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="roleM">
                   Role
                 </label>
+                <p className="h-4 text-red">{dropMsg}</p>
                 {dropRole && dropRoledownItems}
               </div>
               <div className="container_input_rapport">
