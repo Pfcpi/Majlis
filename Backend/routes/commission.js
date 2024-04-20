@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 
 // list of commission members (comission page)
 router.get('/get', (req, res) => {
-  let sqlquery = `SELECT nom_m, prenom_m, role_m, email_m, date_debut_m
+  let sqlquery = `SELECT nom_m, prenom_m, role_m, email_m, date_debut_m, id_m
   FROM Membre
   WHERE est_actif = TRUE`
   db.query(sqlquery, (err, result) => {

@@ -1,6 +1,5 @@
 //Tasks:
-//Check for matricule not duplicated between students
-//autres in motif
+//Add id attribute for input elements
 
 import { useState, useEffect } from 'react'
 import './sidebar_com_css/accueil.css'
@@ -420,7 +419,7 @@ function AjouterRapport() {
         <hr className="w-full dark:text-gray"></hr>
         <div className="flex justify-between w-5/6 py-6">
           <button
-            className="button_dossier text-red min-w-fit"
+            className="button_dossier text-red border-red hover:bg-red/25 min-w-fit"
             onClick={(e) => {
               e.preventDefault()
               if (step > 1) setStep((prev) => prev - 1)
@@ -430,7 +429,7 @@ function AjouterRapport() {
             {step > 1 ? 'Retourner' : 'Annuler'}
           </button>
           <button
-            className="button_dossier text-blue min-w-fit"
+            className="button_dossier text-blue border-blue hover:bg-blue/25 min-w-fit"
             type="submit"
             onClick={(e) => {
               e.preventDefault()

@@ -169,7 +169,6 @@ function App() {
             >
               Continuer
             </button>
-            {Msg && <p className="text-red">{Msg}</p>}
             <button
               className={ChangePassword ? 'text-red' : 'text-blue'}
               onClick={() => {
@@ -178,6 +177,7 @@ function App() {
             >
               {ChangePassword ? 'Annuler ' : 'Changer le mot de pass'}
             </button>
+            <p className="h-9 text-red">{Msg}</p>
           </div>
         </div>
       )}

@@ -7,7 +7,7 @@
     @apply flex flex-col relative w-full;
   }
   .label_rapport {
-    @apply absolute ml-4 mt-[13px] text-[#A9A9A9] dark:text-white h-fit w-fit bg-transparent transition-all duration-150 ease-linear;
+    @apply absolute ml-4 mt-[13px] text-[#A9A9A9] cursor-text dark:text-white h-fit w-fit bg-transparent transition-all duration-150 ease-linear;
   }
   .input_dossier:valid + .label_rapport,
   .input_dossier:focus + .label_rapport {

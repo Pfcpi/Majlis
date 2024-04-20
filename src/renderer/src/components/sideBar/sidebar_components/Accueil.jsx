@@ -1,5 +1,5 @@
 //Tasks:
-//route /rapport/est_traiter (commit by mouhssin to fix route that will only display traited reports)
+//Add id attribute for input elements
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
 import { useState, useRef, useEffect, useMemo } from 'react'
@@ -134,7 +134,6 @@ function Archive() {
 
   useEffect(() => {
     setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
-    console.log('drop degre value: ', dropDegreValue)
   }, [dropDegreValue])
 
   useEffect(() => {
@@ -155,7 +154,6 @@ function Archive() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    console.log('handle input change: name', name, ',value:', value)
     setRapport((prevState) => ({
       ...prevState,
       [name]: value
@@ -349,15 +347,11 @@ function Archive() {
                 onClick={async () => {
                   const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
-                    .then((res) => {
-                      console.log('/rapport/delete', res)
-                    })
                     .catch((err) => console.log(err))
                   const tache2 = await axios
                     .get(api + '/rapport/get')
                     .then((res) => {
                       setEtudiants(res.data)
-                      console.log('worked updated students after delete')
                     })
                     .catch((err) => console.log(err))
                   setSupprimer(false)
@@ -546,7 +540,6 @@ function Archive() {
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
-                    console.log(rapport)
                     const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))

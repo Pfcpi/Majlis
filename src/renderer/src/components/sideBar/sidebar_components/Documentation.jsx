@@ -325,7 +325,7 @@ function Documentation() {
           </div>
         )}
         {doc === 'Arrete14' && (
-          <div>
+          <div className="overflow-y-auto grow">
             <h1 className="text-3xl">Arrêté n°371 du 11 Juin 2014</h1>
             <ul className="list-disc text-xl pt-10">
               <li>
