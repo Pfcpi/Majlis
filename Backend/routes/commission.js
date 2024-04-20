@@ -34,8 +34,8 @@ router.get('/get', (req, res) => {
 /* Body being in the format of :
   {
 	 "nomM": string value,
-   "prenomM": string value
-   "roleM": string value
+   "prenomM": string value,
+   "roleM": string value,
    "emailM": string value in the format of 'name@mail.x',
    "dateDebutM": string value in the format of 'YYYY-MM-DD'
   }
@@ -74,16 +74,16 @@ router.patch('/edit', (req, res) => {
   })
 })
 
-// remove member from active comission
+// Remove member from active comission
 /* Body being in the format of :
   {
     "idM": int value,
     "dateFin": date value format 'YYYY-MM-DD'
   }
 */
-router.delete('/remove', (req, res) => {
-  let values = [req.body.idM, req.body.dateFin]
-  let sqlquery = `UPDATE Membre SET est_actif = TRUE, date_fin_m = ? WHERE id_m = ?`
+router.patch('/remove', (req, res) => {
+  let values = [req.body.dateFin, req.body.idM]
+  let sqlquery = `UPDATE Membre SET est_actif = FALSE, date_fin_m = ? WHERE id_m = ?`
 
   db.query(sqlquery, values, (err, result) => {
     if(err) {
@@ -110,11 +110,12 @@ router.post('/mail', (req, res) => {
   }
   transporter.sendMail(mailOptions, function (err, info) {
     if (err) {
-      res.status(400).send(err)
+      console.log(err)
     } else {
-      res.sendStatus(204)
+      console.log("Email sent")
     }
   })
+  res.sendStatus(204)
 })
 
 module.exports = router

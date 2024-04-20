@@ -22,6 +22,7 @@ const mailOptions = {
   html: ``
 }
 
+//VALID
 // Add a pv
 /* Body being in the format of :
   {
@@ -34,23 +35,23 @@ const mailOptions = {
     "5": int value or null
    ],
    "libeleS": string value,
-   "temoin": [
-    "1": [
+   "temoin": {
+    "1": {
     "nomT": string value,
     "prenomT": string value,
-    "roleT": string value,
-    ] or null,
-    "2": [
+    "roleT": string value
+    } or null,
+    "2": {
     "nomT": string value,
     "prenomT": string value,
-    "roleT": string value,
-    ] or null,
-    "3": [
+    "roleT": string value
+    } or null,
+    "3": {
     "nomT": string value,
     "prenomT": string value,
-    "roleT": string value,
-    ] or null
-   ],
+    "roleT": string value
+    } or null
+  },
    "numR": int value
   }
 */
@@ -77,7 +78,7 @@ router.post('/add', (req, res) => {
     })
     i++
   }while(i<5)
-  
+
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
   db.query(sqlqueryS, libeleS, (err, result) => {
     if(err) {
@@ -90,22 +91,26 @@ router.post('/add', (req, res) => {
   var num = [null, null, null]
   i=0
   do{
-    if(temoin[i]!=null)
+    
+    if(temoin[i] != null)
     {
-      db.query(sqlqueryT, [temoin[i][1],temoin[i][2],temoin[i][3]], (err, result) => {
+      console.log(temoin[i])
+      db.query(sqlqueryT, [temoin[i].nomT,temoin[i].prenomT,temoin[i].roleT], (err, result) => {
         if(err && err.errno != 1062)
         {
           res.status(400).send(err)
         }
       })
-      db.query('SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?', [temoin[i][1],temoin[i][2]], (err, result) => {
+      db.query('SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?', [temoin[i].nomT,temoin[i].prenomT], (err, result) => {
         if(err)
         {
           res.status(400).send(err)
         }
         num[i]=result[0].num_t
+        console.log(num[i])
       })
     }
+    i++
   }while(i<3)
   
   // Counter to track number of temoin
@@ -127,7 +132,7 @@ router.post('/add', (req, res) => {
       }
     })
   }
-  
+
   // Add the pv
   let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r) VALUES (NOW(), LAST_INSERT_ID(), LAST_INSERT_ID(), ?)`
   db.query(sqlqueryPv, numR, (err, result) => {
