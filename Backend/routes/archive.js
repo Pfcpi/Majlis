@@ -159,80 +159,143 @@ router.patch('/editrapport', (req, res) => {
   })
   
 
-  //UNTESTED
+  //VALID
   // Edit selected pv
   /* Body being in the format of :
      {
       "datePV": date format 'YYYY-MM-DD',
       "libeleS": String,
       "numPV": int,
-      "newIdM": {
-        "1" : {
+      "newIdM": [
+        {
           "nomM": String,
-          "prenomM": String,
+          "prenomM": String
         },
-        "2" : {
+        {
           "nomM": String,
-          "prenomM": String,
+          "prenomM": String
         } or null,
-        "3" : {
+        {
           "nomM": String,
-          "prenomM": String,
+          "prenomM": String
         } or null,
-        "4" : {
+        {
           "nomM": String,
-          "prenomM": String,
+          "prenomM": String
         } or null,
-        "5" : {
+        {
           "nomM": String,
-          "prenomM": String,
-        } or null,
-      },
-      "temoinNew": {
-        "1": {
+          "prenomM": String
+        } or null
+      ],
+      "temoinNew": [
+        {
         "nomT": string value,
         "prenomT": string value,
         "roleT": string value
         } or null,
-        "2": {
+        {
         "nomT": string value,
         "prenomT": string value,
         "roleT": string value
         } or null,
-        "3": {
+        {
         "nomT": string value,
         "prenomT": string value,
         "roleT": string value
         } or null
-      },
-      "temoinOld": {
-        "1": {
-        "nomT": string value,
-        "prenomT": string value,
-        "roleT": string value
-        } or null,
-        "2": {
-        "nomT": string value,
-        "prenomT": string value,
-        "roleT": string value
-        } or null,
-        "3": {
-        "nomT": string value,
-        "prenomT": string value,
-        "roleT": string value
-        } or null
-      },
+      ],
       "dateCD": Date value
-
-
     }
   */
-
-
-//UNFIXED HELP PLEASE I'M DYING I CANT TAKE IT ANYMORE PLEASE HELP
-    router.patch('/editpv', async (req, res) => {
-      // to be continued...
-      })
+        router.patch('/editpv', (req, res) => {
+          let {datePV, libeleS, numPV, newIdM, temoinNew, dateCD} = req.body;
+          let newIdMArray = Object.values(newIdM).filter(member => member !== null);
+          let temoinNewArray = Object.values(temoinNew).filter(temoin => temoin !== null);
+          let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`;
+          db.query(sqlqueryP, [datePV, numPV]);
+          let sqlquerydelM = `DELETE cp FROM Commission_Presente cp LEFT JOIN PV ON PV.num_cd = cp.num_cd WHERE PV.num_pv = ?`;
+          db.query(sqlquerydelM, numPV, (err, result) => {
+            if (err) {
+              res.status(400).send(err);
+            }
+          });
+          let sqlquerygetM = `SELECT id_m FROM Membre WHERE nom_m = ? and prenom_m = ?`;
+          let idM = [];
+          for (let member of newIdMArray) {
+            db.query(sqlquerygetM, [member.nomM, member.prenomM], (err, result) => {
+              if (err) {
+                res.status(400).send(err);
+              }
+              idM=result[0];
+              let sqlqueryaddM = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES
+                                  ((SELECT PV.num_cd FROM PV
+                                  INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?), ?)`;
+              db.query(sqlqueryaddM, [numPV, result[0].id_m], (err, result) => {
+                if (err) {
+                  res.status(400).send(err);
+                }
+              });
+            });
+          }
+          let sqlquerydelT = `DELETE te FROM Temoigne te LEFT JOIN PV ON PV.num_cd = te.num_cd WHERE PV.num_pv = ?`;
+          db.query(sqlquerydelT, numPV, (err, result) => {
+            if (err) {
+              res.status(400).send(err);
+            }
+          });
+          var sqlquerylinkT = null
+          let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`;
+          for (let temoin of temoinNewArray) {
+            db.query(sqlqueryaddT, [temoin.nomT, temoin.prenomT, temoin.roleT], (err, result) => {
+              if (err&&err.errno!=1062) {
+                res.status(400).send(err);
+              }
+              else if(err&&err.errno==1062)
+              {
+                var numT = null
+                let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
+                db.query(sqlquerygetT, [temoin.nomT, temoin.prenomT], (err, result) => {
+                  if(err)
+                  {
+                    res.status(400).send(err)
+                  }
+                  numT=result[0].num_t
+                  sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (${numT}, (SELECT PV.num_cd FROM PV
+                    INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
+                    db.query(sqlquerylinkT, numPV, (err, result) => {
+                      if (err) {
+                        res.status(400).send(err);
+                      }
+                    });
+                })
+              }
+              else {
+              sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (LAST_INSERT_ID(), (SELECT PV.num_cd FROM PV
+                INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`;
+                db.query(sqlquerylinkT, numPV, (err, result) => {
+                  if (err) {
+                    res.status(400).send(err);
+                  }
+                });
+              }
+            });
+          }
+          let sqlqueryS = 'UPDATE Sanction s INNER JOIN PV ON PV.num_s = s.num_s SET s.libele_s = ? WHERE PV.num_pv = ?';
+          db.query(sqlqueryS, [libeleS, numPV], (err, result) => {
+            if (err) {
+              res.status(400).send(err);
+            }
+          });
+          let sqlqueryC = `UPDATE Conseil_Discipline cd INNER JOIN PV ON PV.num_cd = cd.num_cd SET cd.date_cd = ? WHERE PV.num_pv = ?`;
+          db.query(sqlqueryC, [dateCD, numPV], (err, result) => {
+            if (err) {
+              res.status(400).send(err);
+            } else {
+              res.sendStatus(204);
+            }
+          });
+        });
     
     
     
