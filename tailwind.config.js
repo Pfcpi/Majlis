@@ -1,4 +1,5 @@
 import { spread } from 'axios'
+import { Transform } from 'nodemailer/lib/xoauth2'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -31,11 +32,18 @@ export default {
       spread: {
         '0%': { width: '10px', opacity: '0.5' },
         '100%': { width: '100%', opacity: '0' }
+      },
+      badInput: {
+        '0%': { opacity: '0' },
+        '5%': { opacity: '1', transform: 'translateY(10px)' },
+        '75%': { opacity: '1' },
+        '100%': { opacity: '0', transform: 'translateY(13px)' }
       }
     },
     animation: {
       spread: 'spread .5s linear',
-      label: '.2 ease'
+      label: '.2 ease',
+      badInput: 'badInput 2s linear'
     }
   },
   plugins: []

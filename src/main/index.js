@@ -57,7 +57,6 @@ app.whenReady().then(() => {
   ExpressApp.listen(3000, () => {
     console.log('Express server running on port 3000')
   })
-
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

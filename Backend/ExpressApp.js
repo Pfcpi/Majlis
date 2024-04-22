@@ -13,11 +13,6 @@ const archiveRouter = require('./routes/archive')
 ExpressApp.use(cors())
 ExpressApp.use(express.json())
 
-// Your routes and other middleware
-ExpressApp.get('/', (req, res) => {
-  res.send('Hello from Express with CORS!')
-})
-
 ExpressApp.use('/rapport', rapportRouter)
 ExpressApp.use('/commission', commissionRouter)
 ExpressApp.use('/pv', pvRouter)

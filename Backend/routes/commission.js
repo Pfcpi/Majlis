@@ -63,8 +63,8 @@ router.post('/add', (req, res) => {
   }
 */
 router.patch('/edit', (req, res) => {
-  let values = [req.body.roleM, req.body.nomM, req.body.prenomM, req.body.dateDebutM, req.body.idM]
-  let sqlquery = `UPDATE Membre SET role_m = ?, nom_m = ?, prenom_m = ?, date_debut_m = ? WHERE id_m = ?`
+  let values = [req.body.roleM, req.body.nomM, req.body.prenomM, req.body.emailM ,req.body.dateDebutM, req.body.idM]
+  let sqlquery = `UPDATE Membre SET role_m = ?, nom_m = ?, prenom_m = ?, email_m = ?, date_debut_m = ? WHERE id_m = ?`
   db.query(sqlquery, values, (err, result) => {
     if(err) {
       res.status(400).send(err)

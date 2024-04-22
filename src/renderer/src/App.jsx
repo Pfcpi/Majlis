@@ -1,15 +1,15 @@
+//not Completed
+//responsiveness when clicked animation
 import SideBar from './components/sideBar/SideBar.jsx'
 import NavBar from './components/NavBar.jsx'
 import authJPG from './assets/auth.jpg'
 import USTOLogo from './assets/USTO-MB_logo2.svg'
 import useAuth from './zustand/auth.js'
 import useAccount from './zustand/account.js'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import './index.css'
 import axios from 'axios'
-//not Completed
-//responsiveness when clicked animation
 
 function App() {
   const { auth, authentificate } = useAuth()

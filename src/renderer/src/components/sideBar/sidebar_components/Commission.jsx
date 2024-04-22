@@ -1,9 +1,6 @@
 //Tasks:
-//handle form validation
-//when submitting(add some notification to the user about incorrect inputs)
-//check for unfilled inputs
-//send email member
-import { useState, useMemo, useEffect } from 'react'
+//When deleting multiple members, it does not update for all deleted members(kind of (not to worry))
+import { useState, useMemo, useEffect, useRef } from 'react'
 
 import './sidebar_com_css/archives.css'
 
@@ -15,11 +12,17 @@ import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
 import SearchSVG from './../../../assets/Search.svg'
 import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
+import WarningSVG from './../../../assets/warning.svg'
 import axios from 'axios'
 
 function Archive() {
   const roles = ['Président', 'Titulaire', 'Suppléant', 'Étudiant']
   const rep = [1, 4, 5, 1]
+
+  const nomRef = useRef()
+  const prenomRef = useRef()
+  const emailRef = useRef()
+  const roleRef = useRef()
 
   const { account } = useAccount()
   const { dark } = useDark()
@@ -32,11 +35,13 @@ function Archive() {
   const [dropRole, setDropRole] = useState(false)
   const [dropRoleValue, setDropRoleValue] = useState('')
 
-  const [nomMsg, setNomMsg] = useState('')
-  const [prenomMsg, setPrenomMsg] = useState('')
-  const [emailMsg, setEmailMsg] = useState('')
-  const [dropMsg, setDropMsg] = useState('')
-  const [dateMsg, setDateMsg] = useState('')
+  const [formData, setFormData] = useState({ nomM: '', prenomM: '', emailM: '', roleM: '' })
+  const [errors, setErrors] = useState({
+    nomError: '',
+    prenomError: '',
+    emailError: '',
+    roleError: ''
+  })
 
   const dataFin = new Date().toISOString().slice(0, 19).replace('T', ' ')
   const api = 'http://localhost:3000'
@@ -77,6 +82,7 @@ function Archive() {
 
   useEffect(() => {
     setCurrentAddedMember((prev) => ({ ...prev, roleM: dropRoleValue }))
+    setFormData((prev) => ({ ...prev, roleM: dropRoleValue }))
   }, [dropRoleValue])
 
   const filteredMembres = useMemo(() => {
@@ -199,7 +205,6 @@ function Archive() {
             dataFin: dataFin,
             idM: m.id_m
           })
-          .then((res) => console.log(res))
           .catch((err) => console.log(err))
       })
       setCurrentModifiedMembres([])
@@ -220,14 +225,17 @@ function Archive() {
       emailM: '',
       idM: 0
     })
+    setFormData({ nomM: '', prenomM: '', emailM: '', roleM: '' })
+    setErrors({ nomError: '', prenomError: '', emailError: '', roleError: '' })
     setDropRole(false)
     setAddMember(false)
     setModifyMember(false)
   }
 
-  const handleAjouter = async (e) => {
+  async function handleAjouter(e) {
     e.preventDefault()
-    if (!nomMsg && !prenomMsg && !emailMsg && !dropMsg) {
+    const newErrors = validateForm(formData)
+    if (Object.keys(newErrors).length === 0) {
       if (addMember) {
         const tache1 = await axios
           .post(api + '/commission/add', currentAddedMember)
@@ -247,7 +255,7 @@ function Archive() {
       const tache2 = await axios
         .get(api + '/commission/get')
         .then((res) => setMembres(res.data))
-        .catch((res) => console.log(err))
+        .catch((err) => console.log(err))
 
       setCurrentAddedMember({
         roleM: '',
@@ -257,7 +265,12 @@ function Archive() {
         emailM: '',
         idM: 0
       })
+      setFormData({ nomM: '', prenomM: '', emailM: '', roleM: '' })
     }
+    setTimeout(
+      () => setErrors({ nomError: '', prenomError: '', emailError: '', roleError: '' }),
+      2000
+    )
   }
 
   const handleModify = () => {
@@ -276,58 +289,78 @@ function Archive() {
     }
   }
 
+  const handleSendEmail = () => {
+    if (currentModifiedMembres != 0) {
+      currentModifiedMembres.map(async (m) => {
+        const tache = await axios
+          .post(api + '/commission/mail', { email: m.email_m })
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err))
+      })
+      setCurrentModifiedMembres([])
+    }
+  }
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setCurrentAddedMember((prevState) => ({
       ...prevState,
       [name]: value
     }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  function handleNomChange(e) {
-    const { value } = e.target
-    if (value.length == 0) {
-      setNomMsg('nom est vide!')
-    } else if (value.length < 3) {
-      setNomMsg('la longueur doit etre > 3')
-    } else if (value.search(/^[a-zA-Z]*$/)) {
-      setNomMsg("Uniquement les caractères (pas d'espace)")
+  const validateForm = (data) => {
+    let errors = {}
+    if (data.nomM.length == 0) {
+      errors.nom = 'nom est vide!'
+      setErrors((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomM.length < 3) {
+      errors.nom = 'la longueur doit etre > 3'
+      setErrors((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomM.search(/^[a-zA-Z]*$/)) {
+      errors.nom = "Uniquement les caractères (pas d'espace)"
+      setErrors((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
     } else {
-      setNomMsg('')
+      setErrors((prev) => ({ ...prev, nomError: '' }))
     }
-  }
-
-  function handlePrenomChange(e) {
-    const { value } = e.target
-    if (value.length == 0) {
-      setPrenomMsg('Prenom est vide!')
-    } else if (value.length < 3) {
-      setPrenomMsg('la longueur doit etre > 3')
-    } else if (value.search(/^[a-zA-Z\s]*$/)) {
-      setPrenomMsg('Uniquement les caractères')
+    if (data.prenomM.length == 0) {
+      errors.prenom = 'Prenom est vide!'
+      setErrors((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomM.length < 3) {
+      errors.prenom = 'la longueur doit etre > 3'
+      setErrors((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomM.search(/^[a-zA-Z\s]*$/)) {
+      errors.prenom = 'Uniquement les caractères'
+      setErrors((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
     } else {
-      setPrenomMsg('')
+      setErrors((prev) => ({ ...prev, prenomError: '' }))
     }
-  }
-
-  function handleEmailChange(e) {
-    const { value } = e.target
-    if (value.length == 0) {
-      setEmailMsg('email est vide!')
-    } else if (value.search(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/gm)) {
-      setEmailMsg("invalid format d'email")
+    if (data.emailM.length == 0) {
+      errors.email = 'email est vide!'
+      setErrors((prev) => ({ ...prev, emailError: errors.email }))
+      return errors
+    } else if (data.emailM.search(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/gm)) {
+      errors.email = 'Format d’e-mail non valide'
+      setErrors((prev) => ({ ...prev, emailError: errors.email }))
+      return errors
     } else {
-      setEmailMsg('')
+      setErrors((prev) => ({ ...prev, emailError: '' }))
     }
-  }
-
-  function handleRoleChange(e) {
-    const { value } = e.target
-    if (value.length == 0) {
-      setDropMsg('Role est vide!')
+    if (data.roleM.length == 0) {
+      errors.role = 'Role est vide!'
+      setErrors((prev) => ({ ...prev, roleError: errors.role }))
+      return errors
     } else {
-      setDropMsg('')
+      setErrors((prev) => ({ ...prev, roleError: '' }))
     }
+    return errors
   }
 
   const membresTable = Array.isArray(filteredMembres)
@@ -351,9 +384,7 @@ function Archive() {
           <td className="border-x">
             <label htmlFor="choice"> {m.role_m}</label>
           </td>
-          <td cl assName="border-x">
-            {[m.nom_m, ' ', m.prenom_m]}
-          </td>
+          <td className="border-x">{[m.nom_m, ' ', m.prenom_m]}</td>
           <td className="border-x">{m.email_m}</td>
           <td className="border-x">{m.date_debut_m.substring(0, 10)}</td>
         </tr>
@@ -383,13 +414,17 @@ function Archive() {
                     id="nomM"
                     onChange={handleInputChange}
                     value={currentAddedMember.nomM}
-                    onKeyUp={(e) => handleNomChange(e)}
                     required
                   ></input>
                   <label className="label_rapport" htmlFor="nomM">
                     Nom
                   </label>
-                  <p className="h-4 text-red">{nomMsg}</p>
+                  {errors.nomError && (
+                    <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                      <img height="16" width="16" src={WarningSVG}></img>
+                      {errors.nomError}
+                    </p>
+                  )}
                 </div>
                 <div className="container_input_rapport">
                   <input
@@ -398,30 +433,37 @@ function Archive() {
                     id="prenomM"
                     onChange={handleInputChange}
                     value={currentAddedMember.prenomM}
-                    onKeyUp={(e) => handlePrenomChange(e)}
                     required
                   ></input>
                   <label className="label_rapport" htmlFor="prenomM">
                     Prenom
                   </label>
-                  <p className="h-4 text-red">{prenomMsg}</p>
+                  {errors.prenomError && (
+                    <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                      <img height="16" width="16" src={WarningSVG}></img>
+                      {errors.prenomError}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="container_input_rapport">
                 <input
                   className="input_dossier"
                   name="emailM"
-                  type="email"
                   id="emailM"
                   onChange={handleInputChange}
                   value={currentAddedMember.emailM}
-                  onKeyUp={(e) => handleEmailChange(e)}
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="emailM">
                   Email
                 </label>
-                <p className="h-4 text-red">{emailMsg}</p>
+                {errors.emailError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errors.emailError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -431,13 +473,17 @@ function Archive() {
                   onChange={handleInputChange}
                   onClick={() => setDropRole(true)}
                   value={currentAddedMember.roleM}
-                  onKeyUp={(e) => handleRoleChange(e)}
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="roleM">
                   Role
                 </label>
-                <p className="h-4 text-red">{dropMsg}</p>
+                {errors.roleError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errors.roleError}
+                  </p>
+                )}
                 {dropRole && dropRoledownItems}
               </div>
               <div className="container_input_rapport">
@@ -461,7 +507,9 @@ function Archive() {
               <button
                 className="button_dossier text-blue border-blue hover:bg-blue/25"
                 type="submit"
-                onClick={handleAjouter}
+                onClick={(e) => {
+                  handleAjouter(e)
+                }}
               >
                 Ajouter
               </button>
@@ -512,7 +560,14 @@ function Archive() {
             </div>
           )}
           {account == 'president' && (
-            <button className="flex justify-center items-center gap-3 py-2 px-4 border rounded-xl border-table-border-white-theme-color">
+            <button
+              onClick={handleSendEmail}
+              className={
+                currentModifiedMembres.length != 0
+                  ? 'flex border py-2 px-4 rounded-xl gap-2 text-blue bg-blue/15 duration-100'
+                  : 'flex border py-2 px-4 rounded-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
+              }
+            >
               <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
             </button>
           )}
