@@ -19,11 +19,6 @@ function Archive() {
   const roles = ['Président', 'Titulaire', 'Suppléant', 'Étudiant']
   const rep = [1, 4, 5, 1]
 
-  const nomRef = useRef()
-  const prenomRef = useRef()
-  const emailRef = useRef()
-  const roleRef = useRef()
-
   const { account } = useAccount()
   const { dark } = useDark()
 
@@ -390,11 +385,6 @@ function Archive() {
         </tr>
       ))
     : ''
-
-  /*function handleRowChecked() {
-    var checkBox = ref.current
-    checkBox.click()
-  }*/
 
   return (
     <div className="relative flex w-full h-full font-poppins flex-row-reverse justify-evenly">

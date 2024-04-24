@@ -56,7 +56,7 @@ const mailOptions = {
   }
 */
 router.post('/add', (req, res) => {
-  let {dateCd, idM, libeleS, temoin, numR} = req.body
+  let { dateCd, idM, libeleS, temoin, numR } = req.body
 
   db.query(`SET FOREIGN_KEY_CHECKS = 0`)
   let sqlqueryCd = `INSERT INTO Conseil_Discipline (date_cd) VALUES (?)`
@@ -68,69 +68,70 @@ router.post('/add', (req, res) => {
 
   // Add multiple members to comission
   let sqlqueryC = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES (LAST_INSERT_ID(), ?)`
-  var i=0
-  do{
-    if(idM[i]!=null)
-    db.query(sqlqueryC, idM[i], (err, result) => {
-      if(err)
-      {
-        console.log(err)
-      }
-    })
+  var i = 0
+  do {
+    if (idM[i] != null)
+      db.query(sqlqueryC, idM[i], (err, result) => {
+        if (err) {
+          console.log(err)
+        }
+      })
     i++
-  }while(i<5)
-
-
+  } while (i < 5)
 
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
   db.query(sqlqueryS, libeleS, (err, result) => {
-    if(err) {
+    if (err) {
       console.log(err)
     }
   })
 
-
   // Add a temoin to the database if it is in the body
   let sqlqueryT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
   let sqlquerytem = `INSERT INTO Temoigne (num_cd, num_t) VALUES ((SELECT num_cd FROM Conseil_Discipline ORDER BY num_cd DESC LIMIT 0,1), ?)`
-  i=0
-  do{
-    if(temoin[i] != null)
-    {
-      db.query(sqlqueryT, [temoin[i].nomT,temoin[i].prenomT,temoin[i].roleT], (err, result) => {
-        if(err && err.errno != 1062)
-        {
+  i = 0
+  do {
+    if (temoin[i] != null) {
+      db.query(sqlqueryT, [temoin[i].nomT, temoin[i].prenomT, temoin[i].roleT], (err, result) => {
+        if (err && err.errno != 1062) {
           console.log(err)
         }
       })
-      db.query('SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?', [temoin[i].nomT,temoin[i].prenomT], (err, result) => {
-        if(err)
-        {
-          console.log(err)
-        }
-        let num = result[0].num_t
-        console.log("num"+i+":"+num)
-        db.query(sqlquerytem, num, (err, result) => {
-          if(err && err.errno!=1062)
-          {
+      db.query(
+        'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?',
+        [temoin[i].nomT, temoin[i].prenomT],
+        (err, result) => {
+          if (err) {
             console.log(err)
           }
-        })
-      })
+          let num = result[0].num_t
+          console.log('num' + i + ':' + num)
+          db.query(sqlquerytem, num, (err, result) => {
+            if (err && err.errno != 1062) {
+              console.log(err)
+            }
+          })
+        }
+      )
     }
     i++
-  }while(i<3)
+  } while (i < 3)
 
-  
-  
   // Add the pv
 
   let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r) VALUES (NOW(), LAST_INSERT_ID(), LAST_INSERT_ID(), ?)`
   db.query(sqlqueryPv, numR, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(400).send(err)
     }
     transporter.sendMail(mailOptions)
+  })
+
+  let sqlqueryTraitement = 'UPDATE Rapport SET est_traite=TRUE WHERE num_r = ?'
+  db.query(sqlqueryTraitement, numR, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    }
   })
   db.query(`SET FOREIGN_KEY_CHECKS = 1`)
   res.sendStatus(204)

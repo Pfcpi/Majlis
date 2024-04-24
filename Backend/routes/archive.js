@@ -8,31 +8,31 @@ const { db } = require('../config/db')
 //VALID
 // List of rapport that is short and that is treated (Archive > Rapport)
 router.get('/getrapport', (req, res) => {
-    let sqlquery = `SELECT r.num_r, e.nom_e, e.prenom_e, i.date_i
+  let sqlquery = `SELECT r.num_r, e.nom_e, e.prenom_e, i.date_i
     FROM Rapport r
     JOIN Etudiant e ON r.matricule_e = e.matricule_e
     JOIN Infraction i ON r.num_i = i.num_i
     WHERE r.est_traite = TRUE
     ORDER BY i.date_i DESC`
-    db.query(sqlquery, (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      } else {
-        res.send(result)
-      }
-    })
+  db.query(sqlquery, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
+    }
   })
-  
-  //VALID
-  // List of rapport that is detailled and treated (click on a rapport) (ARCHIVE)
-  /* Body being in the format of :
+})
+
+//VALID
+// List of rapport that is detailled and treated (click on a rapport) (ARCHIVE)
+/* Body being in the format of :
     {
       "numR": int value
     }
   */
-  router.post('/getsrapport', (req, res) => {
-    let numr = req.body.numR
-    let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
+router.post('/getsrapport', (req, res) => {
+  let numr = req.body.numR
+  let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
     p.nom_p, p.prenom_p,
     i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i
     FROM Rapport r
@@ -40,15 +40,15 @@ router.get('/getrapport', (req, res) => {
     INNER JOIN Plaignant p ON r.id_p = p.id_p
     INNER JOIN Infraction i ON r.num_i = i.num_i
     WHERE r.num_r = ?`
-  
-    db.query(sqlquery, numr, (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      } else {
-        res.send(result)
-      }
-    })
+
+  db.query(sqlquery, numr, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
+    }
   })
+})
 
 //VALID
 // Delete a rapport (archive)
@@ -143,25 +143,24 @@ router.patch('/editrapport', (req, res) => {
   })
 })
 
-  //VALID
-  // Get inactive commission members
-  router.get('/getcommission', (req, res) => {
-    let sqlquery = `SELECT nom_m, prenom_m, role_m, email_m, date_debut_m, date_fin_m
+//VALID
+// Get inactive commission members
+router.get('/getcommission', (req, res) => {
+  let sqlquery = `SELECT nom_m, prenom_m, role_m, email_m, date_debut_m, date_fin_m
     FROM Membre
     WHERE est_actif = false`
-    db.query(sqlquery, (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      } else {
-        res.send(result)
-      }
-    })
+  db.query(sqlquery, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
+    }
   })
-  
+})
 
-  //VALID
-  // Edit selected pv
-  /* Body being in the format of :
+//VALID
+// Edit selected pv
+/* Body being in the format of :
      {
       "datePV": date format 'YYYY-MM-DD',
       "libeleS": String,
@@ -208,105 +207,96 @@ router.patch('/editrapport', (req, res) => {
       "dateCD": Date value
     }
   */
-        router.patch('/editpv', (req, res) => {
-          let {datePV, libeleS, numPV, newIdM, temoinNew, dateCD} = req.body;
-          let newIdMArray = Object.values(newIdM).filter(member => member !== null);
-          let temoinNewArray = Object.values(temoinNew).filter(temoin => temoin !== null);
-          let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`;
-          db.query(sqlqueryP, [datePV, numPV]);
-          let sqlquerydelM = `DELETE cp FROM Commission_Presente cp LEFT JOIN PV ON PV.num_cd = cp.num_cd WHERE PV.num_pv = ?`;
-          db.query(sqlquerydelM, numPV, (err, result) => {
-            if (err) {
-              res.status(400).send(err);
-            }
-          });
-          let sqlquerygetM = `SELECT id_m FROM Membre WHERE nom_m = ? and prenom_m = ?`;
-          let idM = [];
-          for (let member of newIdMArray) {
-            db.query(sqlquerygetM, [member.nomM, member.prenomM], (err, result) => {
-              if (err) {
-                res.status(400).send(err);
-              }
-              idM=result[0];
-              let sqlqueryaddM = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES
+router.patch('/editpv', (req, res) => {
+  let { datePV, libeleS, numPV, newIdM, temoinNew, dateCD } = req.body
+  let newIdMArray = Object.values(newIdM).filter((member) => member !== null)
+  let temoinNewArray = Object.values(temoinNew).filter((temoin) => temoin !== null)
+  let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`
+  db.query(sqlqueryP, [datePV, numPV])
+  let sqlquerydelM = `DELETE cp FROM Commission_Presente cp LEFT JOIN PV ON PV.num_cd = cp.num_cd WHERE PV.num_pv = ?`
+  db.query(sqlquerydelM, numPV, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+  })
+  let sqlquerygetM = `SELECT id_m FROM Membre WHERE nom_m = ? and prenom_m = ?`
+  let idM = []
+  for (let member of newIdMArray) {
+    db.query(sqlquerygetM, [member.nomM, member.prenomM], (err, result) => {
+      if (err) {
+        res.status(400).send(err)
+      }
+      idM = result[0]
+      let sqlqueryaddM = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES
                                   ((SELECT PV.num_cd FROM PV
-                                  INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?), ?)`;
-              db.query(sqlqueryaddM, [numPV, result[0].id_m], (err, result) => {
-                if (err) {
-                  res.status(400).send(err);
-                }
-              });
-            });
+                                  INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?), ?)`
+      db.query(sqlqueryaddM, [numPV, result[0].id_m], (err, result) => {
+        if (err) {
+          res.status(400).send(err)
+        }
+      })
+    })
+  }
+  let sqlquerydelT = `DELETE te FROM Temoigne te LEFT JOIN PV ON PV.num_cd = te.num_cd WHERE PV.num_pv = ?`
+  db.query(sqlquerydelT, numPV, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+  })
+  var sqlquerylinkT = null
+  let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
+  for (let temoin of temoinNewArray) {
+    db.query(sqlqueryaddT, [temoin.nomT, temoin.prenomT, temoin.roleT], (err, result) => {
+      if (err && err.errno != 1062) {
+        res.status(400).send(err)
+      } else if (err && err.errno == 1062) {
+        var numT = null
+        let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
+        db.query(sqlquerygetT, [temoin.nomT, temoin.prenomT], (err, result) => {
+          if (err) {
+            res.status(400).send(err)
           }
-          let sqlquerydelT = `DELETE te FROM Temoigne te LEFT JOIN PV ON PV.num_cd = te.num_cd WHERE PV.num_pv = ?`;
-          db.query(sqlquerydelT, numPV, (err, result) => {
-            if (err) {
-              res.status(400).send(err);
-            }
-          });
-          var sqlquerylinkT = null
-          let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`;
-          for (let temoin of temoinNewArray) {
-            db.query(sqlqueryaddT, [temoin.nomT, temoin.prenomT, temoin.roleT], (err, result) => {
-              if (err&&err.errno!=1062) {
-                res.status(400).send(err);
-              }
-              else if(err&&err.errno==1062)
-              {
-                var numT = null
-                let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
-                db.query(sqlquerygetT, [temoin.nomT, temoin.prenomT], (err, result) => {
-                  if(err)
-                  {
-                    res.status(400).send(err)
-                  }
-                  numT=result[0].num_t
-                  sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (${numT}, (SELECT PV.num_cd FROM PV
+          numT = result[0].num_t
+          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (${numT}, (SELECT PV.num_cd FROM PV
                     INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
-                    db.query(sqlquerylinkT, numPV, (err, result) => {
-                      if (err) {
-                        res.status(400).send(err);
-                      }
-                    });
-                })
-              }
-              else {
-              sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (LAST_INSERT_ID(), (SELECT PV.num_cd FROM PV
-                INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`;
-                db.query(sqlquerylinkT, numPV, (err, result) => {
-                  if (err) {
-                    res.status(400).send(err);
-                  }
-                });
-              }
-            });
+          db.query(sqlquerylinkT, numPV, (err, result) => {
+            if (err) {
+              res.status(400).send(err)
+            }
+          })
+        })
+      } else {
+        sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (LAST_INSERT_ID(), (SELECT PV.num_cd FROM PV
+                INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
+        db.query(sqlquerylinkT, numPV, (err, result) => {
+          if (err) {
+            res.status(400).send(err)
           }
-          let sqlqueryS = 'UPDATE Sanction s INNER JOIN PV ON PV.num_s = s.num_s SET s.libele_s = ? WHERE PV.num_pv = ?';
-          db.query(sqlqueryS, [libeleS, numPV], (err, result) => {
-            if (err) {
-              res.status(400).send(err);
-            }
-          });
-          let sqlqueryC = `UPDATE Conseil_Discipline cd INNER JOIN PV ON PV.num_cd = cd.num_cd SET cd.date_cd = ? WHERE PV.num_pv = ?`;
-          db.query(sqlqueryC, [dateCD, numPV], (err, result) => {
-            if (err) {
-              res.status(400).send(err);
-            } else {
-              res.sendStatus(204);
-            }
-          });
-        });
-    
-    
-    
-    
+        })
+      }
+    })
+  }
+  let sqlqueryS =
+    'UPDATE Sanction s INNER JOIN PV ON PV.num_s = s.num_s SET s.libele_s = ? WHERE PV.num_pv = ?'
+  db.query(sqlqueryS, [libeleS, numPV], (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+  })
+  let sqlqueryC = `UPDATE Conseil_Discipline cd INNER JOIN PV ON PV.num_cd = cd.num_cd SET cd.date_cd = ? WHERE PV.num_pv = ?`
+  db.query(sqlqueryC, [dateCD, numPV], (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.sendStatus(204)
+    }
+  })
+})
 
-    
-
-  // VALID
-  // Display list of pvs (Archive --> Dossier)
-  router.get('/getpv', (req, res) => {
-    let sqlquery = `SELECT
+// VALID
+// Display list of pvs (Archive --> Dossier)
+router.get('/getpv', (req, res) => {
+  let sqlquery = `SELECT
     PV.num_pv,
     e.nom_e,
     e.prenom_e,
@@ -328,25 +318,25 @@ FROM
         LEFT JOIN
     Commission_Presente cp ON PV.num_cd = cp.num_cd`
 
-    db.query(sqlquery, (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      } else {
-        res.send(result)
-      }
-    })
+  db.query(sqlquery, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
+    }
   })
+})
 
-  //VALID
-  // Display detailled informations of a selected pv
-  /* Body being in the form of :
+//VALID
+// Display detailled informations of a selected pv
+/* Body being in the form of :
     {
       "numPV": int value
     }
   */
-  router.post('/getspv', (req, res) => {
-    let numpv = req.body.numPV
-    let sqlquery = `SELECT
+router.post('/getspv', (req, res) => {
+  let numpv = req.body.numPV
+  let sqlquery = `SELECT
     r.num_r,
     e.matricule_e,
     e.nom_e,
@@ -421,15 +411,15 @@ GROUP BY
     pv.date_pv,
     s.libele_s
 `
-  
-    db.query(sqlquery, numpv, (err, result) => {
-      if(err) {
-        res.status(400).send(err)
-      } else {
-        res.send(result)
-      }
-    })
+
+  db.query(sqlquery, numpv, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
+    }
   })
+})
 
 //VALID
 /* Body being in the format of:
@@ -442,7 +432,7 @@ router.delete('/deletepv', (req, res) => {
   let numpv = req.body.numPV
   let sqlquery = `DELETE FROM PV WHERE num_pv = ?`
   db.query(sqlquery, numpv, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(400).send(err)
     } else {
       res.sendStatus(204)

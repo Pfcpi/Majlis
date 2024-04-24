@@ -1,4 +1,4 @@
-import { useState, useRef, Component } from 'react'
+import { useState, useRef, Component, useEffect } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import './sidebar_com_css/archives.css'
@@ -7,7 +7,6 @@ import useDark from '../../../zustand/dark'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
-import SearchSVG from './../../../assets/Search.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
 import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
 import PdfSVG from './../../../assets/pdf.svg'
@@ -17,41 +16,35 @@ import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import GOBackSVG from './../../../assets/GoBack.svg'
 import GOBackGraySVG from './../../../assets/BlueSvgs/GoBackGray.svg'
+import axios from 'axios'
 
 //Need to modify:
 function Archive() {
   //false for rapport, true for Dossier
   const [rapportdossier, setRapportDossier] = useState(false)
+  const [rapports, setRapports] = useState([])
   const [view, setView] = useState(false)
   const { dark } = useDark()
-  const ref = useRef(null)
   const printComponent = useRef(null)
 
-  function handleRowChecked() {
-    var label = ref.current
-    label.click()
-  }
+  const api = 'http://localhost:3000'
 
-  const handlePrint = () => {
-    return new Promise(() => {
-      console.log('forwarding print request to the main process...')
-
-      let data = printComponent.current
-      console.log(data)
-      var blob = new Blob([data], { type: 'text/html' })
-      var url = URL.createObjectURL(blob)
-
-      window.electronAPI.printComponent(url, (response) => {
-        console.log('Main: ', response)
+  useEffect(() => {
+    axios
+      .get(api + '/archive/getrapport')
+      .then((res) => {
+        setRapports(res.data)
+        console.log(res.data)
       })
-    })
-  }
+      .catch((err) => console.log(err))
+  }, [])
 
   const handlePreview = () => {
     return new Promise(() => {
       console.log('forwarding print preview request...')
 
-      const data = printComponent.current
+      const data = printComponent.current.outerHTML
+      console.log(printComponent)
       console.log(data)
       const blob = new Blob([data], { type: 'text/html' })
       const url = URL.createObjectURL(blob)
@@ -62,11 +55,57 @@ function Archive() {
     })
   }
 
+  const tab = Array.isArray(rapports) ? (
+    rapports.map((m) => (
+      <tr
+        ref={printComponent}
+        data-rapportdossier={rapportdossier}
+        className="border-y-[1px] data-[rapportdossier=true]:has-[:checked]:border-blue dark:hover:bg-dark-gray print:flex print:gap-4"
+      >
+        <td
+          data-rapportdossier={rapportdossier}
+          className="data-[rapportdossier=false]:border-x-[1px]"
+        >
+          <span>{m.num_r}</span>
+        </td>
+        <td
+          data-rapportdossier={rapportdossier}
+          className="data-[rapportdossier=false]:border-x-[1px]"
+        >
+          {[m.nom_e, ' ', m.prenom_e]}
+        </td>
+        <td
+          data-rapportdossier={rapportdossier}
+          className="data-[rapportdossier=false]:border-x-[1px]"
+        >
+          {m.date_i.slice(0, m.date_i.indexOf('T'))}
+        </td>
+        {!rapportdossier && (
+          <td className="border-x-[1px]">
+            <button className="mr-10" onClick={() => setView(true)}>
+              <img src={VoirDossierSVG} alt="voir dossier icon"></img>
+            </button>
+            <button>
+              <img src={ModifierDossierSVG} alt="modifier dossier icon"></img>
+            </button>
+          </td>
+        )}
+        {rapportdossier && <td>22 Jan 2023</td>}
+        {rapportdossier && <td>Blame ecrit</td>}
+      </tr>
+    ))
+  ) : (
+    <></>
+  )
+  const handlePrintNPM = useReactToPrint({
+    content: () => printComponent.current
+  })
+
   return (
     <>
       {' '}
       {!view && (
-        <div ref={printComponent} className="flex flex-col font-poppins">
+        <div className="flex flex-col font-poppins">
           <div className="flex w-full">
             <button
               data-rapportdossier={rapportdossier}
@@ -84,8 +123,7 @@ function Archive() {
             </button>
           </div>
           {!rapportdossier && (
-            <div className="flex px-4 justify-between h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
-              <button className="text-blue">Tout</button>
+            <div className="flex px-4 justify-end h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="flex has-[:focus]:border-blue border dark:border-gray bg-white dark:bg-gray rounded-[10px]">
                 <img className="*:fill-blue imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
@@ -100,7 +138,7 @@ function Archive() {
           {rapportdossier && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="w-1/2 flex justify-between">
-                <button onClick={handlePrint} className="text-blue">
+                <button onClick={handlePrintNPM} className="text-blue">
                   <div className="deletePdfImprimer">
                     <img className="imgp" src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
                   </div>
@@ -176,45 +214,7 @@ function Archive() {
                 </th>
               )}
             </tr>
-            <tr
-              data-rapportdossier={rapportdossier}
-              className="border-y-[1px] data-[rapportdossier=true]:has-[:checked]:border-blue dark:hover:bg-dark-gray"
-              onClick={handleRowChecked}
-            >
-              <td
-                data-rapportdossier={rapportdossier}
-                className="data-[rapportdossier=false]:border-x-[1px]"
-              >
-                <label className="" ref={ref} id="DossierCheck">
-                  <input className="mr-2" type="checkbox"></input>
-                  <span>1000</span>
-                </label>
-              </td>
-              <td
-                data-rapportdossier={rapportdossier}
-                className="data-[rapportdossier=false]:border-x-[1px]"
-              >
-                Aboura yacine
-              </td>
-              <td
-                data-rapportdossier={rapportdossier}
-                className="data-[rapportdossier=false]:border-x-[1px]"
-              >
-                22 Jan 2023
-              </td>
-              {!rapportdossier && (
-                <td className="border-x-[1px]">
-                  <button className="mr-10" onClick={() => setView(true)}>
-                    <img src={VoirDossierSVG} alt="voir dossier icon"></img>
-                  </button>
-                  <button>
-                    <img src={ModifierDossierSVG} alt="modifier dossier icon"></img>
-                  </button>
-                </td>
-              )}
-              {rapportdossier && <td>22 Jan 2023</td>}
-              {rapportdossier && <td>Blame ecrit</td>}
-            </tr>
+            {tab}
           </table>
         </div>
       )}
