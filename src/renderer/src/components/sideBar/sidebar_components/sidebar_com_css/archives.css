@@ -12,11 +12,11 @@
   td {
     @apply py-3;
   }
-  .imgp  {
+  .imgp {
     @apply pl-2;
   }
   table th,
-  table td, 
+  table td,
   tr {
     @apply pl-5 border-table-border-white-theme-color dark:border-white/20;
   }
@@ -25,5 +25,12 @@
   }
   .deletePdfImprimer > img {
     @apply pr-2;
+  }
+}
+
+@media print {
+  @page {
+    size: portrait;
+    margin: 1in;
   }
 }

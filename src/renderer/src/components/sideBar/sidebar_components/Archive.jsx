@@ -55,10 +55,26 @@ function Archive() {
     })
   }
 
+  const handlePrint = () => {
+    return new Promise(() => {
+      console.log('forwarding print request to the main process...')
+
+      const data = printComponent.current.outerHTML
+      //console.log(data);
+      let blob = new Blob([data], { type: 'text/html' })
+      let url = URL.createObjectURL(blob)
+
+      window.electronAPI.printComponent(url, (response) => {
+        console.log('Main: ', response)
+      })
+      //console.log('Main: ', data);
+    })
+  }
+
   const tab = Array.isArray(rapports) ? (
     rapports.map((m) => (
       <tr
-        ref={printComponent}
+      ref={printComponent}
         data-rapportdossier={rapportdossier}
         className="border-y-[1px] data-[rapportdossier=true]:has-[:checked]:border-blue dark:hover:bg-dark-gray print:flex print:gap-4"
       >
@@ -98,7 +114,8 @@ function Archive() {
     <></>
   )
   const handlePrintNPM = useReactToPrint({
-    content: () => printComponent.current
+    content: () => printComponent.current,
+    print: handlePreview
   })
 
   return (

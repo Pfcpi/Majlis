@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import axios from 'axios'
 
 import Accueil from './sidebar_components/Accueil'
 import Commission from './sidebar_components/Commission'
@@ -8,6 +7,7 @@ import AjouterRapport from './sidebar_components/AjouterRapport'
 import AjouterPV from './sidebar_components/AjouterPV'
 import Archive from './sidebar_components/Archive'
 import Documentation from './sidebar_components/Documentation'
+import App from './sidebar_components/App'
 
 import AccueilSVG from './../../assets/Accueil.svg'
 import CommissionSVG from './../../assets/Commission.svg'
@@ -48,11 +48,11 @@ function SideBar() {
 
   const ref = useRef(null)
 
-  useEffect(() =>{
+  useEffect(() => {
     var defaultPage = ref.current
 
     defaultPage.click()
-}, [])
+  }, [])
 
   return (
     <div className="flex h-full w-full">
@@ -196,7 +196,13 @@ function SideBar() {
               }}
             >
               <img
-                src={nav === 'Documentation' ? DocumentationBlueSVG : dark ? DocumentationWhiteSVG : DocumentationSVG}
+                src={
+                  nav === 'Documentation'
+                    ? DocumentationBlueSVG
+                    : dark
+                      ? DocumentationWhiteSVG
+                      : DocumentationSVG
+                }
               ></img>
               {!cliped && <p>Documentation</p>}
             </Link>
@@ -216,7 +222,7 @@ function SideBar() {
             <Route path="/Commission" element={<Commission />} />
             <Route path="/AjouterRapport" element={<AjouterRapport />} />
             <Route path="/AjouterPV" element={<AjouterPV />} />
-            <Route path="/Archive" element={<Archive />} />
+            <Route path="/Archive" element={<App />} />
             <Route path="/Documentation" element={<Documentation />} />
           </Routes>
         </div>

@@ -76,7 +76,10 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-//handle print
+//-------------------- print function -----------------
+
+// List of all options at -
+// https://www.electronjs.org/docs/latest/api/web-contents#contentsprintoptions-callback
 const printOptions = {
   silent: false,
   printBackground: true,
@@ -92,8 +95,10 @@ const printOptions = {
   footer: 'Page footer'
 }
 
+//handle print
 ipcMain.handle('printComponent', (event, url) => {
   let win = new BrowserWindow({ show: false })
+
   win.loadURL(url)
 
   win.webContents.on('did-finish-load', () => {
@@ -102,28 +107,25 @@ ipcMain.handle('printComponent', (event, url) => {
       if (!success) console.log(failureReason)
     })
   })
-  return 'done with main'
+  return 'shown print dialog'
 })
 
 //handle preview
-ipcMain.handle('previewComponent', async (event, url) => {
-  let win = new BrowserWindow({
-    title: 'Print Preview',
-    show: false,
-    autoHideMenuBar: true
-  })
+ipcMain.handle('previewComponent', (event, url) => {
+  let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true })
+  win.loadURL(url)
 
   win.webContents.once('did-finish-load', () => {
     win.webContents
       .printToPDF(printOptions)
       .then((data) => {
-        const buf = Buffer.from(data)
-        data = buf.toString('base64')
-        const url = 'data:application/pdf;base64,' + data
+        let buf = Buffer.from(data)
+        var data = buf.toString('base64')
+        let url = 'data:application/pdf;base64,' + data
 
         win.webContents.on('ready-to-show', () => {
-          win.once('page-title-updated', (e) => e.preventDefault())
           win.show()
+          win.setTitle('Preview')
         })
 
         win.webContents.on('closed', () => (win = null))
@@ -133,7 +135,5 @@ ipcMain.handle('previewComponent', async (event, url) => {
         console.log(error)
       })
   })
-
-  await win.loadURL(url)
   return 'shown preview window'
 })
