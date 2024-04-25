@@ -159,7 +159,6 @@ router.delete('/delete', (req, res) => {
 */
 router.post('/add', (req, res) => {
   let object = req.body
-
   // SQL queries
   let sqlqueryE =
     'INSERT INTO Etudiant (matricule_e, nom_e, prenom_e, niveau_e, groupe_e, section_e, antecedant_e) VALUES (?, ?, ?, ?, ?, ?, true)'
@@ -190,13 +189,12 @@ router.post('/add', (req, res) => {
             // Check for duplicate
             return res.status(400).send(err)
           } else {
-            if(result[0]==null) {
+            if (result[0] == null) {
               db.query(sqlqueryP2, [object.nomP, object.prenomP])
               db.query(sqlqueryP, [object.nomP, object.prenomP], (err, result) => {
                 if (err) {
                   console.log(err)
-                }
-                else {
+                } else {
                   let x = result[0].id_p
                   db.query(
                     sqlqueryI,
@@ -205,41 +203,42 @@ router.post('/add', (req, res) => {
                       if (err) {
                         return res.status(400).send(err)
                       } else {
-                        db.query(sqlqueryR, [object.matriculeE,x], (err, result) => {
+                        db.query(sqlqueryR, [object.matriculeE, x], (err, result) => {
                           if (err) {
                             return res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
                             db.query('SELECT email_m FROM Membre WHERE role_m = "President"', (err, result) => {
-                              if (err) {
-                                console.log(err)
-                              } else {
-                                // Automatic mailling setup
-                                const transporter = nodemailer.createTransport({
-                                  host: 'smtp.zoho.com',
-                                  port: 465,
-                                  secure: true,
-                                  auth: {
-                                    user: 'rapport@cd-usto.tech',
-                                    pass: 'uc3Snp?o'
+                                if (err) {
+                                  console.log(err)
+                                } else {
+                                  // Automatic mailling setup
+                                  const transporter = nodemailer.createTransport({
+                                    host: 'smtp.zoho.com',
+                                    port: 465,
+                                    secure: true,
+                                    auth: {
+                                      user: 'rapport@cd-usto.tech',
+                                      pass: 'uc3Snp?o'
+                                    }
+                                  })
+                                  const mailOptions = {
+                                    from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
+                                    to: result[0].email_m,
+                                    subject: 'Nouveau rapport déposé.',
+                                    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
                                   }
-                                })
-                                const mailOptions = {
-                                  from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                  to: "result[0].email_m",
-                                  subject: 'Nouveau rapport déposé.',
-                                  html: '<body><img src="https://i.goopics.net/4lwi68.png"></body>'
+                                  transporter.sendMail(mailOptions, function (err, info) {
+                                    if (err) {
+                                      console.log('Error while sending email' + err)
+                                    } else {
+                                      console.log('Email sent')
+                                    }
+                                  })
                                 }
-                                transporter.sendMail(mailOptions, function (err, info) {
-                                  if (err) {
-                                    console.log('Error while sending email' + err)
-                                  } else {
-                                    console.log('Email sent')
-                                  }
-                                })
                               }
-                            })
-                            res.status(201).send(result)
+                            )
+                            res.statusStatus(204)
                           }
                         })
                       }
@@ -247,13 +246,11 @@ router.post('/add', (req, res) => {
                   )
                 }
               })
-            }
-            else {
+            } else {
               db.query(sqlqueryP, [object.nomP, object.prenomP], (err, result) => {
                 if (err) {
                   console.log(err)
-                }
-                else {
+                } else {
                   let x = result[0].id_p
                   db.query(
                     sqlqueryI,
@@ -262,41 +259,42 @@ router.post('/add', (req, res) => {
                       if (err) {
                         return res.status(400).send(err)
                       } else {
-                        db.query(sqlqueryR, [object.matriculeE,x], (err, result) => {
+                        db.query(sqlqueryR, [object.matriculeE, x], (err, result) => {
                           if (err) {
                             return res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
                             db.query('SELECT email_m FROM Membre WHERE role_m = "President"', (err, result) => {
-                              if (err) {
-                                console.log(err)
-                              } else {
-                                // Automatic mailling setup
-                                const transporter = nodemailer.createTransport({
-                                  host: 'smtp.zoho.com',
-                                  port: 465,
-                                  secure: true,
-                                  auth: {
-                                    user: 'rapport@cd-usto.tech',
-                                    pass: 'uc3Snp?o'
+                                if (err) {
+                                  console.log(err)
+                                } else {
+                                  // Automatic mailling setup
+                                  const transporter = nodemailer.createTransport({
+                                    host: 'smtp.zoho.com',
+                                    port: 465,
+                                    secure: true,
+                                    auth: {
+                                      user: 'rapport@cd-usto.tech',
+                                      pass: 'uc3Snp?o'
+                                    }
+                                  })
+                                  const mailOptions = {
+                                    from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
+                                    to: result[0].email_m,
+                                    subject: 'Nouveau rapport déposé.',
+                                    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
                                   }
-                                })
-                                const mailOptions = {
-                                  from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                  to: result[0].email_m,
-                                  subject: 'Nouveau rapport déposé.',
-                                  html: '<body><img src="https://i.goopics.net/4lwi68.png"></body>'
+                                  transporter.sendMail(mailOptions, function (err, info) {
+                                    if (err) {
+                                      console.log('Error while sending email' + err)
+                                    } else {
+                                      console.log('Email sent')
+                                    }
+                                  })
                                 }
-                                transporter.sendMail(mailOptions, function (err, info) {
-                                  if (err) {
-                                    console.log('Error while sending email' + err)
-                                  } else {
-                                    console.log('Email sent')
-                                  }
-                                })
                               }
-                            })
-                            res.send(result)
+                            )
+                            res.sendStatus(204)
                           }
                         })
                       }
@@ -305,9 +303,7 @@ router.post('/add', (req, res) => {
                 }
               })
             }
-            
-          
-        }
+          }
         })
       }
     }
