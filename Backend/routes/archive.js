@@ -4,6 +4,8 @@
 const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
+const { generatePDFpv } = require('../services/pdf')
+const { generatePDFrapport } = require('../services/pdf')
 const nodemailer = require('nodemailer')
 
 //VALID
@@ -521,37 +523,122 @@ router.delete('/deletepv', (req, res) => {
 
 // Send mail to Etudiant containing PV
 /*
-  "path" : string value that indicates the path of the pdf,
+  "numPV": int value,
   "email" : email of etudiant string value
 */
 router.post('/mail', (req, res) => {
-  let values = [req.body.path, req.body.email]
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.zoho.com',
-    port: 465,
-    secure: true,
-    auth: {
-      user: 'rapport@cd-usto.tech',
-      pass: 'uc3Snp?o'
+  let values = [req.body.numPV, req.body.email]
+  db.query('', values[0], async (err, result) => {
+    if(err)
+    {
+      res.status(400).send(err)
+    }
+    const data = {
+      //placeholder using result[0]
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      country: 'United States'
+    }
+  
+    try {
+      const pdfBuffer = await generatePDFrapport(data)
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.zoho.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: 'rapport@cd-usto.tech',
+          pass: 'uc3Snp?o'
+        }
+      })
+      const mailOptions = {
+        from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
+        to: values[1],
+        subject: 'Nouveau rapport déposé.',
+        html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
+        attachments: [{
+          filename: "PV.pdf",
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }
+      transporter.sendMail(mailOptions, function (err, info) {
+        if (err) {
+          console.log('Error while sending email' + err)
+        } else {
+          console.log('Email sent')
+          res.sendStatus(204)
+        }
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('An error occurred while generating the PDF')
     }
   })
-  const mailOptions = {
-    from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-    to: values[1],
-    subject: 'Nouveau rapport déposé.',
-    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
-    attachements: [{
-      filename: values[0].split("/").pop(),
-      path: values[0],
-      contentType: 'application/pdf'
-    }]
+  
+})
+
+
+//Print rapport
+/*
+  {
+    "numR": int value
   }
-  transporter.sendMail(mailOptions, function (err, info) {
-    if (err) {
-      console.log('Error while sending email' + err)
-    } else {
-      console.log('Email sent')
+*/
+router.get('/printrapport', async (req, res) => {
+  db.query('', req.body.numR, async (err, result) => {
+    if(err)
+    {
+      res.status(400).send(err)
+    }
+    const data = {
+      //placeholder using result[0]
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      country: 'United States'
+    }
+  
+    try {
+      const pdfBuffer = await generatePDFrapport(data)
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+      res.send(pdfBuffer)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('An error occurred while generating the PDF')
+    }
+  })
+  
+})
+
+
+//Print pv
+/*
+  {
+    "numPV": int value
+  }
+*/
+router.get('/printpv', (req, res) => {
+  db.query('', req.body.numPV, async (err, result) => {
+    if(err)
+    {
+      res.status(400).send(err)
+    }
+    const data = {
+      //placeholder using result[0]
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      country: 'United States'
+    }
+  
+    try {
+      const pdfBuffer = await generatePDFrapport(data)
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+      res.send(pdfBuffer)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('An error occurred while generating the PDF')
     }
   })
 })
