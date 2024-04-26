@@ -39,11 +39,11 @@ function Archive() {
       .catch((err) => console.log(err))
   }, [])
 
-  const handlePreview = () => {
+  function handlePreview() {
     return new Promise(() => {
       console.log('forwarding print preview request...')
 
-      const data = printComponent.current.innerHTML
+      const data = printComponent.current.outerHTML
       console.log(printComponent)
       console.log(data)
       const blob = new Blob([data], { type: 'text/html' })
@@ -55,7 +55,7 @@ function Archive() {
     })
   }
 
-  const handlePrint = () => {
+  function handlePrint() {
     return new Promise(() => {
       console.log('forwarding print request to the main process...')
 
@@ -112,16 +112,26 @@ function Archive() {
   ) : (
     <></>
   )
-  const handlePrintNPM = useReactToPrint({
-    content: () => printComponent.current,
-    print: handlePrint
-  })
+  function handlePrintNPM() {
+    useReactToPrint({
+      content: () => printComponent.current,
+      documentTitle: 'PV',
+      print: handlePrint()
+    })
+  }
+
+  function handlePreviewNPM() {
+    useReactToPrint({
+      content: () => printComponent.current,
+      documentTitle: 'PV',
+      print: handlePreview()
+    })
+  }
 
   return (
-    <>
-      {' '}
+    <div className="w-full h-full">
       {!view && (
-        <div className="flex flex-col print:font-poppins print:bg-red" ref={printComponent}>
+        <div className="flex flex-col" ref={printComponent}>
           <div className="flex w-full">
             <button
               data-rapportdossier={rapportdossier}
@@ -141,7 +151,7 @@ function Archive() {
           {!rapportdossier && (
             <div className="flex px-4 justify-end h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="flex has-[:focus]:border-blue border dark:border-gray bg-white dark:bg-gray rounded-[10px]">
-                <img className="*:fill-blue imgp" src={BlueSearchSVG} alt="search icon"></img>
+                <img src={BlueSearchSVG} alt="search icon"></img>
                 <input
                   className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
                   aria-label="search input"
@@ -154,12 +164,12 @@ function Archive() {
           {rapportdossier && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="w-1/2 flex justify-between">
-                <button onClick={handlePrintNPM} className="text-blue">
+                <button onClick={() => handlePrintNPM()} className="text-blue">
                   <div className="deletePdfImprimer">
                     <img className="imgp" src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
                   </div>
                 </button>
-                <button onClick={handlePreview} className="text-blue">
+                <button onClick={() => handlePreviewNPM()} className="text-blue">
                   <div className="deletePdfImprimer">
                     <img className="imgp" src={PdfSVG} alt="pdf icon"></img>Enregistrer PDF
                   </div>
@@ -295,7 +305,7 @@ function Archive() {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }
 export default Archive

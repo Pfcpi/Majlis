@@ -28,8 +28,13 @@
   }
 }
 
+
 @media print {
   body {
-    background-color: red;
+    border: solid red;
+  }
+
+  * {
+    visibility: hidden;
   }
 }
