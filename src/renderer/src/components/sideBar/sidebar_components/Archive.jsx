@@ -43,7 +43,7 @@ function Archive() {
     return new Promise(() => {
       console.log('forwarding print preview request...')
 
-      const data = printComponent.current.outerHTML
+      const data = printComponent.current.innerHTML
       console.log(printComponent)
       console.log(data)
       const blob = new Blob([data], { type: 'text/html' })
@@ -74,7 +74,6 @@ function Archive() {
   const tab = Array.isArray(rapports) ? (
     rapports.map((m) => (
       <tr
-      ref={printComponent}
         data-rapportdossier={rapportdossier}
         className="border-y-[1px] data-[rapportdossier=true]:has-[:checked]:border-blue dark:hover:bg-dark-gray print:flex print:gap-4"
       >
@@ -115,14 +114,14 @@ function Archive() {
   )
   const handlePrintNPM = useReactToPrint({
     content: () => printComponent.current,
-    print: handlePreview
+    print: handlePrint
   })
 
   return (
     <>
       {' '}
       {!view && (
-        <div className="flex flex-col font-poppins">
+        <div className="flex flex-col print:font-poppins print:bg-red" ref={printComponent}>
           <div className="flex w-full">
             <button
               data-rapportdossier={rapportdossier}

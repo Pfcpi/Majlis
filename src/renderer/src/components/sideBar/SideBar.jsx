@@ -7,7 +7,6 @@ import AjouterRapport from './sidebar_components/AjouterRapport'
 import AjouterPV from './sidebar_components/AjouterPV'
 import Archive from './sidebar_components/Archive'
 import Documentation from './sidebar_components/Documentation'
-import App from './sidebar_components/App'
 
 import AccueilSVG from './../../assets/Accueil.svg'
 import CommissionSVG from './../../assets/Commission.svg'
@@ -222,7 +221,7 @@ function SideBar() {
             <Route path="/Commission" element={<Commission />} />
             <Route path="/AjouterRapport" element={<AjouterRapport />} />
             <Route path="/AjouterPV" element={<AjouterPV />} />
-            <Route path="/Archive" element={<App />} />
+            <Route path="/Archive" element={<Archive />} />
             <Route path="/Documentation" element={<Documentation />} />
           </Routes>
         </div>

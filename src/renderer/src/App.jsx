@@ -6,7 +6,7 @@ import authJPG from './assets/auth.jpg'
 import USTOLogo from './assets/USTO-MB_logo2.svg'
 import useAuth from './zustand/auth.js'
 import useAccount from './zustand/account.js'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import './index.css'
 import axios from 'axios'
@@ -108,7 +108,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="w-full h-full p-0 m-0">
       {!auth && (
         <div className="flex h-full w-full font-poppins text-[24px]">
           {blurBg && (
