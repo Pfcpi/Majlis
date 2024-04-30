@@ -4,6 +4,9 @@
 const express = require('express')
 const router = express.Router()
 const { db } = require('../config/db')
+const { generatePDFpv } = require('../services/pdf')
+const { generatePDFrapport } = require('../services/pdf')
+const nodemailer = require('nodemailer')
 
 //VALID
 // List of rapport that is short and that is treated (Archive > Rapport)
@@ -54,7 +57,7 @@ router.post('/getsrapport', (req, res) => {
 // Delete a rapport (archive)
 /* Body being in the format of :
   {
-	"numR": int value
+  "numR": int value
   }
 */
 router.delete('/deleterapport', (req, res) => {
@@ -77,7 +80,7 @@ router.delete('/deleterapport', (req, res) => {
 // Edit the values of a selected rapport (archive)
 /* Body being in the format of :
   {
-	 "matriculeE": big int value,
+   "matriculeE": big int value,
    "nomE": string value,
    "prenomE": string value,
    "niveauE": string value,
@@ -91,7 +94,7 @@ router.delete('/deleterapport', (req, res) => {
    "motifI": string value,
    "descI": string value,
    "degreI": int value (1 or 2),
-	 "numR": int value
+   "numR": int value
   }
 */
 router.patch('/editrapport', (req, res) => {
@@ -144,11 +147,9 @@ router.patch('/editrapport', (req, res) => {
 })
 
 //VALID
-// Get inactive commission members
+// Get inactive commissions and it's members
 router.get('/getcommission', (req, res) => {
-  let sqlquery = `SELECT nom_m, prenom_m, role_m, email_m, date_debut_m, date_fin_m
-    FROM Membre
-    WHERE est_actif = false`
+  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -157,6 +158,83 @@ router.get('/getcommission', (req, res) => {
     }
   })
 })
+
+// Get all pvs of a selected commission
+/*
+  {
+    "numC": int value
+  }
+*/
+router.get('/getscommission', (req, res) => {
+  let numC = req.body.numC
+  let sqlquery = `SELECT
+  c.num_c,
+  CD.num_cd,
+  c.date_fin_c,
+  c.date_fin_c,
+  GROUP_CONCAT(CONCAT_WS(' ', m.nom_m, m.prenom_m, m.role_m) SEPARATOR ', ') AS membres,
+  pv.num_pv,
+  pv.date_pv,
+  nom_e,
+  prenom_e
+FROM
+  Commission c
+INNER JOIN
+  Membre m ON m.num_c = c.num_c
+INNER JOIN
+  PV pv ON pv.num_c = c.num_c
+LEFT JOIN
+  Commission_Presente CP ON m.id_m = CP.id_m
+LEFT JOIN
+  Conseil_Discipline CD ON pv.num_cd = CD.num_cd
+LEFT JOIN
+  Rapport R ON pv.num_r = R.num_r
+LEFT JOIN
+  Etudiant E ON R.matricule_e = E.matricule_e
+WHERE
+  c.num_c = ?
+GROUP BY
+  c.num_c,
+  CD.num_cd,
+  c.date_fin_c,
+  pv.num_pv,
+  pv.date_pv,
+  nom_e,
+  prenom_e`
+  db.query(sqlquery, numC, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
+    }
+  })
+})
+
+/* Delete selected commission
+   {
+    "numC" : int value
+   }
+*/
+router.delete('/deletecommission', (req, res) => {
+  db.query(`SET FOREIGN_KEY_CHECKS = 0`)
+  let value = req.body.numC
+  let sqlquery = `DELETE FROM Membre WHERE num_c = ?`
+  db.query(sqlquery, value, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      db.query(`DELETE FROM Commission WHERE num_c = ?`, value, (err, result) => {
+        if (err) {
+          res.status(400).send(err)
+        } else {
+          db.query(`SET FOREIGN_KEY_CHECKS = 1`)
+          res.sendStatus(204)
+        }
+      })
+    }
+  })
+})
+
 
 //VALID
 // Edit selected pv
@@ -346,6 +424,7 @@ router.post('/getspv', (req, res) => {
     e.groupe_e,
     p.nom_p,
     p.prenom_p,
+    cd.date_cd,
     i.date_i,
     i.lieu_i,
     i.motif_i,
@@ -403,6 +482,7 @@ GROUP BY
     e.groupe_e,
     p.nom_p,
     p.prenom_p,
+    cd.date_cd,
     i.date_i,
     i.lieu_i,
     i.motif_i,
@@ -436,6 +516,129 @@ router.delete('/deletepv', (req, res) => {
       res.status(400).send(err)
     } else {
       res.sendStatus(204)
+    }
+  })
+})
+
+
+// Send mail to Etudiant containing PV
+/*
+  "numPV": int value,
+  "email" : email of etudiant string value
+*/
+router.post('/mail', (req, res) => {
+  let values = [req.body.numPV, req.body.email]
+  db.query('', values[0], async (err, result) => {
+    if(err)
+    {
+      res.status(400).send(err)
+    }
+    const data = {
+      //placeholder using result[0]
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      country: 'United States'
+    }
+  
+    try {
+      const pdfBuffer = await generatePDFrapport(data)
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.zoho.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: 'rapport@cd-usto.tech',
+          pass: 'uc3Snp?o'
+        }
+      })
+      const mailOptions = {
+        from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
+        to: values[1],
+        subject: 'Nouveau rapport déposé.',
+        html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
+        attachments: [{
+          filename: "PV.pdf",
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }
+      transporter.sendMail(mailOptions, function (err, info) {
+        if (err) {
+          console.log('Error while sending email' + err)
+        } else {
+          console.log('Email sent')
+          res.sendStatus(204)
+        }
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('An error occurred while generating the PDF')
+    }
+  })
+  
+})
+
+
+//Print rapport
+/*
+  {
+    "numR": int value
+  }
+*/
+router.get('/printrapport', async (req, res) => {
+  db.query('', req.body.numR, async (err, result) => {
+    if(err)
+    {
+      res.status(400).send(err)
+    }
+    const data = {
+      //placeholder using result[0]
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      country: 'United States'
+    }
+  
+    try {
+      const pdfBuffer = await generatePDFrapport(data)
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+      res.send(pdfBuffer)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('An error occurred while generating the PDF')
+    }
+  })
+  
+})
+
+
+//Print pv
+/*
+  {
+    "numPV": int value
+  }
+*/
+router.get('/printpv', (req, res) => {
+  db.query('', req.body.numPV, async (err, result) => {
+    if(err)
+    {
+      res.status(400).send(err)
+    }
+    const data = {
+      //placeholder using result[0]
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      country: 'United States'
+    }
+  
+    try {
+      const pdfBuffer = await generatePDFrapport(data)
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+      res.send(pdfBuffer)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('An error occurred while generating the PDF')
     }
   })
 })

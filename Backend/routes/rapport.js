@@ -208,9 +208,7 @@ router.post('/add', (req, res) => {
                             return res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
-                            db.query(
-                              'SELECT email_m FROM Membre WHERE role_m = "President"',
-                              (err, result) => {
+                            db.query('SELECT email_m FROM Membre WHERE role_m = "President"', (err, result) => {
                                 if (err) {
                                   console.log(err)
                                 } else {
@@ -226,10 +224,9 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    //to: result[0].email_m,
-                                    to: 'amirmadjour133@gmail.com',
+                                    to: result[0].email_m,
                                     subject: 'Nouveau rapport déposé.',
-                                    html: '<body><img src="https://i.goopics.net/4lwi68.png"></body>'
+                                    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
                                   }
                                   transporter.sendMail(mailOptions, function (err, info) {
                                     if (err) {
@@ -241,7 +238,7 @@ router.post('/add', (req, res) => {
                                 }
                               }
                             )
-                            res.status(201).send(result)
+                            res.statusStatus(204)
                           }
                         })
                       }
@@ -267,9 +264,7 @@ router.post('/add', (req, res) => {
                             return res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
-                            db.query(
-                              'SELECT email_m FROM Membre WHERE role_m = "President"',
-                              (err, result) => {
+                            db.query('SELECT email_m FROM Membre WHERE role_m = "President"', (err, result) => {
                                 if (err) {
                                   console.log(err)
                                 } else {
@@ -287,7 +282,7 @@ router.post('/add', (req, res) => {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
                                     to: result[0].email_m,
                                     subject: 'Nouveau rapport déposé.',
-                                    html: '<body><img src="https://i.goopics.net/4lwi68.png"></body>'
+                                    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
                                   }
                                   transporter.sendMail(mailOptions, function (err, info) {
                                     if (err) {
@@ -299,7 +294,7 @@ router.post('/add', (req, res) => {
                                 }
                               }
                             )
-                            res.send(result)
+                            res.sendStatus(204)
                           }
                         })
                       }
