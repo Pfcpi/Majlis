@@ -27,14 +27,3 @@
     @apply pr-2;
   }
 }
-
-
-@media print {
-  body {
-    border: solid red;
-  }
-
-  * {
-    visibility: hidden;
-  }
-}

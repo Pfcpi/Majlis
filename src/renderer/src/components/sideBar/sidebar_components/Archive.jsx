@@ -131,7 +131,7 @@ function Archive() {
   return (
     <div className="w-full h-full">
       {!view && (
-        <div className="flex flex-col" ref={printComponent}>
+        <div className="flex flex-col redclass" ref={printComponent}>
           <div className="flex w-full">
             <button
               data-rapportdossier={rapportdossier}
