@@ -235,7 +235,6 @@ router.delete('/deletecommission', (req, res) => {
   })
 })
 
-
 //VALID
 // Edit selected pv
 /* Body being in the format of :
@@ -520,7 +519,6 @@ router.delete('/deletepv', (req, res) => {
   })
 })
 
-
 // Send mail to Etudiant containing PV
 /*
   "numPV": int value,
@@ -529,8 +527,7 @@ router.delete('/deletepv', (req, res) => {
 router.post('/mail', (req, res) => {
   let values = [req.body.numPV, req.body.email]
   db.query('', values[0], async (err, result) => {
-    if(err)
-    {
+    if (err) {
       res.status(400).send(err)
     }
     const data = {
@@ -539,7 +536,7 @@ router.post('/mail', (req, res) => {
       email: 'john.doe@example.com',
       country: 'United States'
     }
-  
+
     try {
       const pdfBuffer = await generatePDFrapport(data)
       const transporter = nodemailer.createTransport({
@@ -556,11 +553,13 @@ router.post('/mail', (req, res) => {
         to: values[1],
         subject: 'Nouveau rapport déposé.',
         html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
-        attachments: [{
-          filename: "PV.pdf",
-          content: pdfBuffer,
-          contentType: 'application/pdf'
-        }]
+        attachments: [
+          {
+            filename: 'PV.pdf',
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
       }
       transporter.sendMail(mailOptions, function (err, info) {
         if (err) {
@@ -575,9 +574,7 @@ router.post('/mail', (req, res) => {
       res.status(500).send('An error occurred while generating the PDF')
     }
   })
-  
 })
-
 
 //Print rapport
 /*
@@ -586,31 +583,29 @@ router.post('/mail', (req, res) => {
   }
 */
 router.get('/printrapport', async (req, res) => {
-  db.query('', req.body.numR, async (err, result) => {
+  /*db.query('', req.body.numR, async (err, result) => {
     if(err)
     {
       res.status(400).send(err)
-    }
-    const data = {
-      //placeholder using result[0]
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      country: 'United States'
-    }
-  
-    try {
-      const pdfBuffer = await generatePDFrapport(data)
-      res.setHeader('Content-Type', 'application/pdf')
-      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
-      res.send(pdfBuffer)
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('An error occurred while generating the PDF')
-    }
-  })
-  
-})
+    }*/
+  const data = {
+    //placeholder using result[0]
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    country: 'United States'
+  }
 
+  try {
+    const pdfBuffer = await generatePDFrapport(data)
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+    res.send(pdfBuffer)
+    console.log(pdfBuffer)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('An error occurred while generating the PDF')
+  }
+})
 
 //Print pv
 /*
@@ -620,8 +615,7 @@ router.get('/printrapport', async (req, res) => {
 */
 router.get('/printpv', (req, res) => {
   db.query('', req.body.numPV, async (err, result) => {
-    if(err)
-    {
+    if (err) {
       res.status(400).send(err)
     }
     const data = {
@@ -630,7 +624,7 @@ router.get('/printpv', (req, res) => {
       email: 'john.doe@example.com',
       country: 'United States'
     }
-  
+
     try {
       const pdfBuffer = await generatePDFrapport(data)
       res.setHeader('Content-Type', 'application/pdf')

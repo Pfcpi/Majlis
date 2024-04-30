@@ -40,10 +40,25 @@ function Archive() {
   }, [])
 
   function handlePreview() {
-    return new Promise(() => {
+    return new Promise(async () => {
       console.log('forwarding print preview request...')
 
-      const data = printComponent.current.outerHTML
+      const pdfToPreview = await axios
+        .get(api + '/archive/printrapport')
+        .then((res) => {
+          const result = window.electronAPI.getUrl()
+          console.log(res)
+          /*const datapdf = res.data
+          const blob = new Blob([datapdf], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          console.log('url', url)
+
+          window.electronAPI.previewComponent(url, (response) => {
+            console.log('Main: ', response)
+          })*/
+        })
+        .catch((err) => console.log(err))
+      /*const data = printComponent.current.outerHTML
       console.log(printComponent)
       console.log(data)
       const blob = new Blob([data], { type: 'text/html' })
@@ -51,7 +66,7 @@ function Archive() {
 
       window.electronAPI.previewComponent(url, (response) => {
         console.log('Main: ', response)
-      })
+      })*/
     })
   }
 

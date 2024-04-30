@@ -27,5 +27,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   previewComponent: async (url, callback) => {
     let response = await ipcRenderer.invoke('previewComponent', url)
     callback(response)
-  }
+  },
+  getUrl: async () => await ipcRenderer.invoke('get-url')
 })

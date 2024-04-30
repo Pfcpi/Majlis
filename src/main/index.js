@@ -1,10 +1,13 @@
 'use strict'
 
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
+
+const pie = require('puppeteer-in-electron')
+const puppeteer = require('puppeteer-core')
 
 function createWindow() {
   // Create the browser window.
@@ -52,17 +55,37 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  ipcMain.handle('get-url', getUrl)
   createWindow()
 
   ExpressApp.listen(3000, () => {
     console.log('Express server running on port 3000')
   })
+
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+async function initialize() {
+  await pie.initialize(app)
+}
+initialize()
+
+async function getUrl(){
+  const browser = await pie.connect(app, puppeteer);
+ 
+  const window = new BrowserWindow();
+  const url = __dirname + "../../s.pdf";
+  console.log("url:", url)
+  await window.loadURL(url);
+ 
+  const page = await pie.getPage(browser, window);
+  console.log(page.url());
+  return page.url();
+};
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -119,9 +142,9 @@ ipcMain.handle('previewComponent', (event, url) => {
     win.webContents
       .printToPDF(printOptions)
       .then((data) => {
-        let buf = Buffer.from(data)
+        /*let buf = Buffer.from(data)
         var data = buf.toString('base64')
-        let url = 'data:application/pdf;base64,' + data
+        let url = 'data:application/pdf;base64,' + data*/
 
         win.webContents.on('ready-to-show', () => {
           win.show()

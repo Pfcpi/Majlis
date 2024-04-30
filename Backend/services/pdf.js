@@ -114,13 +114,13 @@ async function generatePDFrapport(data) {
 
     `
 
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({ headless: true})
   const page = await browser.newPage()
   await page.setContent(html)
-  const pdfBuffer = await page.pdf({ format: 'A4' })
-  await browser.close()
+  await page.pdf({ path: './out/s.pdf', format: 'A4' })
+  console.log('passed by here pdf.js generatePdfRapport')
 
-  return pdfBuffer
+  return page.pdf({ format: 'A4' })
 }
 
 module.exports = { generatePDFpv, generatePDFrapport }
