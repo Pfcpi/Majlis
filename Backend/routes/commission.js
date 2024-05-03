@@ -41,10 +41,16 @@ router.get('/get', (req, res) => {
   }
 */
 router.post('/add', (req, res) => {
-  let values = [req.body.nomM, req.body.prenomM, req.body.roleM, req.body.emailM, req.body.dateDebutM]
-  let sqlquery = `INSERT INTO Membre (nom_m, prenom_m, role_m, email_m, date_debut_m, num_c) VALUES (?, ?, ?, ?, ?, (SELECT num_c FROM Commission WHERE actif_c = TRUE))`
+  let values = [
+    req.body.nomM,
+    req.body.prenomM,
+    req.body.roleM,
+    req.body.emailM,
+    req.body.dateDebutM
+  ]
+  let sqlquery = `INSERT INTO Membre (nom_m, prenom_m, role_m, email_m, date_debut_m, num_c, est_actif) VALUES (?, ?, ?, ?, ?, (SELECT num_c FROM Commission WHERE actif_c = TRUE), TRUE)`
   db.query(sqlquery, values, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(400).send(err)
     } else {
       res.status(201).send(result)
@@ -63,10 +69,17 @@ router.post('/add', (req, res) => {
   }
 */
 router.patch('/edit', (req, res) => {
-  let values = [req.body.roleM, req.body.nomM, req.body.prenomM, req.body.emailM ,req.body.dateDebutM, req.body.idM]
+  let values = [
+    req.body.roleM,
+    req.body.nomM,
+    req.body.prenomM,
+    req.body.emailM,
+    req.body.dateDebutM,
+    req.body.idM
+  ]
   let sqlquery = `UPDATE Membre SET role_m = ?, nom_m = ?, prenom_m = ?, email_m = ?, date_debut_m = ? WHERE id_m = ?`
   db.query(sqlquery, values, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(400).send(err)
     } else {
       res.send(result)
@@ -86,25 +99,7 @@ router.patch('/remove', (req, res) => {
   let sqlquery = `UPDATE Membre SET est_actif = FALSE, date_fin_m = ? WHERE id_m = ?`
 
   db.query(sqlquery, values, (err, result) => {
-    if(err) {
-      res.status(400).send(err)
-    } else {
-      res.sendStatus(204)
-    }
-  })
-})
-
-/* add active commission
-  {
-    "date_debut_c": date value format 'YYYY-MM-DD',
-    "date_fin_c": date value format 'YYYY-MM-DD'
-  }
-*/
-router.post('/addcom', (req, res) => {
-  let values = [req.body.date_debut_c, req.body.date_fin_c]
-  let sqlquery = `INSERT INTO Commission (date_debut_c, date_fin_c, actif_c) VALUES (?, ?, TRUE)`
-  db.query(sqlquery, values, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(400).send(err)
     } else {
       res.sendStatus(204)
@@ -122,7 +117,7 @@ router.patch('/editcom', (req, res) => {
   let values = [req.body.date_debut_c, req.body.date_fin_c]
   let sqlquery = `UPDATE Commission SET date_debut_c = ?, date_fin_c = ? WHERE actif_c = TRUE`
   db.query(sqlquery, values, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(400).send(err)
     } else {
       res.sendStatus(204)
@@ -132,12 +127,26 @@ router.patch('/editcom', (req, res) => {
 
 // Archiver commission active
 router.patch('/archivecom', (req, res) => {
-  let sqlquery = `UPDATE Commission SET actif_c = FALSE WHERE actif_c = TRUE`
+  let sqlquery = `UPDATE Commission SET actif_c = FALSE, date_fin_c = NOW() WHERE actif_c = TRUE`
   db.query(sqlquery, (err, result) => {
-    if(err) {
-      res.status(400).send(err)
+    if (err) {
+      res.status(200).send(err)
     } else {
-      res.sendStatus(204)
+      let setAllmemberstoInactive = `UPDATE Membre SET est_actif = FALSE WHERE est_actif = TRUE`
+      db.query(setAllmemberstoInactive, (err, result) => {
+        if (err) {
+          res.status(200).send(err)
+        } else {
+          let sqlquery = `INSERT INTO Commission (date_debut_c, actif_c) VALUES (NOW(), TRUE)`
+          db.query(sqlquery, (err, result) => {
+            if (err) {
+              res.status(200).send(err)
+            } else {
+              res.sendStatus(204)
+            }
+          })
+        }
+      })
     }
   })
 })
@@ -148,12 +157,12 @@ router.patch('/archivecom', (req, res) => {
 router.get('/getcom', (req, res) => {
   let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE m.est_actif = TRUE AND c.actif_c = TRUE`
   db.query(sqlquery, (err, result) => {
-    if(err) {
+    if (err) {
       console.log(err)
     } else {
       res.send(result)
     }
-})
+  })
 })
 
 // Automatic email sent to selected commission member to notify about new conseil de discipline
@@ -176,7 +185,7 @@ router.post('/mail', (req, res) => {
     if (err) {
       console.log(err)
     } else {
-      console.log("Email sent")
+      console.log('Email sent')
     }
   })
   res.sendStatus(204)

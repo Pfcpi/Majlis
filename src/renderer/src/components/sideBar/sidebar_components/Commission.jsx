@@ -9,7 +9,6 @@ import useDark from '../../../zustand/dark'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
-import SearchSVG from './../../../assets/Search.svg'
 import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import WarningSVG from './../../../assets/warning.svg'
@@ -25,12 +24,17 @@ function Archive() {
   const [query, setQuery] = useState('')
   const [membres, setMembres] = useState([])
   const [currentModifiedMembres, setCurrentModifiedMembres] = useState([])
+
+  const [renouvelerComMessage, setRenouvelerComMessage] = useState(false)
+  const [deleteMembersMessage, setDeleteMembersMessage] = useState(false)
+  const [addMemberMessage, setAddMemberMessage] = useState(false)
+  const [modifyMemberMessage, setModifyMemberMessage] = useState(false)
+
   const [addMember, setAddMember] = useState(false)
   const [modifyMember, setModifyMember] = useState(false)
   const [dropRole, setDropRole] = useState(false)
   const [dropRoleValue, setDropRoleValue] = useState('')
 
-  const [formData, setFormData] = useState({ nomM: '', prenomM: '', emailM: '', roleM: '' })
   const [errors, setErrors] = useState({
     nomError: '',
     prenomError: '',
@@ -77,7 +81,6 @@ function Archive() {
 
   useEffect(() => {
     setCurrentAddedMember((prev) => ({ ...prev, roleM: dropRoleValue }))
-    setFormData((prev) => ({ ...prev, roleM: dropRoleValue }))
   }, [dropRoleValue])
 
   const filteredMembres = useMemo(() => {
@@ -192,7 +195,8 @@ function Archive() {
     </svg>
   )
 
-  const handleRemoveMembers = async () => {
+  async function handleRemoveMembers() {
+    console.log('currentModifiedMembres: ', currentModifiedMembres)
     if (currentModifiedMembres.length > 0) {
       currentModifiedMembres.map(async (m) => {
         const tache1 = await axios
@@ -220,47 +224,67 @@ function Archive() {
       emailM: '',
       idM: 0
     })
-    setFormData({ nomM: '', prenomM: '', emailM: '', roleM: '' })
     setErrors({ nomError: '', prenomError: '', emailError: '', roleError: '' })
     setDropRole(false)
     setAddMember(false)
     setModifyMember(false)
   }
 
+  async function handleAddMember() {
+    const tache1 = await axios
+      .post(api + '/commission/add', currentAddedMember)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err))
+    setAddMember(false)
+
+    setCurrentModifiedMembres([])
+    const tache2 = await axios
+      .get(api + '/commission/get')
+      .then((res) => setMembres(res.data))
+      .catch((err) => console.log(err))
+
+    setCurrentAddedMember({
+      roleM: '',
+      nomM: '',
+      prenomM: '',
+      dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      emailM: '',
+      idM: 0
+    })
+  }
+
+  async function handleModifyMember() {
+    const tache1 = await axios
+      .patch(api + '/commission/edit', currentAddedMember)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err))
+    setModifyMember(false)
+
+    setCurrentModifiedMembres([])
+    const tache2 = await axios
+      .get(api + '/commission/get')
+      .then((res) => setMembres(res.data))
+      .catch((err) => console.log(err))
+
+    setCurrentAddedMember({
+      roleM: '',
+      nomM: '',
+      prenomM: '',
+      dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      emailM: '',
+      idM: 0
+    })
+  }
+
   async function handleAjouter(e) {
     e.preventDefault()
-    const newErrors = validateForm(formData)
+    const newErrors = validateForm(currentAddedMember)
     if (Object.keys(newErrors).length === 0) {
       if (addMember) {
-        const tache1 = await axios
-          .post(api + '/commission/add', currentAddedMember)
-          .then((res) => console.log(res))
-          .catch((err) => console.log(err))
+        setAddMemberMessage(true)
       } else {
-        console.log('modify: ', currentAddedMember)
-        const tache1 = await axios
-          .patch(api + '/commission/edit', currentAddedMember)
-          .then((res) => console.log(res))
-          .catch((err) => console.log(err))
+        setModifyMemberMessage(true)
       }
-      setAddMember(false)
-      setModifyMember(false)
-
-      setCurrentModifiedMembres([])
-      const tache2 = await axios
-        .get(api + '/commission/get')
-        .then((res) => setMembres(res.data))
-        .catch((err) => console.log(err))
-
-      setCurrentAddedMember({
-        roleM: '',
-        nomM: '',
-        prenomM: '',
-        dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        emailM: '',
-        idM: 0
-      })
-      setFormData({ nomM: '', prenomM: '', emailM: '', roleM: '' })
     }
     setTimeout(
       () => setErrors({ nomError: '', prenomError: '', emailError: '', roleError: '' }),
@@ -268,7 +292,7 @@ function Archive() {
     )
   }
 
-  const handleModify = () => {
+  async function handleModify() {
     if (currentModifiedMembres.length == 1) {
       setModifyMember(true)
       const mem = currentModifiedMembres[0]
@@ -386,8 +410,86 @@ function Archive() {
       ))
     : ''
 
+  const RechercherSvg = (
+    <svg
+      className={'[&>path]:fill-dark-gray dark:[&>path]:fill-white duration-100 ml-2'}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10.9007 15.7086C11.9649 15.7086 12.9464 15.3677 13.7493 14.7996L16.77 17.7917C16.9102 17.9306 17.0951 18 17.2926 18C17.7069 18 18 17.6844 18 17.2804C18 17.091 17.9363 16.9079 17.7961 16.7754L14.7945 13.7959C15.4254 12.9753 15.8014 11.959 15.8014 10.8543C15.8014 8.18411 13.5964 6 10.9007 6C8.21136 6 6 8.1778 6 10.8543C6 13.5245 8.20499 15.7086 10.9007 15.7086ZM10.9007 14.6607C8.79766 14.6607 7.05789 12.9374 7.05789 10.8543C7.05789 8.77117 8.79766 7.04787 10.9007 7.04787C13.0037 7.04787 14.7435 8.77117 14.7435 10.8543C14.7435 12.9374 13.0037 14.6607 10.9007 14.6607Z"
+        fill-opacity="0.6"
+      />
+    </svg>
+  )
+
   return (
-    <div className="relative flex w-full h-full font-poppins flex-row-reverse justify-evenly">
+    <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
+      {(renouvelerComMessage ||
+        addMemberMessage ||
+        modifyMemberMessage ||
+        deleteMembersMessage) && (
+        <div className="absolute flex items-center justify-center w-[100vw] h-[100vh] bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
+          <div className="flex min-w-fit flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
+            <p className="px-4">
+              {renouvelerComMessage ? 'Confirmez-vous le renouvellement de la commission' : ''}
+              {addMemberMessage ? "Confirmez-vous l'ajout de ce membre" : ''}
+              {modifyMemberMessage ? 'Confirmez-vous la modification de ce membre' : ''}
+              {deleteMembersMessage ? 'Confirmez-vous la suppression de ce membre' : ''}
+            </p>
+            <div className="flex w-full justify-between px-8">
+              <button
+                onClick={() => {
+                  setAddMemberMessage(false)
+                  setModifyMemberMessage(false)
+                  setRenouvelerComMessage(false)
+                  setDeleteMembersMessage(false)
+                }}
+                className="flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={async (e) => {
+                  e.preventDefault()
+                  if (renouvelerComMessage) {
+                    console.log('passed from renouvelycomMessage')
+                    const tache1 = await axios
+                      .patch(api + '/commission/archivecom')
+                      .then((res) => console.log(res))
+                      .then((err) => console.log(err))
+
+                    setCurrentModifiedMembres([])
+                    const tache2 = await axios
+                      .get(api + '/commission/get')
+                      .then((res) => setMembres(res.data))
+                      .catch((err) => console.log(err))
+                    setRenouvelerComMessage(false)
+                  }
+                  if (addMemberMessage) {
+                    handleAddMember()
+                    setAddMemberMessage(false)
+                  }
+                  if (modifyMemberMessage) {
+                    handleModifyMember()
+                    setModifyMemberMessage(false)
+                  }
+                  if (deleteMembersMessage) {
+                    handleRemoveMembers()
+                    setDeleteMembersMessage(false)
+                  }
+                }}
+                className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {(addMember || modifyMember) && (
         <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
@@ -507,15 +609,17 @@ function Archive() {
           </form>
         </div>
       )}
-      <div className="flex flex-col w-3/4 mt-[8vh]">
-        <div className="flex px-12 justify-between h-16 items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
+      <div className="flex flex-col w-full">
+        <div className="flex px-[3vw] justify-between h-16 items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
           {account == 'chef' && (
             <div className="flex w-1/2 justify-evenly items-center">
               <button
                 className={
                   'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
                 }
-                onClick={() => {}}
+                onClick={() => {
+                  setRenouvelerComMessage(true)
+                }}
               >
                 Renouveler commission
               </button>
@@ -540,7 +644,7 @@ function Archive() {
                       ? 'flex border py-2 px-4 gap-2 text-blue bg-blue/15 duration-100'
                       : 'flex border py-2 px-4 gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
                   }
-                  onClick={handleModify}
+                  onClick={() => handleModify()}
                 >
                   {ModifierImage}
                 </button>
@@ -550,7 +654,7 @@ function Archive() {
                       ? 'flex border py-2 px-4 rounded-r-xl gap-2 bg-red/25 dark:bg-brown text-red duration-100'
                       : 'flex border py-2 px-4 rounded-r-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
                   }
-                  onClick={handleRemoveMembers}
+                  onClick={() => setDeleteMembersMessage(true)}
                 >
                   {supprimerImage}
                 </button>
@@ -569,8 +673,8 @@ function Archive() {
               <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
             </button>
           )}
-          <div className="flex bg-white dark:bg-light-gray rounded-lg">
-            <img className="px-2" src={SearchSVG} alt="Search icon"></img>
+          <div className="flex items-center bg-white dark:bg-light-gray rounded-lg">
+            {RechercherSvg}
             <input
               className="flex justify-start items-center w-[240px] h-10 px-2 py-1 rounded-lg bg-transparent outline-none text-[#B6BCD1] dark:text-white"
               type="search"
@@ -580,35 +684,37 @@ function Archive() {
             ></input>
           </div>
         </div>
-        <table className="">
-          <tr className="border-t">
-            <th className="w-1/4 border-x">
-              <div>
-                Titre
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-            <th className="w-1/4 border-x">
-              <div>
-                Nom
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-            <th className="w-1/4 border-x">
-              <div>
-                Email
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-            <th className="w-1/4 border-x">
-              <div>
-                Date de début
-                <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
-              </div>
-            </th>
-          </tr>
-          {membresTable}
-        </table>
+        <div className="w-full max-h-[80vh] overflow-y-auto">
+          <table className='w-full'>
+            <tr className="border-t">
+              <th className="w-1/4 border-x">
+                <div>
+                  Titre
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
+              </th>
+              <th className="w-1/4 border-x">
+                <div>
+                  Nom
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
+              </th>
+              <th className="w-1/4 border-x">
+                <div>
+                  Email
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
+              </th>
+              <th className="w-1/4 border-x">
+                <div>
+                  Date de début
+                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
+                </div>
+              </th>
+            </tr>
+            {membresTable}
+          </table>
+        </div>
       </div>
     </div>
   )

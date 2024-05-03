@@ -2,7 +2,9 @@
 
 ## Backend
 
-- ensure all routes are working(to expand)
+- ensure all routes are working
+  - rapport routes: all working
+  - commission routes: all working besides (/editcom, /getcom) (not tested)
 
 ## Database
 
@@ -11,14 +13,11 @@
 
 ## Commission page
 
-- add functionnality to renouveler commission button.
-- fetch for ajouter, modifier et supprimer les membres.
-- table to fill all the available width.
-- change the color of the search icon (not visible)
+- not updating when deleting a member.
 
 ## AjouterPv page
 
-- Add Creer conseil button :
+- Add Creer conseil button:
 
   - Displays a form with the date of the cd and all the present members.
   - when the user assigns the date, it gives him the list of the commission that was present and the he can choose which members where present
@@ -43,3 +42,7 @@
 ## Se deconnecter page
 
 - A confirmation page
+
+## Bugs
+
+- date always removes one day.
