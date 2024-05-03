@@ -32,7 +32,8 @@ router.post('/gets', (req, res) => {
   let numr = req.body.numR
   let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
   p.nom_p, p.prenom_p,
-  i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i
+  i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i,
+  r.date_r
   FROM Rapport r
   INNER JOIN Etudiant e ON r.matricule_e = e.matricule_e
   INNER JOIN Plaignant p ON r.id_p = p.id_p

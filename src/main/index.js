@@ -58,8 +58,9 @@ app.whenReady().then(() => {
   ipcMain.handle('get-url', getUrl)
   createWindow()
 
-  ExpressApp.listen(3000, () => {
-    console.log('Express server running on port 3000')
+  const PORT = process.env.PORT || 3000
+  ExpressApp.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`)
   })
 
   app.on('activate', function () {
@@ -74,18 +75,18 @@ async function initialize() {
 }
 initialize()
 
-async function getUrl(){
-  const browser = await pie.connect(app, puppeteer);
- 
-  const window = new BrowserWindow();
-  const url = __dirname + "../../s.pdf";
-  console.log("url:", url)
-  await window.loadURL(url);
- 
-  const page = await pie.getPage(browser, window);
-  console.log(page.url());
-  return page.url();
-};
+async function getUrl() {
+  const browser = await pie.connect(app, puppeteer)
+
+  const window = new BrowserWindow()
+  const url = __dirname + '../../s.pdf'
+  console.log('url:', url)
+  await window.loadURL(url)
+
+  const page = await pie.getPage(browser, window)
+  console.log(page.url())
+  return page.url()
+}
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
