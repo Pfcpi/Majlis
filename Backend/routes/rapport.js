@@ -238,7 +238,7 @@ router.post('/add', (req, res) => {
                                 }
                               }
                             )
-                            res.statusStatus(204)
+                            res.sendStatus(204)
                           }
                         })
                       }

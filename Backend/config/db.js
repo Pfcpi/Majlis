@@ -2,16 +2,14 @@
 /* eslint-disable no-unused-vars */
 const Database = require('mysql')
 
-// Aws rds database login
 const db = Database.createConnection({
-  host: 'projet.c9ewe6uqqsev.eu-west-3.rds.amazonaws.com',
+  host: 'eris-shared-g1.dzsecurity.net',
   port: '3306',
-  user: 'admin',
+  user: 'madjri81_admin',
   password: 'pfcpiprojet',
-  database: 'projet'
+  database: 'madjri81_projet'
 })
 
-// Connect to the aws rds database
 db.connect((err) => {
   if (err) {
     console.error('Error connecting to MySQL RDS: ' + err.message)

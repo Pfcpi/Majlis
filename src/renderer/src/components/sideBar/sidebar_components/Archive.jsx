@@ -180,17 +180,17 @@ function Archive() {
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="w-1/2 flex justify-between">
                 <button onClick={() => handlePrintNPM()} className="text-blue">
-                  <div className="deletePdfImprimer">
+                  <div className="deletePdfImprimer border">
                     <img className="imgp" src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
                   </div>
                 </button>
                 <button onClick={() => handlePreviewNPM()} className="text-blue">
-                  <div className="deletePdfImprimer">
+                  <div className="deletePdfImprimer border">
                     <img className="imgp" src={PdfSVG} alt="pdf icon"></img>Enregistrer PDF
                   </div>
                 </button>
                 <button className="text-pink">
-                  <div className="deletePdfImprimer bg-brown">
+                  <div className="deletePdfImprimer border">
                     <img className="imgp" src={SupprimerSVG} alt="supprimer icon"></img>Supprimer
                   </div>
                 </button>
