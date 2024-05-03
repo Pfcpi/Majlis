@@ -2,13 +2,13 @@
 //Add id attribute for input elements
 
 import { useState, useEffect } from 'react'
+import WarningSVG from './../../../assets/warning.svg'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
 
 function AjouterRapport() {
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
-  const degre = ['1', '2']
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
@@ -27,11 +27,25 @@ function AjouterRapport() {
   ]
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
-  const [dropDegre, setDropDegre] = useState(false)
-  const [dropDegreValue, setDropDegreValue] = useState('')
   const [dropMotif, setDropMotif] = useState(false)
   const [dropMotifValue, setDropMotifValue] = useState('')
   const [etudiants, setEtudiants] = useState([])
+  const [errorsStep1, setErrorsStep1] = useState({
+    matriculeError: '',
+    nomError: '',
+    prenomError: '',
+    niveauError: '',
+    groupeError: '',
+    sectionError: ''
+  })
+  const [errorsStep2, setErrorsStep2] = useState({
+    nomError: '',
+    prenomError: ''
+  })
+  const [errorsStep3, setErrorsStep3] = useState({
+    lieuError: '',
+    motifError: ''
+  })
 
   const [step, setStep] = useState(1)
   // Add a rapport
@@ -54,11 +68,11 @@ function AjouterRapport() {
   }
 */
   const [rapport, setRapport] = useState({
-    matriculeE: 0,
+    matriculeE: '',
     nomE: '',
     prenomE: '',
     niveauE: '',
-    groupeE: 1,
+    groupeE: '',
     sectionE: null,
     nomP: '',
     prenomP: '',
@@ -81,11 +95,11 @@ function AjouterRapport() {
   }, [dropNiveauValue])
 
   useEffect(() => {
-    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
-  }, [dropDegreValue])
-
-  useEffect(() => {
-    setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+    if (dropMotifValue != 'autres...') {
+      setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+    } else {
+      setRapport((prev) => ({ ...prev, motifI: '' }))
+    }
   }, [dropMotifValue])
 
   const handleInputChange = (e) => {
@@ -113,23 +127,7 @@ function AjouterRapport() {
     </div>
   )
 
-  const dropDegredownItems = (
-    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-      {degre.map((n) => (
-        <div
-          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
-          onClick={() => {
-            setDropDegre(false)
-            setDropDegreValue(n)
-          }}
-        >
-          {n}
-        </div>
-      ))}
-    </div>
-  )
-
-  const dropMotif1downItems = (
+  const dropMotifdownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {motif1.map((n) => (
         <div
@@ -142,11 +140,6 @@ function AjouterRapport() {
           {n}
         </div>
       ))}
-    </div>
-  )
-
-  const dropMotif2downItems = (
-    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {motif2.map((n) => (
         <div
           className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
@@ -160,6 +153,150 @@ function AjouterRapport() {
       ))}
     </div>
   )
+
+  const validateFormStep1 = (data) => {
+    let errors = {}
+
+    const que_les_nombres_regex = /^[0-9]+$/
+    if (data.matriculeE.length == 0) {
+      errors.matricule = 'matricule est vide!'
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
+      return errors
+    } else if (!que_les_nombres_regex.test(data.matriculeE)) {
+      errors.matricule = 'Uniquement les nombres'
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: '' }))
+    }
+
+    if (data.nomE.length == 0) {
+      errors.nom = 'nom est vide!'
+      setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomE.length < 3) {
+      errors.nom = 'la longueur doit etre > 3'
+      setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomE.search(/^[a-zA-Z]*$/g)) {
+      errors.nom = "Uniquement les caractères (pas d'espace)"
+      setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, nomError: '' }))
+    }
+
+    if (data.prenomE.length == 0) {
+      errors.prenom = 'Prenom est vide!'
+      setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomE.length < 3) {
+      errors.prenom = 'la longueur doit etre > 3'
+      setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomE.search(/^[a-zA-Z\s]*$/g)) {
+      errors.prenom = 'Uniquement les caractères'
+      setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, prenomError: '' }))
+    }
+
+    if (data.niveauE.length == 0) {
+      errors.niveau = 'Niveau est vide!'
+      setErrorsStep1((prev) => ({ ...prev, niveauError: errors.niveau }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, niveauError: '' }))
+    }
+
+    if (data.groupeE.length == 0) {
+      errors.groupe = 'groupe est vide!'
+      setErrorsStep1((prev) => ({ ...prev, groupeError: errors.groupe }))
+      return errors
+    } else if (!que_les_nombres_regex.test(data.groupeE)) {
+      errors.groupe = 'Uniquement les nombres'
+      setErrorsStep1((prev) => ({ ...prev, groupeError: errors.groupe }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, groupeError: '' }))
+    }
+
+    if (data.sectionE == null || data.sectionE.length == 0) {
+      errors.section = 'section est vide!'
+      setErrorsStep1((prev) => ({ ...prev, sectionError: errors.section }))
+      return errors
+    } else if (!que_les_nombres_regex.test(data.sectionE)) {
+      errors.section = 'Uniquement les nombres'
+      setErrorsStep1((prev) => ({ ...prev, sectionError: errors.section }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, sectionError: '' }))
+    }
+    return errors
+  }
+
+  const validateFormStep2 = (data) => {
+    let errors = {}
+
+    if (data.nomP.length == 0) {
+      errors.nom = 'nom est vide!'
+      setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomP.length < 3) {
+      errors.nom = 'la longueur doit etre > 3'
+      setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomP.search(/^[a-zA-Z]*$/g)) {
+      errors.nom = "Uniquement les caractères (pas d'espace)"
+      setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setErrorsStep2((prev) => ({ ...prev, nomError: '' }))
+    }
+
+    if (data.prenomP.length == 0) {
+      errors.prenom = 'Prenom est vide!'
+      setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomP.length < 3) {
+      errors.prenom = 'la longueur doit etre > 3'
+      setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomP.search(/^[a-zA-Z\s]*$/g)) {
+      errors.prenom = 'Uniquement les caractères'
+      setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setErrorsStep2((prev) => ({ ...prev, prenomError: '' }))
+    }
+
+    return errors
+  }
+
+  const validateFormStep3 = (data) => {
+    let errors = {}
+
+    console.log('data: ', data)
+    if (data.lieuI.length == 0) {
+      errors.lieu = 'lieu est vide!'
+      setErrorsStep3((prev) => ({ ...prev, lieuError: errors.lieu }))
+      return errors
+    } else {
+      setErrorsStep3((prev) => ({ ...prev, lieuError: '' }))
+    }
+
+    console.log('data.motifI', data.motifI)
+    if (data.motifI.length == 0) {
+      errors.motif = 'motif est vide!'
+      setErrorsStep3((prev) => ({ ...prev, motifError: errors.motif }))
+      return errors
+    } else {
+      setErrorsStep3((prev) => ({ ...prev, motifError: '' }))
+    }
+
+    return errors
+  }
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6">
@@ -186,7 +323,6 @@ function AjouterRapport() {
             <button
               onClick={() => {
                 setStep(1)
-                setDropDegreValue('')
                 setdropNiveauValue('')
                 setDropMotifValue('')
                 setRapport({})
@@ -198,7 +334,6 @@ function AjouterRapport() {
             <button
               onClick={() => {
                 setStep(1)
-                setDropDegreValue('')
                 setdropNiveauValue('')
                 setDropMotifValue('')
                 setRapport({})
@@ -232,6 +367,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="matriculeE">
                   Matricule
                 </label>
+                {errorsStep1.matriculeError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.matriculeError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -244,6 +385,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="nomE">
                   Nom
                 </label>
+                {errorsStep1.nomError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.nomError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -256,6 +403,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="prenomE">
                   Prenom
                 </label>
+                {errorsStep1.prenomError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.prenomError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -273,6 +426,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="niveauE">
                   Niveau
                 </label>
+                {errorsStep1.niveauError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.niveauError}
+                  </p>
+                )}
                 {dropNiveau && dropNiveaudownItems}
               </div>
               <div className="container_input_rapport">
@@ -286,6 +445,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="GroupeE">
                   Groupe
                 </label>
+                {errorsStep1.groupeError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.groupeError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -298,6 +463,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="sectionE">
                   Section
                 </label>
+                {errorsStep1.sectionError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.sectionError}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -317,6 +488,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="nomP">
                   Nom
                 </label>
+                {errorsStep2.nomError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep2.nomError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -329,6 +506,12 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="prenomP">
                   Prenom
                 </label>
+                {errorsStep2.prenomError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep2.prenomError}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -346,7 +529,10 @@ function AjouterRapport() {
                   value={rapport.dateI}
                   required
                 ></input>
-                <label className="label_rapport" htmlFor="dateI">
+                <label
+                  className="absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent"
+                  htmlFor="dateI"
+                >
                   Date
                 </label>
               </div>
@@ -361,6 +547,40 @@ function AjouterRapport() {
                 <label className="label_rapport" htmlFor="lieuI">
                   Lieu
                 </label>
+                {errorsStep3.lieuError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep3.lieuError}
+                  </p>
+                )}
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="motifI"
+                  onClick={() => {
+                    if (!dropMotif && dropMotifValue != 'autres...') setDropMotif(true)
+                  }}
+                  value={dropMotifValue == 'autres...' ? rapport.motifI : dropMotifValue}
+                  onChange={(e) => {
+                    if (dropMotifValue == 'autres...') {
+                      handleInputChange(e)
+                      setRapport((prev) => ({ ...prev, motifI: e.target.value }))
+                      if (dropMotif) setDropMotif(false)
+                    }
+                  }}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="motifI">
+                  Motif
+                </label>
+                {errorsStep3.motifError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep3.motifError}
+                  </p>
+                )}
+                {dropMotif && dropMotifdownItems}
               </div>
               <div className="container_input_rapport">
                 <input
@@ -372,34 +592,12 @@ function AjouterRapport() {
                   }}
                   name="degreI"
                   onChange={handleInputChange}
-                  value={dropDegreValue}
+                  value={motif2.includes(rapport.motifI) ? '2' : '1'}
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="degreI">
                   Degré
                 </label>
-                {dropDegre && dropDegredownItems}
-              </div>
-              <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="motifI"
-                  onClick={() => {
-                    if (!dropMotif) setDropMotif(true)
-                  }}
-                  value={dropMotifValue == 'autres...' ? rapport.motifI : dropMotifValue}
-                  onChange={(e) => {
-                    handleInputChange
-                    setRapport((prev) => ({ ...prev, motifI: e.target.value }))
-                    if (dropMotif) setDropMotif(false)
-                  }}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="motifI">
-                  Motif
-                </label>
-                {dropMotif && dropDegreValue == 1 && dropMotif1downItems}
-                {dropMotif && dropDegreValue == 2 && dropMotif2downItems}
               </div>
               <div className="container_input_rapport">
                 <textarea
@@ -423,6 +621,24 @@ function AjouterRapport() {
             onClick={(e) => {
               e.preventDefault()
               if (step > 1) setStep((prev) => prev - 1)
+              setTimeout(() => {
+                setErrorsStep1({
+                  matriculeError: '',
+                  nomError: '',
+                  prenomError: '',
+                  niveauError: '',
+                  groupeError: '',
+                  sectionError: ''
+                })
+                setErrorsStep2({
+                  nomError: '',
+                  prenomError: ''
+                })
+                setErrorsStep3({
+                  lieuError: '',
+                  motifError: ''
+                })
+              }, 2000)
             }}
             type="reset"
           >
@@ -433,7 +649,42 @@ function AjouterRapport() {
             type="submit"
             onClick={(e) => {
               e.preventDefault()
-              setStep((prev) => prev + 1)
+              if (step == 1) {
+                const newErrors = validateFormStep1(rapport)
+                if (Object.keys(newErrors).length === 0) {
+                  setStep((prev) => prev + 1)
+                }
+              }
+              if (step == 2) {
+                const newErrors = validateFormStep2(rapport)
+                if (Object.keys(newErrors).length === 0) {
+                  setStep((prev) => prev + 1)
+                }
+              }
+              if (step == 3) {
+                const newErrors = validateFormStep3(rapport)
+                if (Object.keys(newErrors).length === 0) {
+                  setStep((prev) => prev + 1)
+                }
+              }
+              setTimeout(() => {
+                setErrorsStep1({
+                  matriculeError: '',
+                  nomError: '',
+                  prenomError: '',
+                  niveauError: '',
+                  groupeError: '',
+                  sectionError: ''
+                })
+                setErrorsStep2({
+                  nomError: '',
+                  prenomError: ''
+                })
+                setErrorsStep3({
+                  lieuError: '',
+                  motifError: ''
+                })
+              }, 2000)
             }}
           >
             {step > 2 ? 'terminer' : 'continue'}

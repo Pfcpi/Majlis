@@ -42,7 +42,6 @@ export default {
     },
     animation: {
       spread: 'spread .5s linear',
-      label: '.2 ease',
       badInput: 'badInput 2s linear'
     }
   },

@@ -993,6 +993,24 @@ function Archive() {
                   } else {
                     setStep((prev) => prev - 1)
                   }
+                  setTimeout(() => {
+                    setErrorsStep1({
+                      matriculeError: '',
+                      nomError: '',
+                      prenomError: '',
+                      niveauError: '',
+                      groupeError: '',
+                      sectionError: ''
+                    })
+                    setErrorsStep2({
+                      nomError: '',
+                      prenomError: ''
+                    })
+                    setErrorsStep3({
+                      lieuError: '',
+                      motifError: ''
+                    })
+                  }, 2000)
                 }}
               >
                 {step >= 2 ? 'retourner' : 'annuler'}

@@ -16,11 +16,6 @@
 - table to fill all the available width.
 - change the color of the search icon (not visible)
 
-## Ajouter Rapport page
-
-- remove 0 and 1 for matricule and groupe.
-- make the date label fixed and not animated.
-
 ## AjouterPv page
 
 - Add Creer conseil button :
