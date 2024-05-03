@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer')
+const fs = require('fs')
 
 async function generatePDFpv(data) {
   const html = `
@@ -114,13 +115,29 @@ async function generatePDFrapport(data) {
 
     `
 
-  const browser = await puppeteer.launch({ headless: true})
+  const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
-  await page.pdf({ path: './out/s.pdf', format: 'A4' })
-  console.log('passed by here pdf.js generatePdfRapport')
 
-  return page.pdf({ format: 'A4' })
+  // Generate PDF
+  const pdfBuffer = await page.pdf({ format: 'A4' })
+
+  // Define file path
+  const pdfFilePath = './out/s.pdf' // Adjust the path as needed
+
+  // Write PDF to file system
+  fs.writeFile(pdfFilePath, pdfBuffer, (err) => {
+    if (err) {
+      console.error('Error writing PDF:', err)
+    } else {
+      console.log('PDF saved successfully!')
+    }
+  })
+
+  // Close Puppeteer
+  await browser.close()
+
+  return pdfBuffer
 }
 
 module.exports = { generatePDFpv, generatePDFrapport }

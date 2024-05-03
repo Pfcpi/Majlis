@@ -513,40 +513,48 @@ function Archive() {
             <div className="flex w-1/2 justify-evenly items-center">
               <button
                 className={
-                  membres.length < 10
-                    ? 'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
-                    : 'flex border py-2 px-4 rounded-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
+                  'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
                 }
-                onClick={() => {
-                  if (membres.length < 10) {
-                    setAddMember(true)
+                onClick={() => {}}
+              >
+                Renouveler commission
+              </button>
+              <div className="flex gap-0">
+                <button
+                  className={
+                    membres.length < 10
+                      ? 'flex border py-2 px-4 rounded-l-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
+                      : 'flex border py-2 px-4 rounded-l-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
                   }
-                }}
-              >
-                {ajouterImage}Ajouter
-              </button>
-              <button
-                className={
-                  currentModifiedMembres.length == 1
-                    ? 'flex border py-2 px-4 rounded-xl gap-2 text-blue bg-blue/15 duration-100'
-                    : 'flex border py-2 px-4 rounded-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
-                }
-                onClick={handleModify}
-              >
-                {ModifierImage}
-                Modifier
-              </button>
-              <button
-                className={
-                  currentModifiedMembres.length != 0
-                    ? 'flex border py-2 px-4 rounded-xl gap-2 bg-red/25 dark:bg-brown text-red duration-100'
-                    : 'flex border py-2 px-4 rounded-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
-                }
-                onClick={handleRemoveMembers}
-              >
-                {supprimerImage}
-                supprimer
-              </button>
+                  onClick={() => {
+                    if (membres.length < 10) {
+                      setAddMember(true)
+                    }
+                  }}
+                >
+                  {ajouterImage}
+                </button>
+                <button
+                  className={
+                    currentModifiedMembres.length == 1
+                      ? 'flex border py-2 px-4 gap-2 text-blue bg-blue/15 duration-100'
+                      : 'flex border py-2 px-4 gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
+                  }
+                  onClick={handleModify}
+                >
+                  {ModifierImage}
+                </button>
+                <button
+                  className={
+                    currentModifiedMembres.length != 0
+                      ? 'flex border py-2 px-4 rounded-r-xl gap-2 bg-red/25 dark:bg-brown text-red duration-100'
+                      : 'flex border py-2 px-4 rounded-r-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
+                  }
+                  onClick={handleRemoveMembers}
+                >
+                  {supprimerImage}
+                </button>
+              </div>
             </div>
           )}
           {account == 'president' && (
