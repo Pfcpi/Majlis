@@ -149,7 +149,7 @@ router.get('/getcom', (req, res) => {
   let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE m.est_actif = TRUE AND c.actif_c = TRUE`
   db.query(sqlquery, (err, result) => {
     if(err) {
-      res.status(400).send(err)
+      console.log(err)
     } else {
       res.send(result)
     }

@@ -2,7 +2,7 @@
 //Add id attribute for input elements
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import './sidebar_com_css/archives.css'
 import './sidebar_com_css/scroll.css'
@@ -14,7 +14,6 @@ import useAccount from '../../../zustand/account'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
-import SearchSVG from './../../../assets/Search.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
 import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
 import ModifierDossierGraySVG from './../../../assets/BlueSvgs/ModifierDossierGray.svg'
@@ -23,9 +22,9 @@ import GOBackSVG from './../../../assets/GoBack.svg'
 import GOBackGraySVG from './../../../assets/BlueSvgs/GoBackGray.svg'
 import PdfSVG from './../../../assets/pdf.svg'
 import ImprimerSVG from './../../../assets/imprimer.svg'
-import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import SupprimerSVG from './../../../assets/supprimer.svg'
-import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
+import WarningSVG from './../../../assets/warning.svg'
+
 import axios from 'axios'
 
 function Archive() {
@@ -34,8 +33,7 @@ function Archive() {
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
-    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité",
-    'autres...'
+    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant ou de sécurité"
   ]
   const motif2 = [
     'Les récidives des infractions du 1er degré',
@@ -49,10 +47,25 @@ function Archive() {
   ]
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
-  const [dropDegre, setDropDegre] = useState(false)
-  const [dropDegreValue, setDropDegreValue] = useState(1)
   const [dropMotif, setDropMotif] = useState(false)
   const [dropMotifValue, setDropMotifValue] = useState('')
+  const [errorsStep1, setErrorsStep1] = useState({
+    matriculeError: '',
+    nomError: '',
+    prenomError: '',
+    niveauError: '',
+    groupeError: '',
+    sectionError: ''
+  })
+  const [errorsStep2, setErrorsStep2] = useState({
+    nomError: '',
+    prenomError: ''
+  })
+  const [errorsStep3, setErrorsStep3] = useState({
+    lieuError: '',
+    motifError: ''
+  })
+
   const api = 'http://localhost:3000'
 
   //false for rapport, true for Dossier
@@ -73,11 +86,11 @@ function Archive() {
   const classNames = (array) => array?.filter(Boolean).join(' ')
 
   const [rapport, setRapport] = useState({
-    matriculeE: 0,
+    matriculeE: '',
     nomE: '',
     prenomE: '',
     niveauE: '',
-    groupeE: 0,
+    groupeE: '',
     sectionE: null,
     nomP: '',
     prenomP: '',
@@ -101,6 +114,7 @@ function Archive() {
       .get(api + '/commission/get')
       .then((res) => {
         setCommission(res.data)
+        console.log(res)
       })
       .catch((err) => console.log(err))
   }, [])
@@ -109,9 +123,7 @@ function Archive() {
     if (!modify) {
       setdropNiveauValue('')
       setdropNiveau(false)
-      setDropDegreValue('')
-      setDropDegre(false)
-      setDropDegreValue('')
+      setDropMotifValue('')
       setDropMotif(false)
     }
   }, [modify])
@@ -121,11 +133,10 @@ function Archive() {
   }, [currentViewedEtudiant.niveau_e])
 
   useEffect(() => {
-    setDropDegreValue(currentViewedEtudiant.degre_i)
-  }, [currentViewedEtudiant.degre_i])
-
-  useEffect(() => {
-    setDropMotifValue(currentViewedEtudiant.motif_i)
+    setRapport((prev) => ({
+      ...prev,
+      degreI: motif2.includes(currentViewedEtudiant.motif_i) ? '2' : '1'
+    }))
   }, [currentViewedEtudiant.motif_i])
 
   useEffect(() => {
@@ -133,11 +144,12 @@ function Archive() {
   }, [dropNiveauValue])
 
   useEffect(() => {
-    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
-  }, [dropDegreValue])
-
-  useEffect(() => {
-    setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+    if (dropMotifValue != 'autres...') {
+      setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+    } else {
+      setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: '' }))
+      setRapport((prev) => ({ ...prev, motifI: '' }))
+    }
   }, [dropMotifValue])
 
   const filteredEtudiants = useMemo(() => {
@@ -160,22 +172,6 @@ function Archive() {
     }))
   }
 
-  function handleClick(e, color) {
-    let y = e.clientY - e.target.offsetTop
-    let x = e.clientX - e.target.offsetLeft
-
-    let spread = document.createElement('div')
-    spread.classList.add('spreadAni')
-    spread.style.left = x + 'px'
-    spread.style.top = y + 'px'
-    spread.style.backgroundColor = color
-    e.target.appendChild(spread)
-
-    setTimeout(() => {
-      spread.remove()
-    }, 1000)
-  }
-
   const dropNiveaudownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {niveaux.map((n) => (
@@ -192,23 +188,7 @@ function Archive() {
     </div>
   )
 
-  const dropDegredownItems = (
-    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-      {degre.map((n) => (
-        <div
-          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
-          onClick={() => {
-            setDropDegre(false)
-            setDropDegreValue(n)
-          }}
-        >
-          {n}
-        </div>
-      ))}
-    </div>
-  )
-
-  const dropMotif1downItems = (
+  const dropMotifdownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {motif1.map((n) => (
         <div
@@ -221,11 +201,6 @@ function Archive() {
           {n}
         </div>
       ))}
-    </div>
-  )
-
-  const dropMotif2downItems = (
-    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {motif2.map((n) => (
         <div
           className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
@@ -328,6 +303,166 @@ function Archive() {
   ) : (
     <></>
   )
+
+  const RechercherSvg = (
+    <svg
+      className={'[&>path]:fill-dark-gray dark:[&>path]:fill-white duration-100 ml-2'}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10.9007 15.7086C11.9649 15.7086 12.9464 15.3677 13.7493 14.7996L16.77 17.7917C16.9102 17.9306 17.0951 18 17.2926 18C17.7069 18 18 17.6844 18 17.2804C18 17.091 17.9363 16.9079 17.7961 16.7754L14.7945 13.7959C15.4254 12.9753 15.8014 11.959 15.8014 10.8543C15.8014 8.18411 13.5964 6 10.9007 6C8.21136 6 6 8.1778 6 10.8543C6 13.5245 8.20499 15.7086 10.9007 15.7086ZM10.9007 14.6607C8.79766 14.6607 7.05789 12.9374 7.05789 10.8543C7.05789 8.77117 8.79766 7.04787 10.9007 7.04787C13.0037 7.04787 14.7435 8.77117 14.7435 10.8543C14.7435 12.9374 13.0037 14.6607 10.9007 14.6607Z"
+        fill-opacity="0.6"
+      />
+    </svg>
+  )
+
+  const validateFormStep1 = (data) => {
+    let errors = {}
+
+    const que_les_nombres_regex = /^[0-9]+$/
+    if (data.matriculeE.length == 0) {
+      errors.matricule = 'matricule est vide!'
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
+      return errors
+    } else if (!que_les_nombres_regex.test(data.matriculeE)) {
+      errors.matricule = 'Uniquement les nombres'
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: '' }))
+    }
+
+    if (data.nomE.length == 0) {
+      errors.nom = 'nom est vide!'
+      setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomE.length < 3) {
+      errors.nom = 'la longueur doit etre > 3'
+      setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomE.search(/^[a-zA-Z]*$/g)) {
+      errors.nom = "Uniquement les caractères (pas d'espace)"
+      setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, nomError: '' }))
+    }
+
+    if (data.prenomE.length == 0) {
+      errors.prenom = 'Prenom est vide!'
+      setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomE.length < 3) {
+      errors.prenom = 'la longueur doit etre > 3'
+      setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomE.search(/^[a-zA-Z\s]*$/g)) {
+      errors.prenom = 'Uniquement les caractères'
+      setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, prenomError: '' }))
+    }
+
+    if (data.niveauE.length == 0) {
+      errors.niveau = 'Niveau est vide!'
+      setErrorsStep1((prev) => ({ ...prev, niveauError: errors.niveau }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, niveauError: '' }))
+    }
+
+    if (data.groupeE.length == 0) {
+      errors.groupe = 'groupe est vide!'
+      setErrorsStep1((prev) => ({ ...prev, groupeError: errors.groupe }))
+      return errors
+    } else if (!que_les_nombres_regex.test(data.groupeE)) {
+      errors.groupe = 'Uniquement les nombres'
+      setErrorsStep1((prev) => ({ ...prev, groupeError: errors.groupe }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, groupeError: '' }))
+    }
+
+    if (data.sectionE == null || data.sectionE.length == 0) {
+      errors.section = 'section est vide!'
+      setErrorsStep1((prev) => ({ ...prev, sectionError: errors.section }))
+      return errors
+    } else if (!que_les_nombres_regex.test(data.sectionE)) {
+      errors.section = 'Uniquement les nombres'
+      setErrorsStep1((prev) => ({ ...prev, sectionError: errors.section }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, sectionError: '' }))
+    }
+    return errors
+  }
+
+  const validateFormStep2 = (data) => {
+    let errors = {}
+
+    if (data.nomP.length == 0) {
+      errors.nom = 'nom est vide!'
+      setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomP.length < 3) {
+      errors.nom = 'la longueur doit etre > 3'
+      setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomP.search(/^[a-zA-Z]*$/g)) {
+      errors.nom = "Uniquement les caractères (pas d'espace)"
+      setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setErrorsStep2((prev) => ({ ...prev, nomError: '' }))
+    }
+
+    if (data.prenomP.length == 0) {
+      errors.prenom = 'Prenom est vide!'
+      setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomP.length < 3) {
+      errors.prenom = 'la longueur doit etre > 3'
+      setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomP.search(/^[a-zA-Z\s]*$/g)) {
+      errors.prenom = 'Uniquement les caractères'
+      setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setErrorsStep2((prev) => ({ ...prev, prenomError: '' }))
+    }
+
+    return errors
+  }
+
+  const validateFormStep3 = (data) => {
+    let errors = {}
+
+    console.log('data: ', data)
+    if (data.lieuI.length == 0) {
+      errors.lieu = 'lieu est vide!'
+      setErrorsStep3((prev) => ({ ...prev, lieuError: errors.lieu }))
+      return errors
+    } else {
+      setErrorsStep3((prev) => ({ ...prev, lieuError: '' }))
+    }
+
+    console.log('data.motifI', data.motifI)
+    if (data.motifI.length == 0) {
+      errors.motif = 'motif est vide!'
+      setErrorsStep3((prev) => ({ ...prev, motifError: errors.motif }))
+      return errors
+    } else {
+      setErrorsStep3((prev) => ({ ...prev, motifError: '' }))
+    }
+
+    return errors
+  }
   return (
     <div className="flex w-full h-full">
       {supprimer && (
@@ -433,15 +568,12 @@ function Archive() {
                   <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
                     <img src={PdfSVG}></img>enregistrer
                   </button>
-                  <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
-                    <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
-                  </button>
                 </div>
               </div>
             </div>
           )}
           <div className={classNames(['flex flex-col mt-[8vh]', view ? 'w-1/2' : 'w-3/4'])}>
-            {etudiants.length != 0 && (
+            {Array.isArray(etudiants) && etudiants.length != 0 && (
               <div className="flex items-center w-fit px-4 gap-4 py-2 text-blue bg-blue/15 border border-blue rounded-lg">
                 <img className="w-7 aspect-square" src={NotificationsSVG}></img>
                 <p>{etudiants.length} Nouveax rapports ajoutés...</p>
@@ -449,8 +581,8 @@ function Archive() {
             )}
             <h1 className="text-3xl py-4">Rapport a traiter</h1>
             <div className="flex px-12 justify-end h-16 w-full items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
-              <div className="flex bg-white dark:bg-light-gray rounded-lg">
-                <img className="px-2" src={SearchSVG} alt="Search icon"></img>
+              <div className="flex items-center bg-white dark:bg-light-gray rounded-lg">
+                {RechercherSvg}
                 <input
                   className="flex justify-start items-center w-[240px] h-10 px-2 py-1 rounded-lg bg-transparent outline-none text-[#B6BCD1] dark:text-white"
                   value={query}
@@ -582,6 +714,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="matriculeE">
                       Matricule
                     </label>
+                    {errorsStep1.matriculeError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.matriculeError}
+                      </p>
+                    )}
                   </div>
                   <div className="container_input_rapport">
                     <input
@@ -597,6 +735,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="nomE">
                       Nom
                     </label>
+                    {errorsStep1.nomError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.nomError}
+                      </p>
+                    )}
                   </div>
                   <div className="container_input_rapport">
                     <input
@@ -612,6 +756,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="prenomE">
                       Prenom
                     </label>
+                    {errorsStep1.prenomError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.prenomError}
+                      </p>
+                    )}
                   </div>
                   <div className="container_input_rapport">
                     <input
@@ -629,6 +779,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="niveauE">
                       Niveau
                     </label>
+                    {errorsStep1.niveauError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.niveauError}
+                      </p>
+                    )}
                     {dropNiveau && dropNiveaudownItems}
                   </div>
                   <div className="container_input_rapport">
@@ -645,6 +801,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="niveauE">
                       Groupe
                     </label>
+                    {errorsStep1.groupeError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.groupeError}
+                      </p>
+                    )}
                   </div>
                   <div className="container_input_rapport">
                     <input
@@ -660,6 +822,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="niveauE">
                       Section
                     </label>
+                    {errorsStep1.sectionError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.sectionError}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -682,6 +850,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="nomP">
                       Nom
                     </label>
+                    {errorsStep2.nomError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep2.nomError}
+                      </p>
+                    )}
                   </div>
                   <div className="container_input_rapport">
                     <input
@@ -697,6 +871,12 @@ function Archive() {
                     <label className="label_rapport" htmlFor="prenomP">
                       Prenom
                     </label>
+                    {errorsStep2.prenomError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep2.prenomError}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -730,42 +910,30 @@ function Archive() {
                     <label className="label_rapport" htmlFor="lieuI">
                       Lieu
                     </label>
-                  </div>
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="degreI"
-                      onChange={() => {
-                        handleInputChange
-                        setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
-                      }}
-                      onClick={() => {
-                        if (!dropDegre) {
-                          setDropDegre(true)
-                        }
-                      }}
-                      value={dropDegreValue || currentViewedEtudiant.degre_i}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="degreI">
-                      Degré
-                    </label>
-                    {dropDegre && dropDegredownItems}
+                    {errorsStep3.lieuError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep3.lieuError}
+                      </p>
+                    )}
                   </div>
                   <div className="container_input_rapport">
                     <input
                       className="input_dossier"
                       name="motifI"
                       onChange={(e) => {
-                        handleInputChange
-                        setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
-                        if (dropMotif) setDropMotif(false)
+                        console.log('dropMotifValue:', dropMotifValue)
+                        if (dropMotifValue == 'autres...') {
+                          handleInputChange(e)
+                          setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
+                          if (dropMotif) setDropMotif(false)
+                        }
                       }}
                       onClick={() => {
-                        if (!dropMotif) setDropMotif(true)
+                        if (!dropMotif && dropMotifValue != 'autres...') setDropMotif(true)
                       }}
                       value={
-                        dropMotifValue == 'autres...'
+                        dropMotifValue == 'autres...' || dropMotifValue == ''
                           ? currentViewedEtudiant.motif_i
                           : dropMotifValue
                       }
@@ -774,8 +942,24 @@ function Archive() {
                     <label className="label_rapport" htmlFor="motifI">
                       Motif
                     </label>
-                    {dropMotif && dropDegreValue == 1 && dropMotif1downItems}
-                    {dropMotif && dropDegreValue == 2 && dropMotif2downItems}
+                    {errorsStep3.motifError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep3.motifError}
+                      </p>
+                    )}
+                    {dropMotif && dropMotifdownItems}
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="degreI"
+                      value={motif2.includes(rapport.motifI) ? '2' : '1'}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="degreI">
+                      Degré
+                    </label>
                   </div>
                   <div className="container_input_rapport">
                     <textarea
@@ -801,10 +985,9 @@ function Archive() {
             <hr className="w-full dark:text-gray"></hr>
             <div className="flex justify-between w-5/6 py-6">
               <button
-                className="button_dossier text-red min-w-fit"
+                className="button_dossier text-red min-w-fit hover:bg-0.36-red"
                 onClick={(e) => {
                   e.preventDefault()
-                  handleClick(e, '#fff')
                   if (step == 1) {
                     setModify(false)
                   } else {
@@ -815,14 +998,48 @@ function Archive() {
                 {step >= 2 ? 'retourner' : 'annuler'}
               </button>
               <button
-                className="button_dossier text-blue min-w-fit"
+                className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
                 onClick={(e) => {
                   e.preventDefault()
-                  handleClick(e, '#fff')
-                  setStep((prev) => prev + 1)
+                  if (step == 1) {
+                    const newErrors = validateFormStep1(rapport)
+                    if (Object.keys(newErrors).length === 0) {
+                      setStep((prev) => prev + 1)
+                    }
+                  }
+                  if (step == 2) {
+                    const newErrors = validateFormStep2(rapport)
+                    if (Object.keys(newErrors).length === 0) {
+                      setStep((prev) => prev + 1)
+                    }
+                  }
+                  if (step == 3) {
+                    const newErrors = validateFormStep3(rapport)
+                    if (Object.keys(newErrors).length === 0) {
+                      setStep((prev) => prev + 1)
+                    }
+                  }
+                  setTimeout(() => {
+                    setErrorsStep1({
+                      matriculeError: '',
+                      nomError: '',
+                      prenomError: '',
+                      niveauError: '',
+                      groupeError: '',
+                      sectionError: ''
+                    })
+                    setErrorsStep2({
+                      nomError: '',
+                      prenomError: ''
+                    })
+                    setErrorsStep3({
+                      lieuError: '',
+                      motifError: ''
+                    })
+                  }, 2000)
                 }}
               >
-                {step > 2 ? 'modifier' : 'continue'}
+                {step > 2 ? 'modifier' : 'continuer'}
               </button>
             </div>
           </form>

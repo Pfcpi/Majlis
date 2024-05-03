@@ -1,6 +1,6 @@
 //Tasks:
 //When deleting multiple members, it does not update for all deleted members(kind of (not to worry))
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 
 import './sidebar_com_css/archives.css'
 

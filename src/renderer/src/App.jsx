@@ -2,8 +2,9 @@
 //responsiveness when clicked animation
 import SideBar from './components/sideBar/SideBar.jsx'
 import NavBar from './components/NavBar.jsx'
-import authJPG from './assets/auth.jpg'
+import authJPG from './assets/usto.jpg'
 import USTOLogo from './assets/USTO-MB_logo2.svg'
+import applogo from '../../../build/icon.png'
 import useAuth from './zustand/auth.js'
 import useAccount from './zustand/account.js'
 import { useEffect, useState } from 'react'
@@ -37,7 +38,7 @@ function App() {
 
   function handleClick(e, color) {
     let y = e.clientY - e.target.offsetTop
-    let x = e.clientX - e.target.offsetLeft - screen.availWidth / 2
+    let x = e.clientX - e.target.offsetLeft - window.innerWidth / 2
 
     let spread = document.createElement('div')
     spread.classList.add('spreadAni')
@@ -114,11 +115,11 @@ function App() {
           {blurBg && (
             <div className="absolute w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20"></div>
           )}
-          <img className="w-1/2 p-0 max-h-[100vh] object-cover" src={authJPG}></img>
+          <img className="w-1/2 p-0 h-[100vh] object-cover" src={authJPG}></img>
           <div className="flex flex-col relative w-1/2 items-center justify-center gap-3 text-light-gray">
             <div className="absolute flex top-4 w-full justify-between items-center px-6">
               <img className="w-20 aspect-square" src={USTOLogo}></img>
-              <p className="font-cutive w-36 text-center">Conseil Discipline</p>
+              <img className="w-20 aspect-square rounded-[10px]" src={applogo}></img>
             </div>
             <h1 className="text-dark-gray text-[3vw] font-bold">
               {ChangePassword ? 'Changer mot de pass' : 'Se Connecter'}
@@ -152,7 +153,7 @@ function App() {
             </button>
             <input
               className="w-3/5 py-3 px-5 border rounded-[10px] outline-none focus:border-blue hover:bg-blue/15"
-              placeholder={ChangePassword ? 'nouveau mot de pass' : 'mot de pass'}
+              placeholder={ChangePassword ? 'nouveau mot de passe' : 'mot de passe'}
               onChange={(e) => {
                 setPassword(e.target.value)
               }}

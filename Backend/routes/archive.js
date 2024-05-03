@@ -807,12 +807,9 @@ WHERE
 
     try {
       const pdfBuffer = await generatePDFpv(data)
-      res.setHeader('Content-Type', 'application/pdf')
-      res.setHeader('Content-Disposition', `attachment; filename=PV${req.body.numPV}.pdf`)
-      res.send(pdfBuffer)
     } catch (err) {
       console.error(err)
-      res.status(500).send('An error occurred while generating the PDF')
+      res.status(200).send('An error occurred while generating the PDF')
     }
   })
 })

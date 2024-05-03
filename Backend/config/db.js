@@ -1,11 +1,10 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
-const Database = require('mysql')
+const Database = require('mysql2')
 
 // Aws rds database login
 const dbConfig = {
   host: 'eris-shared-g1.dzsecurity.net',
-  port: '3306',
   user: 'madjri81_admin',
   password: 'pfcpiprojet',
   database: 'madjri81_projet'
@@ -29,12 +28,9 @@ function connectToDB() {
   // Handle unexpected disconnections
   db.on('error', (err) => {
     console.error('Database connection error:', err)
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-      // Retry connecting after a delay (e.g., 5 seconds)
-      setTimeout(connectToDB, 5000)
-    } else {
-      throw err
-    }
+    db.destroy()
+    // Retry connecting after a delay (e.g., 5 seconds)
+    setTimeout(connectToDB, 5000)
   })
 
   // Export the database connection

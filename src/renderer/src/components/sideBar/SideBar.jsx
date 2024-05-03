@@ -31,7 +31,7 @@ import ArchiveWhiteSVG from './../../assets/BlueSvgs/ArchiveWhite.svg'
 import DocumentationWhiteSVG from './../../assets/BlueSvgs/DocumentationWhite.svg'
 import LogOutWhiteSVG from './../../assets/BlueSvgs/LogOutWhite.svg'
 
-import USTOLogo from './../../assets/USTO-MB_logo2.svg'
+import applogo from './../../../../../build/icon.png'
 
 import useCliped from './../../zustand/cliped'
 import useAuth from '../../zustand/auth'
@@ -70,15 +70,15 @@ function SideBar() {
                 setCliped()
               }}
             >
+              <img
+                data-cliped={cliped}
+                className="p-0 w-1/3 aspect-square rounded-[10px] data-[cliped=true]:w-full"
+                src={applogo}
+                alt="Outil pour le conseil Discipline"
+              />
               {!cliped && (
                 <p className="font-cutive w-36 dark:text-white text-center">Conseil Discipline</p>
               )}
-              <img
-                data-cliped={cliped}
-                className="p-0 w-1/3 aspect-square data-[cliped=true]:w-full"
-                src={USTOLogo}
-                alt="Outil pour le conseil Discipline"
-              />
             </div>
             <Link
               data-cliped={cliped}
