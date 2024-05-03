@@ -8,6 +8,35 @@ const { generatePDFpv } = require('../services/pdf')
 const { generatePDFrapport } = require('../services/pdf')
 const nodemailer = require('nodemailer')
 
+// Automatic mailling setup
+const transporter = nodemailer.createTransport({
+  host: 'smtp.zoho.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: 'conseil-discipline@cd-usto.tech',
+    pass: '2dleH#hz'
+  }
+})
+
+function maj(chaine) {
+  return chaine.charAt(0).toUpperCase() + chaine.slice(1)
+}
+
+function formatDate(inputDate) {
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ]
+
+  const date = new Date(inputDate);
+  const day = date.getDate().toString().padStart(2, '0')
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}/${month}/${year}`
+}
+
 //VALID
 // List of rapport that is short and that is treated (Archive > Rapport)
 router.get('/getrapport', (req, res) => {
@@ -37,7 +66,8 @@ router.post('/getsrapport', (req, res) => {
   let numr = req.body.numR
   let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
     p.nom_p, p.prenom_p,
-    i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i
+    i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i,
+    r.date_r
     FROM Rapport r
     INNER JOIN Etudiant e ON r.matricule_e = e.matricule_e
     INNER JOIN Plaignant p ON r.id_p = p.id_p
@@ -235,7 +265,6 @@ router.delete('/deletecommission', (req, res) => {
   })
 })
 
-
 //VALID
 // Edit selected pv
 /* Body being in the format of :
@@ -321,14 +350,14 @@ router.patch('/editpv', (req, res) => {
       res.status(400).send(err)
     }
   })
-  var sqlquerylinkT = null
+  let sqlquerylinkT = null
   let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
   for (let temoin of temoinNewArray) {
     db.query(sqlqueryaddT, [temoin.nomT, temoin.prenomT, temoin.roleT], (err, result) => {
       if (err && err.errno != 1062) {
         res.status(400).send(err)
       } else if (err && err.errno == 1062) {
-        var numT = null
+        let numT = null
         let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
         db.query(sqlquerygetT, [temoin.nomT, temoin.prenomT], (err, result) => {
           if (err) {
@@ -520,48 +549,111 @@ router.delete('/deletepv', (req, res) => {
   })
 })
 
-
 // Send mail to Etudiant containing PV
 /*
+{
   "numPV": int value,
   "email" : email of etudiant string value
+}
 */
 router.post('/mail', (req, res) => {
   let values = [req.body.numPV, req.body.email]
-  db.query('', values[0], async (err, result) => {
-    if(err)
-    {
+  let sqlquery = `SELECT
+  e.matricule_e,
+  e.nom_e,
+  e.prenom_e,
+  e.niveau_e,
+  e.section_e,
+  e.groupe_e,
+  p.nom_p,
+  p.prenom_p,
+  cd.date_cd,
+  i.motif_i,
+  pv.date_pv,
+  s.libele_s,
+  (SELECT m.nom_m FROM Membre m INNER JOIN Commission c ON m.num_c = c.num_c WHERE m.role_m = "Président" AND c.actif_c = TRUE) AS nom_pres,
+  (SELECT m.prenom_m FROM Membre m INNER JOIN Commission c ON m.num_c = c.num_c WHERE m.role_m = "Président" AND c.actif_c = TRUE) AS prenom_pres,
+  temoins.nom_tt AS noms_temoins,
+  temoins.prenom_tt AS prenoms_temoins,
+
+  GROUP_CONCAT(m.nom_m) AS noms_membres,
+  GROUP_CONCAT(m.prenom_m) AS prenoms_membres
+FROM
+  PV pv
+INNER JOIN
+  Rapport r ON r.num_r = pv.num_r
+INNER JOIN
+  Sanction s ON pv.num_s = s.num_s
+INNER JOIN
+  Conseil_Discipline cd ON pv.num_cd = cd.num_cd
+LEFT JOIN
+  Etudiant e ON r.matricule_e = e.matricule_e
+LEFT JOIN
+  Plaignant p ON r.id_p = p.id_p
+LEFT JOIN
+  Infraction i ON r.num_i = i.num_i
+LEFT JOIN
+  (SELECT
+      te.num_cd,
+      GROUP_CONCAT(t.nom_t) AS nom_tt,
+      GROUP_CONCAT(t.prenom_t) AS prenom_tt,
+      GROUP_CONCAT(t.role_t) AS role_tt
+  FROM
+      Temoigne te
+  LEFT JOIN
+      Temoin t ON te.num_t = t.num_t
+  GROUP BY
+      te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
+LEFT JOIN
+  Commission_Presente cp ON pv.num_cd = cp.num_cd
+LEFT JOIN
+  Membre m ON cp.id_m = m.id_m
+WHERE
+  pv.num_pv = ?`
+
+  db.query(sqlquery, req.body.numPV, async (err, result) => {
+    if (err && err.errno!=1065) {
       res.status(400).send(err)
     }
+
     const data = {
-      //placeholder using result[0]
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      country: 'United States'
+      matriculeE: result[0].matricule_e,
+      nomE: result[0].nom_e.toUpperCase(),
+      prenomE: maj(result[0].prenom_e),
+      niveauE: result[0].niveau_e,
+      groupeE: result[0].groupe_e,
+      sectionE: result[0].section_e,
+      nomP: result[0].nom_p.toUpperCase(),
+      prenomP: maj(result[0].prenom_p),
+      dateCD: formatDate(result[0].date_cd),
+      motifI: result[0].motif_i,
+	    datePV: formatDate(result[0].date_pv),
+      libeleS: result[0].libele_s,
+      nomPR: result[0].nom_pres.toUpperCase(),
+      prenomPR: maj(result[0].prenom_pres),
+      nomT: result[0].noms_temoins,
+      prenomT: result[0].prenoms_temoins,
+      nomM: result[0].noms_membres,
+      prenomM: result[0].prenoms_membres
     }
-  
+
     try {
-      const pdfBuffer = await generatePDFrapport(data)
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.zoho.com',
-        port: 465,
-        secure: true,
-        auth: {
-          user: 'rapport@cd-usto.tech',
-          pass: 'uc3Snp?o'
-        }
-      })
+
+      const pdfBuffer = await generatePDFpv(data)
       const mailOptions = {
-        from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
+        from: '"Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
         to: values[1],
-        subject: 'Nouveau rapport déposé.',
+        subject: `Procès-Verbal du conseil de discipline du ${data.dateCD}.`,
         html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
-        attachments: [{
-          filename: "PV.pdf",
-          content: pdfBuffer,
-          contentType: 'application/pdf'
-        }]
+        attachments: [
+          {
+            filename: 'PV.pdf',
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
       }
+      console.log('AAAAAAAA')
       transporter.sendMail(mailOptions, function (err, info) {
         if (err) {
           console.log('Error while sending email' + err)
@@ -575,7 +667,6 @@ router.post('/mail', (req, res) => {
       res.status(500).send('An error occurred while generating the PDF')
     }
   })
-  
 })
 
 
@@ -586,31 +677,48 @@ router.post('/mail', (req, res) => {
   }
 */
 router.get('/printrapport', async (req, res) => {
-  db.query('', req.body.numR, async (err, result) => {
-    if(err)
-    {
+  let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
+  p.nom_p, p.prenom_p,
+  DATE(i.date_i) AS date_i, i.lieu_i, i.motif_i,
+  DATE(r.date_r) AS date_r,
+(SELECT nomU FROM Utilisateur u WHERE id_u = 1) AS nom_chef,
+  (SELECT prenomU FROM Utilisateur u WHERE id_u = 1) AS prenom_chef
+FROM Rapport r
+INNER JOIN Etudiant e ON r.matricule_e = e.matricule_e
+INNER JOIN Plaignant p ON r.id_p = p.id_p
+INNER JOIN Infraction i ON r.num_i = i.num_i
+WHERE r.num_r = ?`
+  db.query(sqlquery, req.body.numR, async (err, result) => {
+    if (err && err.errno!=1065) {
       res.status(400).send(err)
     }
     const data = {
-      //placeholder using result[0]
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      country: 'United States'
+      matriculeE: result[0].matricule_e,
+      nomE: result[0].nom_e.toUpperCase(),
+      prenomE: maj(result[0].prenom_e),
+      niveauE: result[0].niveau_e,
+      groupeE: result[0].groupe_e,
+      sectionE: result[0].section_e,
+      nomP: result[0].nom_p.toUpperCase(),
+      prenomP: maj(result[0].prenom_p),
+      dateI: formatDate(result[0].date_i),
+      lieuI: result[0].lieu_i,
+      motifI: result[0].motif_i,
+	    dateR: formatDate(result[0].date_r),
+      nomC: result[0].nom_chef.toUpperCase(),
+      prenomC: maj(result[0].prenom_chef)
     }
-  
     try {
       const pdfBuffer = await generatePDFrapport(data)
       res.setHeader('Content-Type', 'application/pdf')
-      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+      res.setHeader('Content-Disposition', `attachment; filename=Rapport${req.body.numR}.pdf`)
       res.send(pdfBuffer)
     } catch (err) {
       console.error(err)
       res.status(500).send('An error occurred while generating the PDF')
     }
   })
-  
 })
-
 
 //Print pv
 /*
@@ -618,23 +726,90 @@ router.get('/printrapport', async (req, res) => {
     "numPV": int value
   }
 */
-router.get('/printpv', (req, res) => {
-  db.query('', req.body.numPV, async (err, result) => {
-    if(err)
-    {
+router.get('/printpv', async (req, res) => {
+  let sqlquery = `SELECT
+  e.matricule_e,
+  e.nom_e,
+  e.prenom_e,
+  e.niveau_e,
+  e.section_e,
+  e.groupe_e,
+  p.nom_p,
+  p.prenom_p,
+  cd.date_cd,
+  i.motif_i,
+  pv.date_pv,
+  s.libele_s,
+  (SELECT m.nom_m FROM Membre m INNER JOIN Commission c ON m.num_c = c.num_c WHERE m.role_m = "Président" AND c.actif_c = TRUE) AS nom_pres,
+  (SELECT m.prenom_m FROM Membre m INNER JOIN Commission c ON m.num_c = c.num_c WHERE m.role_m = "Président" AND c.actif_c = TRUE) AS prenom_pres,
+  temoins.nom_tt AS noms_temoins,
+  temoins.prenom_tt AS prenoms_temoins,
+
+  GROUP_CONCAT(m.nom_m) AS noms_membres,
+  GROUP_CONCAT(m.prenom_m) AS prenoms_membres
+FROM
+  PV pv
+INNER JOIN
+  Rapport r ON r.num_r = pv.num_r
+INNER JOIN
+  Sanction s ON pv.num_s = s.num_s
+INNER JOIN
+  Conseil_Discipline cd ON pv.num_cd = cd.num_cd
+LEFT JOIN
+  Etudiant e ON r.matricule_e = e.matricule_e
+LEFT JOIN
+  Plaignant p ON r.id_p = p.id_p
+LEFT JOIN
+  Infraction i ON r.num_i = i.num_i
+LEFT JOIN
+  (SELECT
+      te.num_cd,
+      GROUP_CONCAT(t.nom_t) AS nom_tt,
+      GROUP_CONCAT(t.prenom_t) AS prenom_tt,
+      GROUP_CONCAT(t.role_t) AS role_tt
+  FROM
+      Temoigne te
+  LEFT JOIN
+      Temoin t ON te.num_t = t.num_t
+  GROUP BY
+      te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
+LEFT JOIN
+  Commission_Presente cp ON pv.num_cd = cp.num_cd
+LEFT JOIN
+  Membre m ON cp.id_m = m.id_m
+WHERE
+  pv.num_pv = ?`
+
+  db.query(sqlquery, req.body.numPV, async (err, result) => {
+    if (err && err.errno!=1065) {
       res.status(400).send(err)
     }
+
     const data = {
-      //placeholder using result[0]
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      country: 'United States'
+      matriculeE: result[0].matricule_e,
+      nomE: result[0].nom_e.toUpperCase(),
+      prenomE: maj(result[0].prenom_e),
+      niveauE: result[0].niveau_e,
+      groupeE: result[0].groupe_e,
+      sectionE: result[0].section_e,
+      nomP: result[0].nom_p.toUpperCase(),
+      prenomP: maj(result[0].prenom_p),
+      dateCD: formatDate(result[0].date_cd),
+      motifI: result[0].motif_i,
+	    datePV: formatDate(result[0].date_pv),
+      libeleS: result[0].libele_s,
+      nomPR: result[0].nom_pres.toUpperCase(),
+      prenomPR: maj(result[0].prenom_pres),
+      nomT: result[0].noms_temoins,
+      prenomT: result[0].prenoms_temoins,
+      nomM: result[0].noms_membres,
+      prenomM: result[0].prenoms_membres
     }
-  
+
     try {
-      const pdfBuffer = await generatePDFrapport(data)
+      const pdfBuffer = await generatePDFpv(data)
       res.setHeader('Content-Type', 'application/pdf')
-      res.setHeader('Content-Disposition', 'attachment; filename=file.pdf')
+      res.setHeader('Content-Disposition', `attachment; filename=PV${req.body.numPV}.pdf`)
       res.send(pdfBuffer)
     } catch (err) {
       console.error(err)

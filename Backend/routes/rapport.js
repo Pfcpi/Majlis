@@ -15,7 +15,7 @@ router.get('/get', (req, res) => {
   ORDER BY i.date_i DESC`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      res.send(err)
     } else {
       res.send(result)
     }
@@ -32,7 +32,8 @@ router.post('/gets', (req, res) => {
   let numr = req.body.numR
   let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
   p.nom_p, p.prenom_p,
-  i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i
+  i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i,
+  r.date_r
   FROM Rapport r
   INNER JOIN Etudiant e ON r.matricule_e = e.matricule_e
   INNER JOIN Plaignant p ON r.id_p = p.id_p
@@ -110,7 +111,7 @@ router.patch('/edit', (req, res) => {
 
   db.query(sqlquery, values, (err, result) => {
     if (err) {
-      res.sendStatus(err.errno) //if error number is 1062 that means that there is duplicate of either a etudiant or plaignant
+      res.send(err) //if error number is 1062 that means that there is duplicate of either a etudiant or plaignant
     } else {
       res.send(result)
     }
@@ -132,7 +133,7 @@ router.delete('/delete', (req, res) => {
 
   db.query(sqlquery, numr, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      res.send(err)
     } else {
       res.sendStatus(204)
     }
@@ -238,7 +239,7 @@ router.post('/add', (req, res) => {
                                 }
                               }
                             )
-                            res.statusStatus(204)
+                            res.sendStatus(204)
                           }
                         })
                       }
