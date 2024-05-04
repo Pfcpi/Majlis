@@ -7,8 +7,6 @@ import useDark from '../../../zustand/dark'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
-import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
-import ModifierDossierGraySVG from './../../../assets/BlueSvgs/ModifierDossierGray.svg'
 
 //Tasks:
 //make the skeleton
@@ -22,8 +20,10 @@ function AjouterPV() {
   const [query, setQuery] = useState('')
   const [supprimer, setSupprimer] = useState(false)
   const [addPV, setAddPV] = useState(false)
+  const [cd, setCd] = useState({ dateCd: '', id: '' })
   const [members, setMembers] = useState([])
-  const [membersForCurrentPV, setMembersForCurrentPV] = useState([])
+  const [creerConseilState, setCreerConseildState] = useState(false)
+  const [temoin, setTemoin] = useState([])
 
   //VALID
   // Add a pv
@@ -114,16 +114,6 @@ function AjouterPV() {
         </td>
         <td className="font-medium border-x">{[rapport.nom_e, ' ', rapport.prenom_e]}</td>
         <td className="border-x">{rapport.date_i.slice(0, rapport.date_i.indexOf('T'))}</td>
-        <td className="border-x">
-          <button
-            onClick={() => {
-              setAddPV(true)
-              setPv((prev) => ({ ...prev, numR: rapport.num_r }))
-            }}
-          >
-            <img src={dark ? ModifierDossierSVG : ModifierDossierGraySVG}></img>
-          </button>
-        </td>
       </tr>
     ))
   ) : (
@@ -161,26 +151,6 @@ function AjouterPV() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path d="M20 0.75H2.5C1.125 0.75 0 1.875 0 3.25V20.75C0 22.125 1.125 23.25 2.5 23.25H20C21.375 23.25 22.5 22.125 22.5 20.75V3.25C22.5 1.875 21.375 0.75 20 0.75ZM8.125 11.375C8.125 12.375 7.25 13.25 6.25 13.25H5V15.75H3.125V8.25H6.25C7.25 8.25 8.125 9.125 8.125 10.125V11.375ZM14.375 13.875C14.375 14.875 13.5 15.75 12.5 15.75H9.375V8.25H12.5C13.5 8.25 14.375 9.125 14.375 10.125V13.875ZM19.375 10.125H17.5V11.375H19.375V13.25H17.5V15.75H15.625V8.25H19.375V10.125ZM11.25 10.125H12.5V13.875H11.25V10.125ZM5 10.125H6.25V11.375H5V10.125Z" />
-    </svg>
-  )
-
-  const imprimerImage = (
-    <svg
-      className={
-        currentSelectedRapports.length == 1
-          ? '[&>path]:fill-blue duration-100'
-          : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
-      }
-      width="25"
-      height="24"
-      viewBox="0 0 25 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M21.25 7C23.325 7 25 8.675 25 10.75V18.25H20V23.25H5V18.25H0V10.75C0 8.675 1.675 7 3.75 7H5V0.75H20V7H21.25ZM7.5 3.25V7H17.5V3.25H7.5ZM17.5 20.75V15.75H7.5V20.75H17.5ZM20 15.75H22.5V10.75C22.5 10.0625 21.9375 9.5 21.25 9.5H3.75C3.0625 9.5 2.5 10.0625 2.5 10.75V15.75H5V13.25H20V15.75ZM21.25 11.375C21.25 12.0625 20.6875 12.625 20 12.625C19.3125 12.625 18.75 12.0625 18.75 11.375C18.75 10.6875 19.3125 10.125 20 10.125C20.6875 10.125 21.25 10.6875 21.25 11.375Z"
-        fill="#068EE7"
-      />
     </svg>
   )
 
@@ -265,36 +235,103 @@ function AjouterPV() {
     }))
 
     if (name == 'dateCd') {
-      const tache = await axios
-        .get(api + '/archive/getcommission')
-        .then((res) => {
-          setMembers(res.data)
-          setMembersForCurrentPV([res.data[0], res.data[1], res.data[2], res.data[3], res.data[4]])
-          console.log(res.data)
-        })
-        .catch((err) => console.log(err))
     }
     setPv((prev) => ({ ...prev, idM: [1, 2, 3, 4, 5] }))
   }
 
   return (
     <div className="flex w-full h-full">
-      {addPV && (
+      {creerConseilState && (
         <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
-            <h1 className="text-[36px] py-4">Détails du PV</h1>
+            <h1 className="text-[36px] py-4">Creation d'un CONSEIL DISCIPLINE</h1>
             <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
             <div className="flex w-5/6 flex-col gap-6 my-4">
               <div className="container_input_rapport">
                 <input
                   className="input_dossier"
                   name="dateCd"
-                  onChange={handleInputChange}
-                  value={pv.dateCd}
+                  onChange={async (e) => {
+                    setCd((prev) => ({ ...prev, dateCd: e.target.value }))
+                    const tache = await axios
+                      .post(api + '/pv/getActiveCommissionAndMembersByData', {
+                        date: e.target.value
+                      })
+                      .then((res) => {
+                        setMembers(res.data)
+                        console.log(res.data)
+                      })
+                      .catch((err) => console.log(err))
+                  }}
+                  value={cd.dateCd}
                   type="date"
                   required
                 ></input>
               </div>
+              <div className="container_input_rapport">
+                <h2>Membres présents au conseil</h2>
+                <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                  {members.map((p) => (
+                    <div className="flex border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                      <div className="w-5/12">{p.role_m}</div>
+                      <div className="w-3/12">{p.nom_m}</div>
+                      <div className={members.length > 5 ? 'w-3/12' : 'w-1/3'}>{p.prenom_m}</div>
+                      {members.length > 5 && (
+                        <button
+                          className="flex justify-end w-1/12"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setMembers(members.filter((item) => item !== p))
+                          }}
+                        >
+                          <div>{supprimerImage}</div>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between py-4 w-5/6">
+              <button
+                className="button_dossier text-red border-red hover:bg-red/25"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setCreerConseildState(false)
+                }}
+              >
+                Annuler
+              </button>
+              <button
+                className="button_dossier text-blue border-blue hover:bg-blue/25"
+                type="submit"
+                onClick={async (e) => {
+                  e.preventDefault()
+                  const tache = await axios
+                    .post(api + '/pv/addCD', {
+                      dateCd: cd.dateCd,
+                      idM: members.map((obj) => obj.id_m)
+                    })
+                    .then((res) => {
+                      console.log(res)
+                      setCd((prev) => ({ ...prev, id: res.data[0].num_cd }))
+                    })
+                    .catch((err) => console.log(err))
+                  setCreerConseildState(false)
+                }}
+              >
+                Ajouter
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+      {addPV && (
+        <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
+          <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
+            <h1 className="text-[36px] py-4">Détails du PV</h1>
+            <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
+            <div className="flex w-5/6 flex-col gap-6 my-4">
               <div className="container_input_rapport">
                 <input
                   className="input_dossier"
@@ -309,27 +346,17 @@ function AjouterPV() {
                 </label>
               </div>
               <div className="container_input_rapport">
-                <h2>Membres présents au conseil</h2>
-                <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                  {membersForCurrentPV.map((p) => (
-                    <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                      <div>{p.role_m}</div>
-                      <div>{p.nom_m}</div>
-                      <div>{p.prenom_m}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="container_input_rapport">
                 <h2>les témoins</h2>
                 <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                  {pv.temoin.map((t) => (
-                    <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                      <div>{t.roleT}</div>
-                      <div>{t.nomT}</div>
-                      <div>{t.prenomT}</div>
-                    </div>
-                  ))}
+                  {Array.isArray(temoin) &&
+                    temoin.length == 0 &&
+                    temoin.map((t) => (
+                      <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                        <div>{t.roleT}</div>
+                        <div>{t.nomT}</div>
+                        <div>{t.prenomT}</div>
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
@@ -356,7 +383,7 @@ function AjouterPV() {
           {supprimer && (
             <div className="absolute flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
               <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
-                Confirmer la suppression du rapport
+                Confirmer la suppression du PV
                 <div className="flex w-full justify-between px-8">
                   <button
                     onClick={() => {
@@ -380,13 +407,15 @@ function AjouterPV() {
             <div className="flex gap-6 px-6">
               <button
                 className={
-                  currentSelectedRapports.length == 1
+                  currentSelectedRapports.length != 0
                     ? 'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
                     : 'flex border py-2 px-4 rounded-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
                 }
+                onClick={() => {
+                  setCreerConseildState(true)
+                }}
               >
-                {imprimerImage}
-                Imprimer
+                Creer Conseil
               </button>
               <button
                 className={
@@ -396,7 +425,7 @@ function AjouterPV() {
                 }
               >
                 {enregistrerImage}
-                Enregistrer pdf
+                Voir PDF
               </button>
               <button
                 className={
@@ -425,26 +454,23 @@ function AjouterPV() {
           </div>
           <table className="w-full">
             <tr className="border-t">
-              <th className="w-1/4 border-x">
+              <th className="w-1/3 border-x">
                 <div>
                   Rapport
                   <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
-              <th className="w-1/4 border-x">
+              <th className="w-1/3 border-x">
                 <div>
                   Nom Etudiant
                   <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
-              <th className="w-1/4 border-x">
+              <th className="w-1/3 border-x">
                 <div>
                   Date de l'infraction
                   <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
-              </th>
-              <th className="w-1/4 border-x">
-                <div>Action</div>
               </th>
             </tr>
             {tableRapport}
