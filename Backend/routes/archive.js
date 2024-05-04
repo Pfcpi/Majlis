@@ -403,7 +403,7 @@ router.patch('/editpv', (req, res) => {
 // VALID
 // Display list of pvs (Archive --> Dossier)
 router.get('/getpv', (req, res) => {
-  let sqlquery = `SELECT
+  let sqlquery = `SELECT DISTINCT
     PV.num_pv,
     e.nom_e,
     e.prenom_e,
@@ -423,7 +423,8 @@ FROM
         LEFT JOIN
     Sanction s ON PV.num_s = s.num_s
         LEFT JOIN
-    Commission_Presente cp ON PV.num_cd = cp.num_cd`
+    Commission_Presente cp ON PV.num_cd = cp.num_cd
+    ORDER BY i.date_i DESC`
 
   db.query(sqlquery, (err, result) => {
     if (err) {

@@ -9,6 +9,7 @@ import UpDownSVG from './../../../assets/UpDown.svg'
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
 import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
+import ModifierDossierGraySVG from './../../../assets/BlueSvgs/ModifierDossierGray.svg'
 import PdfSVG from './../../../assets/pdf.svg'
 import ImprimerSVG from './../../../assets/imprimer.svg'
 import SupprimerSVG from './../../../assets/supprimer.svg'
@@ -20,23 +21,36 @@ import axios from 'axios'
 
 //Need to modify:
 function Archive() {
-  //false for rapport, true for Dossier
-  const [rapportdossier, setRapportDossier] = useState(false)
+  const win = ['rapport', 'pv', 'conseil', 'commission']
+  const [currentWindow, setCurrentWindow] = useState(win[0])
   const [rapports, setRapports] = useState([])
+  const [PVs, setPVs] = useState([])
   const [view, setView] = useState(false)
   const { dark } = useDark()
   const printComponent = useRef(null)
 
   const api = 'http://localhost:3000'
 
-  useEffect(() => {
-    axios
+  async function fetchData() {
+    const tache1 = await axios
       .get(api + '/archive/getrapport')
       .then((res) => {
         setRapports(res.data)
         console.log(res.data)
       })
       .catch((err) => console.log(err))
+
+    const tache2 = await axios
+      .get(api + '/archive/getpv')
+      .then((res) => {
+        console.log(res.data)
+        setPVs(res.data)
+      })
+      .catch((err) => console.log(err))
+  }
+
+  useEffect(() => {
+    fetchData()
   }, [])
 
   function handlePreview() {
@@ -86,47 +100,49 @@ function Archive() {
     })
   }
 
-  const tab = Array.isArray(rapports) ? (
+  const tabRapports = Array.isArray(rapports) ? (
     rapports.map((m) => (
-      <tr
-        data-rapportdossier={rapportdossier}
-        className="border-y-[1px] data-[rapportdossier=true]:has-[:checked]:border-blue dark:hover:bg-dark-gray print:flex print:gap-4"
-      >
-        <td
-          data-rapportdossier={rapportdossier}
-          className="data-[rapportdossier=false]:border-x-[1px]"
-        >
+      <tr className="border-y-[1px] hover:bg-blue/5 dark:hover:bg-dark-gray">
+        <td>
           <span>{m.num_r}</span>
         </td>
-        <td
-          data-rapportdossier={rapportdossier}
-          className="data-[rapportdossier=false]:border-x-[1px]"
-        >
-          {[m.nom_e, ' ', m.prenom_e]}
-        </td>
-        <td
-          data-rapportdossier={rapportdossier}
-          className="data-[rapportdossier=false]:border-x-[1px]"
-        >
-          {m.date_i.slice(0, m.date_i.indexOf('T'))}
-        </td>
-        {!rapportdossier && (
-          <td className="border-x-[1px]">
-            <button className="mr-10" onClick={() => setView(true)}>
-              <img src={VoirDossierSVG} alt="voir dossier icon"></img>
+        <td>{[m.nom_e, ' ', m.prenom_e]}</td>
+        <td>{m.date_i.slice(0, m.date_i.indexOf('T'))}</td>
+        <td>
+          <div className="w-full flex justify-evenly">
+            <button className="" onClick={() => setView(true)}>
+              <img src={VoirDossierSVG} alt=""></img>
             </button>
             <button>
-              <img src={ModifierDossierSVG} alt="modifier dossier icon"></img>
+              <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
             </button>
-          </td>
-        )}
-        {rapportdossier && <td>22 Jan 2023</td>}
-        {rapportdossier && <td>Blame ecrit</td>}
+            <button>
+              <img src={SupprimerSVG} alt=""></img>
+            </button>
+          </div>
+        </td>
       </tr>
     ))
   ) : (
     <></>
   )
+
+  const tabPVs = Array.isArray(PVs) ? (
+    PVs.map((m) => (
+      <tr className="border-y-[1px] hover:bg-blue/5 dark:hover:bg-dark-gray">
+        <td>
+          <span>{m.num_pv}</span>
+        </td>
+        <td>{[m.nom_e, ' ', m.prenom_e]}</td>
+        <td>{m.date_i.slice(0, m.date_i.indexOf('T'))}</td>
+        <td>{m.date_pv.slice(0, m.date_i.indexOf('T'))}</td>
+        <td>{m.libele_s}</td>
+      </tr>
+    ))
+  ) : (
+    <></>
+  )
+
   function handlePrintNPM() {
     useReactToPrint({
       content: () => printComponent.current,
@@ -146,27 +162,46 @@ function Archive() {
   return (
     <div className="w-full h-full">
       {!view && (
-        <div className="flex flex-col redclass" ref={printComponent}>
+        <div className="w-full h-full flex flex-col">
           <div className="flex w-full">
             <button
-              data-rapportdossier={rapportdossier}
-              className="w-1/2 text-2xl  py-4 rounded-xl data-[rapportDossier=false]:text-blue data-[rapportdossier=false]:bg-0.08-blue data-[rapportdossier=false]:border data-[rapportdossier=false]:border-blue"
-              onClick={() => setRapportDossier(false)}
+              data-rapportdossier={currentWindow == win[0]}
+              className="w-1/2 text-2xl  py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
+              onClick={() => setCurrentWindow(win[0])}
             >
               Rapport
             </button>
             <button
-              data-rapportdossier={rapportdossier}
+              data-rapportdossier={currentWindow == win[1]}
               className="w-1/2 text-2xl py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
-              onClick={() => setRapportDossier(true)}
+              onClick={() => setCurrentWindow(win[1])}
             >
-              Dossier
+              PV
+            </button>
+            <button
+              data-rapportdossier={currentWindow == win[2]}
+              className="w-1/2 text-2xl py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
+              onClick={() => setCurrentWindow(win[2])}
+            >
+              Commission
+            </button>
+            <button
+              data-rapportdossier={currentWindow == win[3]}
+              className="w-1/2 text-2xl py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
+              onClick={() => setCurrentWindow(win[3])}
+            >
+              Conseils Discipline
             </button>
           </div>
-          {!rapportdossier && (
-            <div className="flex px-4 justify-end h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
+          {currentWindow == win[0] && (
+            <div className="flex px-4 justify-between h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
+              <button onClick={() => handlePreviewNPM()} className="text-blue">
+                <div className="deletePdfImprimer border">
+                  <img src={PdfSVG} alt="pdf icon"></img>PDF
+                </div>
+              </button>
               <div className="flex has-[:focus]:border-blue border dark:border-gray bg-white dark:bg-gray rounded-[10px]">
-                <img src={BlueSearchSVG} alt="search icon"></img>
+                <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
                   className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
                   aria-label="search input"
@@ -176,27 +211,27 @@ function Archive() {
               </div>
             </div>
           )}
-          {rapportdossier && (
+          {currentWindow == win[1] && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
-              <div className="w-1/2 flex justify-between">
-                <button onClick={() => handlePrintNPM()} className="text-blue">
-                  <div className="deletePdfImprimer border">
-                    <img className="imgp" src={ImprimerSVG} alt="imprimer icon"></img>Imprimer
-                  </div>
-                </button>
+              <div className="w-fit flex gap-4">
                 <button onClick={() => handlePreviewNPM()} className="text-blue">
                   <div className="deletePdfImprimer border">
-                    <img className="imgp" src={PdfSVG} alt="pdf icon"></img>Enregistrer PDF
+                    <img src={PdfSVG} alt="pdf icon"></img>PDF
                   </div>
                 </button>
                 <button className="text-pink">
                   <div className="deletePdfImprimer border">
-                    <img className="imgp" src={SupprimerSVG} alt="supprimer icon"></img>Supprimer
+                    <img src={SupprimerSVG} alt="supprimer icon"></img>Supprimer
+                  </div>
+                </button>
+                <button className="text-blue">
+                  <div className="deletePdfImprimer border">
+                    <img src={VoirDossierSVG} alt=""></img>Voir
                   </div>
                 </button>
               </div>
               <div className="flex has-[:focus]:border-blue border bg-white dark:border-gray dark:bg-gray rounded-[10px]">
-                <img className="*:fill-blue imgp" src={BlueSearchSVG} alt="search icon"></img>
+                <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
                   className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
                   aria-label="search input"
@@ -206,57 +241,51 @@ function Archive() {
               </div>
             </div>
           )}
-          <table className="w-full">
-            <tr className="border-t-[1px]">
-              <th
-                data-rapportdossier={rapportdossier}
-                className="w-1/4 data-[rapportdossier=true]:w-1/5 data-[rapportdossier=false]:border-x-[1px]"
-              >
-                <div>
-                  Rapport
-                  <img className="imgp" src={UpDownSVG} alt="filter"></img>
-                </div>
-              </th>
-              <th
-                data-rapportdossier={rapportdossier}
-                className="w-1/4 data-[rapportdossier=true]:w-1/5 data-[rapportdossier=false]:border-x-[1px]"
-              >
-                <div>
-                  Nom Etudiant
-                  <img className="imgp" src={UpDownSVG} alt="filter"></img>
-                </div>
-              </th>
-              <th
-                data-rapportdossier={rapportdossier}
-                className="w-1/4 data-[rapportdossier=true]:w-1/5 data-[rapportdossier=false]:border-x-[1px]"
-              >
-                <div>
-                  Date de l'infraction
-                  <img className="imgp" src={UpDownSVG} alt="filter"></img>
-                </div>
-              </th>
-              {!rapportdossier && (
-                <th className="w-1/4 border-x-[1px]">
-                  <div>Action</div>
-                </th>
-              )}
-              {rapportdossier && (
-                <th className="w-1/5">
-                  <div>
-                    Date de Conseil<img className="imgp" src={UpDownSVG} alt="filter"></img>
-                  </div>
-                </th>
-              )}
-              {rapportdossier && (
-                <th className="w-1/5">
-                  <div>
-                    Sanction<img className="imgp" src={UpDownSVG} alt="filter"></img>
-                  </div>
-                </th>
-              )}
-            </tr>
-            {tab}
-          </table>
+          <div className="w-full grow h-[50vh]">
+            <div className="w-full max-h-full overflow-y-auto">
+              <table className="w-full">
+                <tr className="border-t-[1px]">
+                  <th
+                    data-rapportdossier={currentWindow == win[1]}
+                    className="w-1/4 data-[rapportdossier=true]:w-1/5 "
+                  >
+                    <div>
+                      {currentWindow == win[0] ? 'Rapport' : currentWindow == win[1] ? 'PV' : ''}
+                    </div>
+                  </th>
+                  <th
+                    data-rapportdossier={currentWindow == win[1]}
+                    className="w-1/4 data-[rapportdossier=true]:w-1/5 "
+                  >
+                    <div>Nom Etudiant</div>
+                  </th>
+                  <th
+                    data-rapportdossier={currentWindow == win[1]}
+                    className="w-1/4 data-[rapportdossier=true]:w-1/5 "
+                  >
+                    <div>Date de l'infraction</div>
+                  </th>
+                  {currentWindow == win[0] && (
+                    <th className="w-1/4">
+                      <div>Action</div>
+                    </th>
+                  )}
+                  {currentWindow == win[1] && (
+                    <th className="w-1/5">
+                      <div>Date de PV</div>
+                    </th>
+                  )}
+                  {currentWindow == win[1] && (
+                    <th className="w-1/5">
+                      <div>Sanction </div>
+                    </th>
+                  )}
+                </tr>
+                {currentWindow == win[0] && tabRapports}
+                {currentWindow == win[1] && tabPVs}
+              </table>
+            </div>
+          </div>
         </div>
       )}
       {view && (

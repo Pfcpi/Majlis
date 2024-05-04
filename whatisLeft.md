@@ -17,16 +17,31 @@
 
 ## Archive page
 
-- remove imprimer and enregistrer buttons and make it pdf button.
-- pdf functionnality.
+- rapport:
 
-- modify, delete and view pv.
-- modify, view, delete rapport.
+  - view.
+  - pdf.
+  - modify
+  - delete
 
-- afficher archived commissions.
-- modify commissions.
+- pv:
 
-- afficher archived conseils disciplines.
+  - view.
+  - pdf.
+  - modify
+  - delete
+
+- commissions.
+
+  - display.
+  - view. (see members)
+  - modify.
+
+- conseils:
+
+  - display.
+  - view. (all related details)
+
 - (to expand)
 
 ## Se deconnecter page
@@ -36,6 +51,7 @@
 ## Bugs
 
 - matricule for plaignant in form and database and request.
+- not every pv has its own temoins.
 - date always removes one day.
 - not updating immediately when deleting a member(commission).
 - when deleting a report it does not update immediately(pv).
