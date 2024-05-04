@@ -79,6 +79,7 @@ async function getUrl() {
   const browser = await pie.connect(app, puppeteer)
 
   const window = new BrowserWindow()
+  window.maximize()
   const url = __dirname + '../../s.pdf'
   console.log('url:', url)
   await window.loadURL(url)

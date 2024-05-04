@@ -848,10 +848,7 @@ async function generatePDFrapport(data) {
     }
   })
 
-  // Close Puppeteer
-  await browser.close()
-
-  return page.pdf({ format: 'A4' })
+  return "worked" 
 }
 
 module.exports = { generatePDFpv, generatePDFrapport }

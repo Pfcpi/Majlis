@@ -20,16 +20,26 @@ const transporter = nodemailer.createTransport({
 })
 
 function maj(chaine) {
-  return chaine.charAt(0).toUpperCase() + chaine.slice(1)
+  return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
 }
 
 function formatDate(inputDate) {
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
   ]
 
-  const date = new Date(inputDate);
+  const date = new Date(inputDate)
   const day = date.getDate().toString().padStart(2, '0')
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const year = date.getFullYear()
@@ -613,7 +623,7 @@ WHERE
   pv.num_pv = ?`
 
   db.query(sqlquery, req.body.numPV, async (err, result) => {
-    if (err && err.errno!=1065) {
+    if (err && err.errno != 1065) {
       res.status(400).send(err)
     }
 
@@ -628,7 +638,7 @@ WHERE
       prenomP: maj(result[0].prenom_p),
       dateCD: formatDate(result[0].date_cd),
       motifI: result[0].motif_i,
-	    datePV: formatDate(result[0].date_pv),
+      datePV: formatDate(result[0].date_pv),
       libeleS: result[0].libele_s,
       nomPR: result[0].nom_pres.toUpperCase(),
       prenomPR: maj(result[0].prenom_pres),
@@ -639,7 +649,6 @@ WHERE
     }
 
     try {
-
       const pdfBuffer = await generatePDFpv(data)
       const mailOptions = {
         from: '"Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
@@ -676,7 +685,8 @@ WHERE
     "numR": int value
   }
 */
-router.get('/printrapport', async (req, res) => {
+router.post('/printrapport', async (req, res) => {
+  console.log(req.body.numR)
   let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
   p.nom_p, p.prenom_p,
   DATE(i.date_i) AS date_i, i.lieu_i, i.motif_i,
@@ -689,33 +699,34 @@ INNER JOIN Plaignant p ON r.id_p = p.id_p
 INNER JOIN Infraction i ON r.num_i = i.num_i
 WHERE r.num_r = ?`
   db.query(sqlquery, req.body.numR, async (err, result) => {
-    if (err && err.errno!=1065) {
+    if (err && err.errno != 1065) {
       res.status(400).send(err)
     }
-    const data = {
-      matriculeE: result[0].matricule_e,
-      nomE: result[0].nom_e.toUpperCase(),
-      prenomE: maj(result[0].prenom_e),
-      niveauE: result[0].niveau_e,
-      groupeE: result[0].groupe_e,
-      sectionE: result[0].section_e,
-      nomP: result[0].nom_p.toUpperCase(),
-      prenomP: maj(result[0].prenom_p),
-      dateI: formatDate(result[0].date_i),
-      lieuI: result[0].lieu_i,
-      motifI: result[0].motif_i,
-	    dateR: formatDate(result[0].date_r),
-      nomC: result[0].nom_chef.toUpperCase(),
-      prenomC: maj(result[0].prenom_chef)
-    }
-    try {
-      const pdfBuffer = await generatePDFrapport(data)
-      res.setHeader('Content-Type', 'application/pdf')
-      res.setHeader('Content-Disposition', `attachment; filename=Rapport${req.body.numR}.pdf`)
-      res.send(pdfBuffer)
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('An error occurred while generating the PDF')
+    if (result) {
+      console.log('result', result)
+      const data = {
+        matriculeE: result[0].matricule_e,
+        nomE: result[0].nom_e.toUpperCase(),
+        prenomE: maj(result[0].prenom_e),
+        niveauE: result[0].niveau_e,
+        groupeE: result[0].groupe_e,
+        sectionE: result[0].section_e,
+        nomP: result[0].nom_p.toUpperCase(),
+        prenomP: maj(result[0].prenom_p),
+        dateI: formatDate(result[0].date_i),
+        lieuI: result[0].lieu_i,
+        motifI: result[0].motif_i,
+        dateR: formatDate(result[0].date_r),
+        nomC: result[0].nom_chef,
+        prenomC: result[0].prenom_chef
+      }
+      try {
+        const pdfBuffer = await generatePDFrapport(data)
+        res.send('it worked')
+      } catch (err) {
+        console.error(err)
+        res.status(200).send('An error occurred while generating the PDF')
+      }
     }
   })
 })
@@ -781,7 +792,7 @@ WHERE
   pv.num_pv = ?`
 
   db.query(sqlquery, req.body.numPV, async (err, result) => {
-    if (err && err.errno!=1065) {
+    if (err && err.errno != 1065) {
       res.status(400).send(err)
     }
 
@@ -796,7 +807,7 @@ WHERE
       prenomP: maj(result[0].prenom_p),
       dateCD: formatDate(result[0].date_cd),
       motifI: result[0].motif_i,
-	    datePV: formatDate(result[0].date_pv),
+      datePV: formatDate(result[0].date_pv),
       libeleS: result[0].libele_s,
       nomPR: result[0].nom_pres.toUpperCase(),
       prenomPR: maj(result[0].prenom_pres),

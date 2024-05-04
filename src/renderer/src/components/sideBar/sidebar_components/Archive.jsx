@@ -5,13 +5,11 @@ import './sidebar_com_css/archives.css'
 
 import useDark from '../../../zustand/dark'
 
-import UpDownSVG from './../../../assets/UpDown.svg'
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
 import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
 import ModifierDossierGraySVG from './../../../assets/BlueSvgs/ModifierDossierGray.svg'
 import PdfSVG from './../../../assets/pdf.svg'
-import ImprimerSVG from './../../../assets/imprimer.svg'
 import SupprimerSVG from './../../../assets/supprimer.svg'
 import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
@@ -75,12 +73,12 @@ function Archive() {
     </svg>
   )
 
-  function handlePreview() {
+  function handlePreview(numR) {
     return new Promise(async () => {
       console.log('forwarding print preview request...')
-
+      console.log('numR', numR)
       const pdfToPreview = await axios
-        .get(api + '/archive/printrapport')
+        .post(api + '/archive/printrapport', { numR: numR })
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)
@@ -133,14 +131,13 @@ function Archive() {
         <td>
           <div className="w-full flex justify-evenly">
             <button
-              className=""
               onClick={async () => {
                 setView(true)
                 const tache1 = await axios
                   .post(api + '/rapport/gets', { numR: m.num_r })
                   .then((res) => {
                     console.log(res.data)
-                    setCurrentViewedRappport(res.data[0])
+                    setCurrentViewedRappport({ ...res.data[0], num_r: m.num_r })
                   })
                   .catch((err) => console.log(err))
               }}
@@ -189,14 +186,6 @@ function Archive() {
   ) : (
     <></>
   )
-
-  function handlePreviewNPM() {
-    useReactToPrint({
-      content: () => printComponent.current,
-      documentTitle: 'PV',
-      print: handlePreview()
-    })
-  }
 
   return (
     <div className="w-full h-full">
@@ -248,7 +237,7 @@ function Archive() {
           {currentWindow == win[1] && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
-                <button onClick={() => handlePreviewNPM()} className="text-blue">
+                <button onClick={() => handlePreview()} className="text-blue">
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
@@ -389,8 +378,15 @@ function Archive() {
             </div>
           </div>
           <div className="flex flex-col w-1/2 justify-center items-center [&>button]:w-1/3 [&>button]:min-w-fit gap-4">
-            <button className="modify_rapport_button">
-              <img src={PdfSVG}></img>PDF
+            <button
+              onClick={() => {
+                console.log('clicked')
+                handlePreview(currentViewedRapport.num_r)
+              }}
+              className="modify_rapport_button"
+            >
+              <img src={PdfSVG}></img>
+              PDF
             </button>
             <button className="modify_rapport_button">
               <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
