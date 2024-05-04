@@ -6,10 +6,10 @@
   - rapport routes: all working
   - commission routes: all working besides (/editcom, /getcom) (not tested)
 
-## Database
-
-- fix database connection error after a period of time. (in progress)
-- Verify connection (when user lanches the app offline, weak internet connect, reconnection): ensure app is working.(in progress)
+- tests conduceted (production mode):
+  - run the app for 30 min (done)
+  - turn off the connection and then on mutiple time (done: three times in peroid of 30 mins)
+  - launch the app with connection lost, and then turn the wifi connection(done) 
 
 ## AjouterPv page
 

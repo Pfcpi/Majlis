@@ -12,9 +12,9 @@ const dbConfig = {
 
 // Function to connect to the database with retry mechanism
 function connectToDB() {
-  const db = Database.createConnection(dbConfig)
+  const db = Database.createPool(dbConfig)
 
-  db.connect((err) => {
+  db.getConnection((err, connection) => {
     if (err) {
       console.error('Error connecting to MySQL RDS: ' + err.message)
       console.error(err.stack)
@@ -22,16 +22,17 @@ function connectToDB() {
       setTimeout(connectToDB, 5000)
       return
     }
-    console.log('Connected to MySQL RDS as ID ' + db.threadId)
+    console.log('Connected to MySQL RDS as ID ' + connection.threadId)
+    connection.release()
   })
 
   // Handle unexpected disconnections
-  db.on('error', (err) => {
+  /*db.on('error', (err) => {
     console.error('Database connection error:', err)
     db.destroy()
     // Retry connecting after a delay (e.g., 5 seconds)
     setTimeout(connectToDB, 5000)
-  })
+  })*/
 
   // Export the database connection
   module.exports = { db }
