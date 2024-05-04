@@ -19,7 +19,6 @@
 
 - rapport:
 
-  - view.
   - pdf.
   - modify
   - delete

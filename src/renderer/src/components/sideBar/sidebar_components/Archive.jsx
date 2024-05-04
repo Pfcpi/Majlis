@@ -25,6 +25,11 @@ function Archive() {
   const [currentWindow, setCurrentWindow] = useState(win[0])
   const [rapports, setRapports] = useState([])
   const [PVs, setPVs] = useState([])
+
+  const [selectedPVs, setSelectedPVs] = useState([])
+
+  const [currentViewedRapport, setCurrentViewedRappport] = useState({})
+
   const [view, setView] = useState(false)
   const { dark } = useDark()
   const printComponent = useRef(null)
@@ -52,6 +57,23 @@ function Archive() {
   useEffect(() => {
     fetchData()
   }, [])
+
+  const supprimerImage = (
+    <svg
+      width="18"
+      height="24"
+      viewBox="0 0 18 24"
+      fill="none"
+      className={
+        selectedPVs.length != 0
+          ? '[&>path]:fill-red duration-100'
+          : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
+      }
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M1.25 20.75C1.25 21.413 1.51339 22.0489 1.98223 22.5178C2.45107 22.9866 3.08696 23.25 3.75 23.25H13.75C14.413 23.25 15.0489 22.9866 15.5178 22.5178C15.9866 22.0489 16.25 21.413 16.25 20.75V5.75H1.25V20.75ZM3.75 8.25H13.75V20.75H3.75V8.25ZM13.125 2L11.875 0.75H5.625L4.375 2H0V4.5H17.5V2H13.125Z" />
+    </svg>
+  )
 
   function handlePreview() {
     return new Promise(async () => {
@@ -102,7 +124,7 @@ function Archive() {
 
   const tabRapports = Array.isArray(rapports) ? (
     rapports.map((m) => (
-      <tr className="border-y-[1px] hover:bg-blue/5 dark:hover:bg-dark-gray">
+      <tr className="border-y-[1px]">
         <td>
           <span>{m.num_r}</span>
         </td>
@@ -110,7 +132,19 @@ function Archive() {
         <td>{m.date_i.slice(0, m.date_i.indexOf('T'))}</td>
         <td>
           <div className="w-full flex justify-evenly">
-            <button className="" onClick={() => setView(true)}>
+            <button
+              className=""
+              onClick={async () => {
+                setView(true)
+                const tache1 = await axios
+                  .post(api + '/rapport/gets', { numR: m.num_r })
+                  .then((res) => {
+                    console.log(res.data)
+                    setCurrentViewedRappport(res.data[0])
+                  })
+                  .catch((err) => console.log(err))
+              }}
+            >
               <img src={VoirDossierSVG} alt=""></img>
             </button>
             <button>
@@ -129,7 +163,20 @@ function Archive() {
 
   const tabPVs = Array.isArray(PVs) ? (
     PVs.map((m) => (
-      <tr className="border-y-[1px] hover:bg-blue/5 dark:hover:bg-dark-gray">
+      <tr
+        className={
+          selectedPVs.findIndex((el) => el == m) == -1
+            ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
+            : 'border-y duration-150 ease-linear bg-blue/25'
+        }
+        onClick={() => {
+          const found = selectedPVs.findIndex((el) => el == m)
+          if (found == -1) setSelectedPVs((prev) => [...prev, m])
+          else {
+            setSelectedPVs((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
+          }
+        }}
+      >
         <td>
           <span>{m.num_pv}</span>
         </td>
@@ -142,14 +189,6 @@ function Archive() {
   ) : (
     <></>
   )
-
-  function handlePrintNPM() {
-    useReactToPrint({
-      content: () => printComponent.current,
-      documentTitle: 'PV',
-      print: handlePrint()
-    })
-  }
 
   function handlePreviewNPM() {
     useReactToPrint({
@@ -194,12 +233,7 @@ function Archive() {
             </button>
           </div>
           {currentWindow == win[0] && (
-            <div className="flex px-4 justify-between h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
-              <button onClick={() => handlePreviewNPM()} className="text-blue">
-                <div className="deletePdfImprimer border">
-                  <img src={PdfSVG} alt="pdf icon"></img>PDF
-                </div>
-              </button>
+            <div className="flex px-4 justify-end h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="flex has-[:focus]:border-blue border dark:border-gray bg-white dark:bg-gray rounded-[10px]">
                 <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
@@ -215,17 +249,23 @@ function Archive() {
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
                 <button onClick={() => handlePreviewNPM()} className="text-blue">
-                  <div className="deletePdfImprimer border">
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                  >
                     <img src={PdfSVG} alt="pdf icon"></img>PDF
                   </div>
                 </button>
                 <button className="text-pink">
-                  <div className="deletePdfImprimer border">
-                    <img src={SupprimerSVG} alt="supprimer icon"></img>Supprimer
+                  <div
+                    className={selectedPVs.length != 0 ? 'button_active_red' : 'button_inactive'}
+                  >
+                    {supprimerImage}Supprimer
                   </div>
                 </button>
                 <button className="text-blue">
-                  <div className="deletePdfImprimer border">
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                  >
                     <img src={VoirDossierSVG} alt=""></img>Voir
                   </div>
                 </button>
@@ -288,7 +328,7 @@ function Archive() {
           </div>
         </div>
       )}
-      {view && (
+      {view && currentWindow == win[0] && (
         <div className="w-full h-full flex">
           <div className="h-full w-1/2 bg-side-bar-white-theme-color dark:bg-dark-gray flex flex-col">
             <button
@@ -304,46 +344,55 @@ function Archive() {
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Matricule : 22220358439</p>
-                  <p>Nom : Badache Radi</p>
-                  <p>Filière : Informatique (ingénieur)</p>
-                  <p>Groupe : 2</p>
+                  <p>matricule: {currentViewedRapport.matricule_e}</p>
+                  <p>Nom: {[currentViewedRapport.nom_e, ' ', currentViewedRapport.prenom_e]}</p>
+                  <p>Niveau: {currentViewedRapport.niveau_e}</p>
+                  <p>Section: {currentViewedRapport.section_e}</p>
+                  <p>Groupe: {currentViewedRapport.groupe_e}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Matricule : 22220358439</p>
-                  <p>Nom : Reguig Hichem</p>
+                  <p>Nom: {[currentViewedRapport.nom_p, ' ', currentViewedRapport.prenom_p]}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations globales</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Date de l’infraction : 22/03/2023</p>
-                  <p>Lieu : Salle B</p>
-                  <p>Motif : Tentative de fraude</p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                <h3 className="text-blue text-2xl">Description:</h3>
-                <div className="flex flex-col gap-3">
-                  <p>
-                    l’etudiant a en plus manquer de respact a l’enseignt on disant le terme”sale
-                    arabe” ou encore”مناطق الظل”
-                  </p>
+                  {currentViewedRapport.date_i && (
+                    <p>
+                      Date de l’infraction:
+                      {currentViewedRapport.date_i.slice(
+                        0,
+                        currentViewedRapport.date_i.indexOf('T')
+                      )}
+                    </p>
+                  )}
+                  {currentViewedRapport.date_r && (
+                    <p>
+                      Date de Rapport:
+                      {currentViewedRapport.date_r.slice(
+                        0,
+                        currentViewedRapport.date_r.indexOf('T')
+                      )}
+                    </p>
+                  )}
+                  <p>Lieu: {currentViewedRapport.lieu_i}</p>
+                  <p>Motif: {currentViewedRapport.motif_i}</p>
+                  <p>Degre: {currentViewedRapport.degre_i}</p>
+                  {currentViewedRapport.description_i && (
+                    <p>Description: {currentViewedRapport.description_i}</p>
+                  )}
                 </div>
               </div>
             </div>
           </div>
           <div className="flex flex-col w-1/2 justify-center items-center [&>button]:w-1/3 [&>button]:min-w-fit gap-4">
-            <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
-              <img src={ImprimerSVG}></img>imprimer
+            <button className="modify_rapport_button">
+              <img src={PdfSVG}></img>PDF
             </button>
-            <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
-              <img src={PdfSVG}></img>enregistrer
-            </button>
-            <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
+            <button className="modify_rapport_button">
               <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
             </button>
           </div>
