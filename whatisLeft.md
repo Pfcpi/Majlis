@@ -35,6 +35,7 @@
 
 ## Bugs
 
+- matricule for plaignant in form and database and request.
 - date always removes one day.
 - not updating immediately when deleting a member(commission).
 - when deleting a report it does not update immediately(pv).

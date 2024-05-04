@@ -19,56 +19,13 @@ function AjouterPV() {
   const [currentSelectedRapports, setCurrentSelectedRapports] = useState([])
   const [query, setQuery] = useState('')
   const [supprimer, setSupprimer] = useState(false)
-  const [addPV, setAddPV] = useState(false)
+  const [pv, setPv] = useState({ numCD: '', libeleS: '', temoin: '', numR: '' })
   const [cd, setCd] = useState({ dateCd: '', id: '' })
   const [members, setMembers] = useState([])
   const [creerConseilState, setCreerConseildState] = useState(false)
-  const [temoin, setTemoin] = useState([])
-
-  //VALID
-  // Add a pv
-  /* Body being in the format of :
-  {
-	 "dateCd": string value in the format of 'YYYY-MM-DD',
-   "idM": [
-    "1": int value,
-    "2": int value or null,
-    "3": int value or null,
-    "4": int value or null,
-    "5": int value or null
-   ],
-   "libeleS": string value,
-   "temoin": {
-    "1": {
-    "nomT": string value,
-    "prenomT": string value,
-    "roleT": string value
-    } or null,
-    "2": {
-    "nomT": string value,
-    "prenomT": string value,
-    "roleT": string value
-    } or null,
-    "3": {
-    "nomT": string value,
-    "prenomT": string value,
-    "roleT": string value
-    } or null
-  },
-   "numR": int value
-  }
-*/
-
-  const [pv, setPv] = useState({
-    dateCd: new Date().toISOString().slice(0, 19).replace('T', ' '),
-    idM: [],
-    libeleS: '',
-    temoin: [
-      { nomT: 'amir', prenomT: 'madjour', roleT: 'etudiant' },
-      { nomT: 'hichem', prenomT: 'guerid', roleT: 'prof' }
-    ],
-    numR: 0
-  })
+  const [isAddingTemoin, setIsAddingTemoin] = useState(false)
+  const [temoinBuffer, setTemoinBuffer] = useState({ nomT: '', prenomT: '', roleT: '' })
+  const [temoinArray, setTemoinArray] = useState([])
 
   const api = 'http://localhost:3000'
 
@@ -172,38 +129,36 @@ function AjouterPV() {
 
   const handleAnuuler = (e) => {
     e.preventDefault()
-    setAddPV({
-      dateCd: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      idM: [],
-      libeleS: '',
-      temoin: [],
-      numR: 0
-    })
-    setAddPV(false)
+    setCd({ id: '', dateCd: '' })
+    setCurrentSelectedRapports([])
+    setMembers([])
   }
 
   const handleAjouter = async (e) => {
     e.preventDefault()
     const tache = await axios
-      .post(api + '/pv/add', pv)
+      .post(api + '/pv/addPV', {
+        numR: pv.numR,
+        libeleS: pv.libeleS,
+        numCD: pv.numCD,
+        temoin: temoinArray
+      })
       .then((res) => console.log(res))
       .catch((err) => console.log(err))
 
-    setAddPV({
-      dateCd: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      idM: [],
-      libeleS: '',
-      temoin: [],
-      numR: 0
-    })
-
+    if (currentSelectedRapports.length > 1) {
+      setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
+    }
+    if (currentSelectedRapports.length == 1) {
+      setMembers([])
+    }
+    setCurrentSelectedRapports(currentSelectedRapports.slice(1))
     const tache1 = await axios
       .get(api + '/rapport/get')
       .then((res) => {
         setRapports(res.data)
       })
       .catch((err) => console.log(err))
-    setAddPV(false)
   }
 
   async function handleSupprimer() {
@@ -227,16 +182,12 @@ function AjouterPV() {
     }
   }
 
-  const handleInputChange = async (e) => {
+  const handleInputTemoinChange = async (e) => {
     const { name, value } = e.target
-    setPv((prevState) => ({
+    setTemoinBuffer((prevState) => ({
       ...prevState,
       [name]: value
     }))
-
-    if (name == 'dateCd') {
-    }
-    setPv((prev) => ({ ...prev, idM: [1, 2, 3, 4, 5] }))
   }
 
   return (
@@ -298,6 +249,7 @@ function AjouterPV() {
                 onClick={(e) => {
                   e.preventDefault()
                   setCreerConseildState(false)
+                  setMembers([])
                 }}
               >
                 Annuler
@@ -315,6 +267,11 @@ function AjouterPV() {
                     .then((res) => {
                       console.log(res)
                       setCd((prev) => ({ ...prev, id: res.data[0].num_cd }))
+                      setPv((prev) => ({
+                        ...prev,
+                        numCD: res.data[0].num_cd,
+                        numR: currentSelectedRapports[0].num_r
+                      }))
                     })
                     .catch((err) => console.log(err))
                   setCreerConseildState(false)
@@ -326,10 +283,12 @@ function AjouterPV() {
           </form>
         </div>
       )}
-      {addPV && (
+      {cd.id && currentSelectedRapports != 0 && (
         <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
-            <h1 className="text-[36px] py-4">Détails du PV</h1>
+            <h1 className="text-[36px] py-4">
+              Détails du PV de {currentSelectedRapports[0].nom_e}
+            </h1>
             <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
             <div className="flex w-5/6 flex-col gap-6 my-4">
               <div className="container_input_rapport">
@@ -337,7 +296,9 @@ function AjouterPV() {
                   className="input_dossier"
                   name="libeleS"
                   id="libeleS"
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    setPv((prev) => ({ ...prev, libeleS: e.target.value }))
+                  }}
                   value={pv.libeleS}
                   required
                 ></input>
@@ -345,16 +306,86 @@ function AjouterPV() {
                   libele
                 </label>
               </div>
+              {!isAddingTemoin && temoinArray.length < 3 && (
+                <div className="flex w-full justify-between items-center">
+                  <div>Ajouter un temoin</div>
+                  <button className="bg-blue" onClick={() => setIsAddingTemoin(true)}>
+                    A
+                  </button>
+                </div>
+              )}
+              {isAddingTemoin && (
+                <div className="flex">
+                  <div className="container_input_rapport ">
+                    <input
+                      className="input_dossier rounded-r-none"
+                      name="roleT"
+                      id="roleT"
+                      onChange={handleInputTemoinChange}
+                      value={temoinBuffer.roleT}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="roleT">
+                      Role
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier rounded-none"
+                      name="nomT"
+                      id="nomT"
+                      onChange={handleInputTemoinChange}
+                      value={temoinBuffer.nomT}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="nomT">
+                      nom
+                    </label>
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier rounded-l-none"
+                      name="prenomT"
+                      id="prenomT"
+                      onChange={handleInputTemoinChange}
+                      value={temoinBuffer.prenomT}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="prenomT">
+                      Prenom
+                    </label>
+                  </div>
+                  <button
+                    className="bg-green-400"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setTemoinArray((prev) => [...prev, temoinBuffer])
+                      setIsAddingTemoin(false)
+                      setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+                    }}
+                  >
+                    Aj
+                  </button>
+                </div>
+              )}
               <div className="container_input_rapport">
                 <h2>les témoins</h2>
                 <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                  {Array.isArray(temoin) &&
-                    temoin.length == 0 &&
-                    temoin.map((t) => (
+                  {Array.isArray(temoinArray) &&
+                    temoinArray.length != 0 &&
+                    temoinArray.map((t) => (
                       <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                         <div>{t.roleT}</div>
                         <div>{t.nomT}</div>
                         <div>{t.prenomT}</div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setTemoinArray(temoinArray.filter((item) => item !== t))
+                          }}
+                        >
+                          {supprimerImage}
+                        </button>
                       </div>
                     ))}
                 </div>
@@ -378,7 +409,7 @@ function AjouterPV() {
           </form>
         </div>
       )}
-      {!addPV && (
+      {(!cd.id || currentSelectedRapports.length == 0) && (
         <div className="flex flex-col w-full h-full">
           {supprimer && (
             <div className="absolute flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
