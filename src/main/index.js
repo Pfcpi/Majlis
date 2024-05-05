@@ -103,7 +103,7 @@ async function getUrl() {
   const window = new BrowserWindow()
 
   window.on('ready-to-show', () => {
-    mainWindow.maximize()
+    window.maximize()
   })
   const url = __dirname + '../../s.pdf'
   console.log('url:', url)
