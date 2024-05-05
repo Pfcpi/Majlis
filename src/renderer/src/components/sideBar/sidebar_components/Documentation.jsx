@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import './sidebar_com_css/documentation.css'
-//Completed
+
 function Documentation() {
   const [doc, setDoc] = useState('Usto')
   return (

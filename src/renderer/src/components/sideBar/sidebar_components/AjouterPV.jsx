@@ -9,10 +9,6 @@ import useApi from '../../../zustand/api'
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
 
-//Tasks:
-//make the skeleton
-//Responsiveness
-//fetch data
 function AjouterPV() {
   const { dark } = useDark()
   const { api } = useApi()
@@ -28,8 +24,6 @@ function AjouterPV() {
   const [isAddingTemoin, setIsAddingTemoin] = useState(false)
   const [temoinBuffer, setTemoinBuffer] = useState({ nomT: '', prenomT: '', roleT: '' })
   const [temoinArray, setTemoinArray] = useState([])
-
-  //const api = 'http://localhost:3000'
 
   useEffect(() => {
     axios

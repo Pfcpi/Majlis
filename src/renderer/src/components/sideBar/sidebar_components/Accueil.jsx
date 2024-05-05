@@ -1,5 +1,4 @@
 //Tasks:
-//Add id attribute for input elements
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
 import { useState, useEffect, useMemo } from 'react'
@@ -68,9 +67,6 @@ function Archive() {
   })
 
   const { api } = useApi()
-  //const api = 'http://localhost:3000'
-
-  //false for rapport, true for Dossier
   const { cliped, setCliped } = useCliped()
   const { dark } = useDark()
   const { account } = useAccount()

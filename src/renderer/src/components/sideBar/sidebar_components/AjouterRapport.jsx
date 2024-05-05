@@ -1,6 +1,3 @@
-//Tasks:
-//Add id attribute for input elements
-
 import { useState, useEffect } from 'react'
 import WarningSVG from './../../../assets/warning.svg'
 import './sidebar_com_css/accueil.css'
@@ -86,7 +83,6 @@ function AjouterRapport() {
   })
 
   const { api } = useApi()
-  //const api = 'http://localhost:3000'
 
   useEffect(() => {
     axios

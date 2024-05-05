@@ -1,5 +1,3 @@
-//Tasks:
-//When deleting multiple members, it does not update for all deleted members(kind of (not to worry))
 import { useState, useMemo, useEffect } from 'react'
 
 import './sidebar_com_css/archives.css'
@@ -45,7 +43,6 @@ function Archive() {
   })
 
   const dataFin = new Date().toISOString().slice(0, 19).replace('T', ' ')
-  //const api = 'http://localhost:3000'
 
   // edit a member information
   /* Body being in the format of :

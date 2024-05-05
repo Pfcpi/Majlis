@@ -1,5 +1,4 @@
-import { useState, useRef, Component, useEffect } from 'react'
-import { useReactToPrint } from 'react-to-print'
+import { useState, useRef, useEffect } from 'react'
 
 import './sidebar_com_css/archives.css'
 
@@ -35,8 +34,6 @@ function Archive() {
   const { api } = useApi()
 
   const printComponent = useRef(null)
-
-  //const api = 'http://localhost:3000'
 
   async function fetchData() {
     const tache1 = await axios
@@ -86,41 +83,8 @@ function Archive() {
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)
-          /*const datapdf = res.data
-          const blob = new Blob([datapdf], { type: 'application/pdf' })
-          const url = URL.createObjectURL(blob)
-          console.log('url', url)
-
-          window.electronAPI.previewComponent(url, (response) => {
-            console.log('Main: ', response)
-          })*/
         })
         .catch((err) => console.log(err))
-      /*const data = printComponent.current.outerHTML
-      console.log(printComponent)
-      console.log(data)
-      const blob = new Blob([data], { type: 'text/html' })
-      const url = URL.createObjectURL(blob)
-
-      window.electronAPI.previewComponent(url, (response) => {
-        console.log('Main: ', response)
-      })*/
-    })
-  }
-
-  function handlePrint() {
-    return new Promise(() => {
-      console.log('forwarding print request to the main process...')
-
-      const data = printComponent.current.outerHTML
-      //console.log(data);
-      let blob = new Blob([data], { type: 'text/html' })
-      let url = URL.createObjectURL(blob)
-
-      window.electronAPI.printComponent(url, (response) => {
-        console.log('Main: ', response)
-      })
-      //console.log('Main: ', data);
     })
   }
 
