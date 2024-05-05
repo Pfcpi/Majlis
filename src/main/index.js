@@ -5,11 +5,12 @@ import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
+const portfinder = require('portfinder')
 
 const pie = require('puppeteer-in-electron')
 const puppeteer = require('puppeteer-core')
 
-function createWindow() {
+async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -25,6 +26,12 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.maximize()
+  })
+
+  let used_port = await handlePort()
+  console.log('used_port: ', used_port)
+  ipcMain.handle('get-Port', async (ev, args) => {
+    return used_port
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -56,12 +63,8 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('get-url', getUrl)
-  createWindow()
 
-  const PORT = process.env.PORT || 3000
-  ExpressApp.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
-  })
+  createWindow()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -75,11 +78,33 @@ async function initialize() {
 }
 initialize()
 
+async function handlePort() {
+  try {
+    const port = await portfinder.getPortPromise();
+
+    // Listen on the port returned by portfinder
+    ExpressApp.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+
+    // Update the global_port variable with the obtained port
+
+    return port;
+  } catch (err) {
+    console.error('Error finding an available port:', err);
+    // Return the original global_port if an error occurs
+    return 3000;
+  }
+}
+
 async function getUrl() {
   const browser = await pie.connect(app, puppeteer)
 
   const window = new BrowserWindow()
-  window.maximize()
+
+  window.on('ready-to-show', () => {
+    mainWindow.maximize()
+  })
   const url = __dirname + '../../s.pdf'
   console.log('url:', url)
   await window.loadURL(url)

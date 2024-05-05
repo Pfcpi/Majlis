@@ -36,6 +36,7 @@
     "mysql2": "^3.9.7",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
+    "portfinder": "^1.0.32",
     "puppeteer": "^22.7.1",
     "puppeteer-core": "^22.7.1",
     "puppeteer-in-electron": "^3.0.5",

@@ -7,6 +7,8 @@ import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
 
+import useApi from '../../../zustand/api'
+
 function AjouterRapport() {
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
   const motif1 = [
@@ -83,6 +85,9 @@ function AjouterRapport() {
     degreI: 1
   })
 
+  const { api } = useApi()
+  //const api = 'http://localhost:3000'
+
   useEffect(() => {
     axios
       .get(api + '/rapport/get')
@@ -109,7 +114,6 @@ function AjouterRapport() {
       [name]: value
     }))
   }
-  const api = 'http://localhost:3000'
 
   const dropNiveaudownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">

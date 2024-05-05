@@ -4,6 +4,7 @@ import { useReactToPrint } from 'react-to-print'
 import './sidebar_com_css/archives.css'
 
 import useDark from '../../../zustand/dark'
+import useApi from '../../../zustand/api'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
@@ -29,10 +30,13 @@ function Archive() {
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
 
   const [view, setView] = useState(false)
+  
   const { dark } = useDark()
+  const { api } = useApi()
+
   const printComponent = useRef(null)
 
-  const api = 'http://localhost:3000'
+  //const api = 'http://localhost:3000'
 
   async function fetchData() {
     const tache1 = await axios

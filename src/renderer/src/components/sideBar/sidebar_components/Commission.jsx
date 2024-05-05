@@ -6,6 +6,7 @@ import './sidebar_com_css/archives.css'
 
 import useAccount from '../../../zustand/account'
 import useDark from '../../../zustand/dark'
+import useApi from '../../../zustand/api'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
@@ -20,6 +21,7 @@ function Archive() {
 
   const { account } = useAccount()
   const { dark } = useDark()
+  const { api } = useApi()
 
   const [query, setQuery] = useState('')
   const [membres, setMembres] = useState([])
@@ -43,7 +45,7 @@ function Archive() {
   })
 
   const dataFin = new Date().toISOString().slice(0, 19).replace('T', ' ')
-  const api = 'http://localhost:3000'
+  //const api = 'http://localhost:3000'
 
   // edit a member information
   /* Body being in the format of :

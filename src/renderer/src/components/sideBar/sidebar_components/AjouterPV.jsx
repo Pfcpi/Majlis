@@ -4,6 +4,7 @@ import axios from 'axios'
 import './sidebar_com_css/archives.css'
 
 import useDark from '../../../zustand/dark'
+import useApi from '../../../zustand/api'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
@@ -14,6 +15,7 @@ import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
 //fetch data
 function AjouterPV() {
   const { dark } = useDark()
+  const { api } = useApi()
 
   const [rapports, setRapports] = useState()
   const [currentSelectedRapports, setCurrentSelectedRapports] = useState([])
@@ -27,7 +29,7 @@ function AjouterPV() {
   const [temoinBuffer, setTemoinBuffer] = useState({ nomT: '', prenomT: '', roleT: '' })
   const [temoinArray, setTemoinArray] = useState([])
 
-  const api = 'http://localhost:3000'
+  //const api = 'http://localhost:3000'
 
   useEffect(() => {
     axios

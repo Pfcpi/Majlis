@@ -11,6 +11,7 @@ import './sidebar_com_css/accueil.css'
 import useCliped from '../../../zustand/cliped'
 import useDark from '../../../zustand/dark'
 import useAccount from '../../../zustand/account'
+import useApi from '../../../zustand/api'
 
 import UpDownSVG from './../../../assets/UpDown.svg'
 import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
@@ -66,7 +67,8 @@ function Archive() {
     motifError: ''
   })
 
-  const api = 'http://localhost:3000'
+  const { api } = useApi()
+  //const api = 'http://localhost:3000'
 
   //false for rapport, true for Dossier
   const { cliped, setCliped } = useCliped()

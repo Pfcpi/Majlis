@@ -8,6 +8,7 @@ import applogo from '../../../build/icon.png'
 import useAuth from './zustand/auth.js'
 import useAccount from './zustand/account.js'
 import { useEffect, useState } from 'react'
+import useApi from './zustand/api.js'
 
 import './index.css'
 import axios from 'axios'
@@ -15,12 +16,16 @@ import axios from 'axios'
 function App() {
   const { auth, authentificate } = useAuth()
   const { account, setChef, setPresident, emptyAccount } = useAccount()
+  const { api } = useApi()
   const [ChangePassword, setChangePassword] = useState(false)
   const [password, setPassword] = useState('')
   const [blurBg, setBlurBg] = useState(false)
   const [Msg, setMsg] = useState('')
 
-  const api = 'http://localhost:3000'
+  //const api = 'http://localhost:3000'
+  useEffect(() => {
+   console.log("api in auth", api) 
+  })
 
   useEffect(() => {
     if (!auth) {
