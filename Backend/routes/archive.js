@@ -721,7 +721,10 @@ WHERE r.num_r = ?`
         prenomC: result[0].prenom_chef
       }
       try {
+        const startTime = performance.now()
         const pdfBuffer = await generatePDFrapport(data)
+        const endTime = performance.now()
+        console.log('execution of generatePDFrapport func took: ', endTime - startTime, ' ms')
         res.send('it worked')
       } catch (err) {
         console.error(err)

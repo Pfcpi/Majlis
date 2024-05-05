@@ -484,9 +484,9 @@ async function generatePDFpv(data) {
 }
 
 async function generatePDFrapport(data) {
-    let html = null
-    if(data.sectionE != null){
-   html = `
+  let html = null
+  if (data.sectionE != null) {
+    html = `
   <!DOCTYPE html>
 <html lang="fr-FR">
 <head>
@@ -656,7 +656,7 @@ async function generatePDFrapport(data) {
 </body>
 </html>
     `
-} else {
+  } else {
     html = `
   <!DOCTYPE html>
 <html lang="fr-FR">
@@ -828,13 +828,18 @@ async function generatePDFrapport(data) {
 </html>
     `
   }
+  const startTime = performance.now()
 
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
 
+  const endTime = performance.now()
+  console.log('execution generating pdf took: ', endTime - startTime, ' ms')
+
   // Generate PDF
   const pdfBuffer = await page.pdf({ format: 'A4' })
+
 
   // Define file path
   const pdfFilePath = './out/s.pdf' // Adjust the path as needed
@@ -848,7 +853,7 @@ async function generatePDFrapport(data) {
     }
   })
 
-  return "worked" 
+  return 'worked'
 }
 
 module.exports = { generatePDFpv, generatePDFrapport }

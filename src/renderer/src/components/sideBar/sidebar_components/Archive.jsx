@@ -29,7 +29,7 @@ function Archive() {
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
 
   const [view, setView] = useState(false)
-  
+
   const { dark } = useDark()
   const { api } = useApi()
 

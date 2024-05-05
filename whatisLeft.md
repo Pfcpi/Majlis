@@ -13,6 +13,11 @@
   - launch the app with connection lost, and then turn the wifi connection(done)
   - run three instances of the app at the same time.
 
+## Services/pdf 
+
+- Execution time of printing is long ( > 15(s) )
+  - Potential fix : put the code for generating pdf in main process rather than backend.
+
 ## AjouterPv page
 
 - assign to each of the selected reports the sanction and temoins.

@@ -80,20 +80,20 @@ initialize()
 
 async function handlePort() {
   try {
-    const port = await portfinder.getPortPromise();
+    const port = await portfinder.getPortPromise()
 
     // Listen on the port returned by portfinder
     ExpressApp.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
+      console.log(`Server is running on port ${port}`)
+    })
 
     // Update the global_port variable with the obtained port
 
-    return port;
+    return port
   } catch (err) {
-    console.error('Error finding an available port:', err);
+    console.error('Error finding an available port:', err)
     // Return the original global_port if an error occurs
-    return 3000;
+    return 3000
   }
 }
 
@@ -106,11 +106,9 @@ async function getUrl() {
     window.maximize()
   })
   const url = __dirname + '../../s.pdf'
-  console.log('url:', url)
   await window.loadURL(url)
 
   const page = await pie.getPage(browser, window)
-  console.log(page.url())
   return page.url()
 }
 
