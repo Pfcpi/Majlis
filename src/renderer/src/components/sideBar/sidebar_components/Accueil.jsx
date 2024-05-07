@@ -574,7 +574,14 @@ function Archive() {
             {Array.isArray(etudiants) && etudiants.length != 0 && (
               <div className="flex items-center w-fit px-4 gap-4 py-2 text-notification-blue bg-notification-blue/10 border border-notification-border-blue rounded-lg">
                 <img className="w-7 aspect-square" src={NotificationsSVG}></img>
-                <p>{[etudiants.length, etudiants.length == 1 ? " Nouveau rapport ajouté..." : " Nouveax rapports ajoutés..."]}</p>
+                <p>
+                  {[
+                    etudiants.length,
+                    etudiants.length == 1
+                      ? ' Nouveau rapport ajouté...'
+                      : ' Nouveax rapports ajoutés...'
+                  ]}
+                </p>
               </div>
             )}
             <h1 className="text-3xl py-4">Rapport a traiter</h1>
@@ -596,31 +603,16 @@ function Archive() {
                   <th className="w-1/4 border-x">
                     <div>
                       Rapport
-                      <img
-                        className="imgp"
-                        src={dark ? UpDownSVG : UpDownGraySVG}
-                        alt="filter"
-                      ></img>
                     </div>
                   </th>
                   <th className="w-1/4 border-x">
                     <div>
                       Nom Etudiant
-                      <img
-                        className="imgp"
-                        src={dark ? UpDownSVG : UpDownGraySVG}
-                        alt="filter"
-                      ></img>
                     </div>
                   </th>
                   <th className="w-1/4 border-x">
                     <div>
                       Date de l'infraction
-                      <img
-                        className="imgp"
-                        src={dark ? UpDownSVG : UpDownGraySVG}
-                        alt="filter"
-                      ></img>
                     </div>
                   </th>
                   {!view && (
@@ -699,6 +691,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="matriculeE"
+                      id="matriculeE"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({
@@ -723,6 +716,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="nomE"
+                      id="nomE"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, nom_e: e.target.value }))
@@ -744,6 +738,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="prenomE"
+                      id="prenomE"
                       value={currentViewedEtudiant.prenom_e}
                       onChange={(e) => {
                         handleInputChange(e)
@@ -765,6 +760,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="niveauE"
+                      id="niveauE"
                       onClick={() => {
                         if (!dropNiveau) {
                           setdropNiveau(true)
@@ -789,6 +785,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="groupeE"
+                      id="groupeE"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, groupe_e: e.target.value }))
@@ -796,7 +793,7 @@ function Archive() {
                       value={currentViewedEtudiant.groupe_e}
                       required
                     ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="groupeE">
                       Groupe
                     </label>
                     {errorsStep1.groupeError && (
@@ -810,6 +807,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="sectionE"
+                      id="sectionE"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, section_e: e.target.value }))
@@ -817,7 +815,7 @@ function Archive() {
                       value={currentViewedEtudiant.section_e}
                       required
                     ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <label className="label_rapport" htmlFor="sectionE">
                       Section
                     </label>
                     {errorsStep1.sectionError && (
@@ -838,6 +836,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="nomP"
+                      id="nomP"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, nom_p: e.target.value }))
@@ -859,6 +858,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="prenomP"
+                      id="prenomP"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, prenom_p: e.target.value }))
@@ -883,21 +883,31 @@ function Archive() {
               <div className="flex flex-col w-5/6 my-2">
                 <label className="label_dossier">Informations globales</label>
                 <div className="flex flex-col w-full gap-6 mb-4">
-                  <input
-                    className="input_dossier"
-                    name="dateI"
-                    type="date"
-                    onChange={(e) => {
-                      handleInputChange(e)
-                      setCurrentViewedEtudiant((prev) => ({ ...prev, date_i: e.target.value }))
-                    }}
-                    value={currentViewedEtudiant.date_i.substring(0, 10)}
-                    required
-                  ></input>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="dateI"
+                      id="dateI"
+                      type="date"
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, date_i: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.date_i.substring(0, 10)}
+                      required
+                    ></input>
+                    <label
+                      className="absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent"
+                      htmlFor="dateI"
+                    >
+                      Date
+                    </label>
+                  </div>
                   <div className="container_input_rapport">
                     <input
                       className="input_dossier"
                       name="lieuI"
+                      id="lieuI"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, lieu_i: e.target.value }))
@@ -919,6 +929,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="motifI"
+                      id="motifI"
                       onChange={(e) => {
                         console.log('dropMotifValue:', dropMotifValue)
                         if (dropMotifValue == 'autres...') {
@@ -952,6 +963,7 @@ function Archive() {
                     <input
                       className="input_dossier"
                       name="degreI"
+                      id="degreI"
                       value={motif2.includes(rapport.motifI) ? '2' : '1'}
                       required
                     ></input>
@@ -963,6 +975,7 @@ function Archive() {
                     <textarea
                       className="input_dossier resize-none"
                       name="descI"
+                      id="descI"
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({

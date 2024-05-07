@@ -360,6 +360,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="matriculeE"
+                  id="matriculeE"
                   onChange={handleInputChange}
                   value={rapport.matriculeE}
                   required
@@ -378,6 +379,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="nomE"
+                  id="nomE"
                   onChange={handleInputChange}
                   value={rapport.nomE}
                   required
@@ -396,6 +398,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="prenomE"
+                  id="prenomE"
                   onChange={handleInputChange}
                   value={rapport.prenomE}
                   required
@@ -414,6 +417,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="niveauE"
+                  id="niveauE"
                   onClick={() => {
                     if (!dropNiveau) {
                       setdropNiveau(true)
@@ -438,6 +442,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="groupeE"
+                  id="groupeE"
                   onChange={handleInputChange}
                   value={rapport.groupeE}
                   required
@@ -456,6 +461,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="sectionE"
+                  id="sectionE"
                   onChange={handleInputChange}
                   value={rapport.sectionE}
                   required
@@ -481,6 +487,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="nomP"
+                  id="nomP"
                   onChange={handleInputChange}
                   value={rapport.nomP}
                   required
@@ -499,6 +506,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="prenomP"
+                  id="prenomP"
                   onChange={handleInputChange}
                   value={rapport.prenomP}
                   required
@@ -524,6 +532,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="dateI"
+                  id="dateI"
                   type="date"
                   onChange={handleInputChange}
                   value={rapport.dateI}
@@ -540,6 +549,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="lieuI"
+                  id="lieuI"
                   onChange={handleInputChange}
                   value={rapport.lieuI}
                   required
@@ -558,6 +568,7 @@ function AjouterRapport() {
                 <input
                   className="input_dossier"
                   name="motifI"
+                  id="motifI"
                   onClick={() => {
                     if (!dropMotif && dropMotifValue != 'autres...') setDropMotif(true)
                   }}
@@ -591,6 +602,7 @@ function AjouterRapport() {
                     }
                   }}
                   name="degreI"
+                  id="degreI"
                   onChange={handleInputChange}
                   value={motif2.includes(rapport.motifI) ? '2' : '1'}
                   required
@@ -603,6 +615,7 @@ function AjouterRapport() {
                 <textarea
                   className="input_dossier resize-none"
                   name="descI"
+                  id="descI"
                   onChange={handleInputChange}
                   value={rapport.descI}
                   required

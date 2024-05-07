@@ -689,25 +689,21 @@ function Archive() {
               <th className="w-1/4 border-x">
                 <div>
                   Titre
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
               <th className="w-1/4 border-x">
                 <div>
                   Nom
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
               <th className="w-1/4 border-x">
                 <div>
                   Email
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
               <th className="w-1/4 border-x">
                 <div>
                   Date de début
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
             </tr>

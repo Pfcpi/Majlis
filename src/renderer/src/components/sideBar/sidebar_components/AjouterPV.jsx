@@ -484,19 +484,16 @@ function AjouterPV() {
               <th className="w-1/3 border-x">
                 <div>
                   Rapport
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
               <th className="w-1/3 border-x">
                 <div>
                   Nom Etudiant
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
               <th className="w-1/3 border-x">
                 <div>
                   Date de l'infraction
-                  <img className="imgp" src={dark ? UpDownSVG : UpDownGraySVG} alt="filter"></img>
                 </div>
               </th>
             </tr>

@@ -172,8 +172,7 @@ router.post('/getActiveCommissionAndMembersByData', (req, res) => {
       db.query(members, result[0].num_c, (err, result) => {
         if (err) {
           res.send(err)
-        }
-        else {
+        } else {
           res.send(result)
         }
       })
@@ -199,7 +198,8 @@ router.post('/addCD', (req, res) => {
   let sqlqueryCd = `INSERT INTO Conseil_Discipline (date_cd) VALUES (?)`
   db.query(sqlqueryCd, dateCd, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      res.send(err)
+      return
     }
   })
 
@@ -210,40 +210,35 @@ router.post('/addCD', (req, res) => {
     if (idM[i] != null)
       db.query(sqlqueryC, idM[i], (err, result) => {
         if (err) {
-          res.status(400).send(err)
+          res.send(err)
+          return
         }
       })
     i++
   } while (i < 5)
-  db.query(
-    `SELECT num_cd FROM Conseil_Discipline WHERE num_cd = LAST_INSERT_ID()`,
-    (err, result) => {
-      if (err) {
-        res.status(400).send(err)
+  console.log('after looping...')
+  /*db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
+    if (err) {
+      res.send(err)
+      return
+    } else {
+      console.log('after executing a query after looping in else')
+      const mail = result[0].email_u
+      const mailOptions = {
+        from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
+        to: mail,
+        subject: 'Nouveau PV déposé.',
+        html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
       }
-      db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
+      transporter.sendMail(mailOptions, function (err, info) {
         if (err) {
-          res.status(400).send(err)
+          console.log(err)
         } else {
-          const mail = result[0].email_u
-          const mailOptions = {
-            from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
-            to: mail,
-            subject: 'Nouveau PV déposé.',
-            html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
-          }
-          transporter.sendMail(mailOptions, function (err, info) {
-            if (err) {
-              console.log(err)
-            } else {
-              console.log('Email sent!')
-            }
-          })
+          console.log('Email sent!')
         }
       })
-      res.send(result)
     }
-  )
+  })*/
 })
 
 // Add pv with given num_cd

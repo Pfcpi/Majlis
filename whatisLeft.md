@@ -13,6 +13,18 @@
   - launch the app with connection lost, and then turn the wifi connection(done)
   - run three instances of the app at the same time.
 
+## Overall
+
+- remove accessiblity for chef for creating pv and for pres for ajouter rapport.
+- pv generale.
+- use manual animated.
+- bold font for chef and pres buttons in auth.
+- remove duplicate for commission
+
+## pv.js
+
+- addCd does not work.
+
 ## UX
 
 - a blue moving line for indicating fetching data below the nav bar.
