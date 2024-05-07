@@ -12,8 +12,6 @@ import useDark from '../../../zustand/dark'
 import useAccount from '../../../zustand/account'
 import useApi from '../../../zustand/api'
 
-import UpDownSVG from './../../../assets/UpDown.svg'
-import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
 import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
 import ModifierDossierGraySVG from './../../../assets/BlueSvgs/ModifierDossierGray.svg'
@@ -239,39 +237,41 @@ function Archive() {
               >
                 <img src={VoirDossierSVG} alt="voir dossier icon"></img>
               </button>
-              <button
-                onClick={() => {
-                  setModify(true)
-                  console.log()
-                  axios
-                    .post(api + '/rapport/gets', { numR: etudiant.num_r })
-                    .then((res) => {
-                      setCurrentViewedEtudiant(res.data[0])
-                      setRapport((prev) => ({
-                        degreI: res.data[0].degre_i,
-                        matriculeE: res.data[0].matricule_e,
-                        nomE: res.data[0].nom_e,
-                        prenomE: res.data[0].prenom_e,
-                        niveauE: res.data[0].niveau_e,
-                        groupeE: res.data[0].groupe_e,
-                        sectionE: res.data[0].section_e,
-                        nomP: res.data[0].nom_p,
-                        prenomP: res.data[0].prenom_p,
-                        dateI: res.data[0].date_i,
-                        lieuI: res.data[0].lieu_i,
-                        motifI: res.data[0].motif_i,
-                        descI: res.data[0].description_i,
-                        numR: etudiant.num_r
-                      }))
-                    })
-                    .catch((err) => console.log(err))
-                }}
-              >
-                <img
-                  src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
-                  alt="modifier dossier icon"
-                ></img>
-              </button>
+              {account == 'chef' && (
+                <button
+                  onClick={() => {
+                    setModify(true)
+                    console.log()
+                    axios
+                      .post(api + '/rapport/gets', { numR: etudiant.num_r })
+                      .then((res) => {
+                        setCurrentViewedEtudiant(res.data[0])
+                        setRapport((prev) => ({
+                          degreI: res.data[0].degre_i,
+                          matriculeE: res.data[0].matricule_e,
+                          nomE: res.data[0].nom_e,
+                          prenomE: res.data[0].prenom_e,
+                          niveauE: res.data[0].niveau_e,
+                          groupeE: res.data[0].groupe_e,
+                          sectionE: res.data[0].section_e,
+                          nomP: res.data[0].nom_p,
+                          prenomP: res.data[0].prenom_p,
+                          dateI: res.data[0].date_i,
+                          lieuI: res.data[0].lieu_i,
+                          motifI: res.data[0].motif_i,
+                          descI: res.data[0].description_i,
+                          numR: etudiant.num_r
+                        }))
+                      })
+                      .catch((err) => console.log(err))
+                  }}
+                >
+                  <img
+                    src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG}
+                    alt="modifier dossier icon"
+                  ></img>
+                </button>
+              )}
               {account == 'chef' && (
                 <button
                   onClick={() => {
@@ -601,19 +601,13 @@ function Archive() {
               <table className="w-full">
                 <tr className="border-t">
                   <th className="w-1/4 border-x">
-                    <div>
-                      Rapport
-                    </div>
+                    <div>Rapport</div>
                   </th>
                   <th className="w-1/4 border-x">
-                    <div>
-                      Nom Etudiant
-                    </div>
+                    <div>Nom Etudiant</div>
                   </th>
                   <th className="w-1/4 border-x">
-                    <div>
-                      Date de l'infraction
-                    </div>
+                    <div>Date de l'infraction</div>
                   </th>
                   {!view && (
                     <th className="w-1/4 border-x">

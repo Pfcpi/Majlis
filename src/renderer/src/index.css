@@ -6,4 +6,10 @@
   .spreadAni {
     @apply absolute rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-spread aspect-square;
   }
+  .auth_btns {
+    @apply relative w-3/5 py-3 px-1 border rounded-[10px] hover:bg-blue/15 border-auth-border-gray overflow-hidden font-semibold;
+  }
+  button:active {
+   @apply animate-clickDownUp; 
+  }
 }

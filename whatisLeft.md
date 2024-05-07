@@ -15,10 +15,8 @@
 
 ## Overall
 
-- remove accessiblity for chef for creating pv and for pres for ajouter rapport.
 - pv generale.
 - use manual animated.
-- bold font for chef and pres buttons in auth.
 - remove duplicate for commission
 
 ## pv.js

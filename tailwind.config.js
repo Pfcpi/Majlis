@@ -36,6 +36,11 @@ export default {
         '0%': { width: '10px', opacity: '0.5' },
         '100%': { width: '100%', opacity: '0' }
       },
+      scaledownUp: {
+        '0%': { scale: '100%' },
+        '30%': { scale: '97%' },
+        '100%': { scale: '100%' }
+      },
       badInput: {
         '0%': { opacity: '0' },
         '5%': { opacity: '1', transform: 'translateY(10px)' },
@@ -44,6 +49,7 @@ export default {
       }
     },
     animation: {
+      clickDownUp: 'scaledownUp .3s linear',
       spread: 'spread .5s linear',
       badInput: 'badInput 2s linear'
     }

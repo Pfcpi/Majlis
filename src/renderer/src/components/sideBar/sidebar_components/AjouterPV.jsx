@@ -3,14 +3,9 @@ import axios from 'axios'
 
 import './sidebar_com_css/archives.css'
 
-import useDark from '../../../zustand/dark'
 import useApi from '../../../zustand/api'
 
-import UpDownSVG from './../../../assets/UpDown.svg'
-import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
-
 function AjouterPV() {
-  const { dark } = useDark()
   const { api } = useApi()
 
   const [rapports, setRapports] = useState()

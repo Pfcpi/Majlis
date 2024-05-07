@@ -35,6 +35,7 @@ import applogo from './../../../../../build/icon.png'
 
 import useCliped from './../../zustand/cliped'
 import useAuth from '../../zustand/auth'
+import useAccount from '../../zustand/account'
 import useDark from '../../zustand/dark'
 
 import './SideBarcss.css'
@@ -42,8 +43,9 @@ import './SideBarcss.css'
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
   const { cliped, setCliped } = useCliped()
-  const { auth, authentificate, logOut } = useAuth()
+  const { logOut } = useAuth()
   const { dark } = useDark()
+  const { account } = useAccount()
 
   const ref = useRef(null)
 
@@ -121,48 +123,52 @@ function SideBar() {
               ></img>
               {!cliped && <p>Commission</p>}
             </Link>
-            <Link
-              data-cliped={cliped}
-              className={
-                nav === 'AjouterRapport'
-                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
-              }
-              to="/AjouterRapport"
-              onClick={() => {
-                setNav('AjouterRapport')
-              }}
-            >
-              <img
-                src={
+            {account == 'chef' && (
+              <Link
+                data-cliped={cliped}
+                className={
                   nav === 'AjouterRapport'
-                    ? AjouterRapportBlueSVG
-                    : dark
-                      ? AjouterRapportWhiteSVG
-                      : AjouterRapportSVG
+                    ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                    : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
                 }
-              ></img>
-              {!cliped && <p>Ajouter Rapport</p>}
-            </Link>
-            <Link
-              data-cliped={cliped}
-              className={
-                nav === 'AjouterPV'
-                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
-              }
-              to="/AjouterPV"
-              onClick={() => {
-                setNav('AjouterPV')
-              }}
-            >
-              <img
-                src={
-                  nav === 'AjouterPV' ? AjouterPVBlueSVG : dark ? AjouterPVWhiteSVG : AjouterPVSVG
+                to="/AjouterRapport"
+                onClick={() => {
+                  setNav('AjouterRapport')
+                }}
+              >
+                <img
+                  src={
+                    nav === 'AjouterRapport'
+                      ? AjouterRapportBlueSVG
+                      : dark
+                        ? AjouterRapportWhiteSVG
+                        : AjouterRapportSVG
+                  }
+                ></img>
+                {!cliped && <p>Ajouter Rapport</p>}
+              </Link>
+            )}
+            {account == 'president' && (
+              <Link
+                data-cliped={cliped}
+                className={
+                  nav === 'AjouterPV'
+                    ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                    : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
                 }
-              ></img>
-              {!cliped && <p>Ajouter PV</p>}
-            </Link>
+                to="/AjouterPV"
+                onClick={() => {
+                  setNav('AjouterPV')
+                }}
+              >
+                <img
+                  src={
+                    nav === 'AjouterPV' ? AjouterPVBlueSVG : dark ? AjouterPVWhiteSVG : AjouterPVSVG
+                  }
+                ></img>
+                {!cliped && <p>Ajouter PV</p>}
+              </Link>
+            )}
             <Link
               data-cliped={cliped}
               className={

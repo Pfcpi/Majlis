@@ -23,9 +23,6 @@ function App() {
   const [Msg, setMsg] = useState('')
 
   //const api = 'http://localhost:3000'
-  useEffect(() => {
-   console.log("api in auth", api) 
-  })
 
   useEffect(() => {
     if (!auth) {
@@ -80,7 +77,10 @@ function App() {
           .then((res) => {
             if (res.data == 'Password changed') {
               setChangePassword(false)
-              setTimeout(() => setMsg(`Le mot de passe a été changé pour le chef de département`), 500)
+              setTimeout(
+                () => setMsg(`Le mot de passe a été changé pour le chef de département`),
+                500
+              )
               setTimeout(() => setMsg(''), 3000)
             }
           })
@@ -121,69 +121,68 @@ function App() {
             <div className="absolute w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20"></div>
           )}
           <img className="w-1/2 p-0 h-[100vh] object-cover" src={authJPG}></img>
-          <div className="flex flex-col relative w-1/2 items-center justify-center gap-3 text-light-gray">
+          <div className="flex flex-col relative w-1/2 items-center justify-center gap-6 text-light-gray">
             <div className="absolute flex top-4 w-full justify-between items-center px-6">
               <img className="w-20 aspect-square" src={USTOLogo}></img>
               <img className="w-20 aspect-square rounded-[10px]" src={applogo}></img>
             </div>
-            <h1 className="text-dark-gray text-[3vw] font-bold">
-              {ChangePassword ? 'Changer mot de pass' : 'Se Connecter'}
-            </h1>
-            <p>Veulliez choisir une session</p>
-            <button
-              className={["relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"]}
-              onClick={(e) => {
-                handleClick(e, '#2EA7F4')
-                setChef()
-              }}
-              style={{
-                borderColor: account === 'chef' ? '#2EA7F4' : '',
-                color: account === 'chef' ? '#2EA7F4' : ''
-              }}
-            >
-              Chef de département
-            </button>
-            <button
-              className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
-              onClick={(e) => {
-                handleClick(e, '#2EA7F4')
-                setPresident()
-              }}
-              style={{
-                borderColor: account === 'president' ? '#2EA7F4' : '',
-                color: account === 'president' ? '#2EA7F4' : ''
-              }}
-            >
-              Président du conseil
-            </button>
-            <input
-              className="w-3/5 py-3 px-5 border rounded-[10px] outline-none focus:border-blue hover:bg-blue/15"
-              placeholder={ChangePassword ? 'nouveau mot de passe' : 'mot de passe'}
-              onChange={(e) => {
-                setPassword(e.target.value)
-              }}
-              value={password}
-              type="password"
-            ></input>
-            <hr className="bg-light-gray w-3/5"></hr>
-            <button
-              className="relative w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white hover:opacity-80 overflow-hidden"
-              onClick={(e) => {
-                handleClick(e, '#fff')
-                handleContinue()
-              }}
-            >
-              Continuer
-            </button>
-            <button
-              className={ChangePassword ? 'text-red' : 'text-blue'}
-              onClick={() => {
-                setChangePassword((prev) => !prev)
-              }}
-            >
-              {ChangePassword ? 'Annuler' : 'Changer le mot de passe'}
-            </button>
-            <p className="h-9 text-red">{Msg}</p>
+            <div className='flex flex-col w-full items-center justify-center gap-6'>
+              <div className="flex flex-col">
+                <h1 className="text-dark-gray text-[3vw] font-bold text-center">
+                  {ChangePassword ? 'Changer mot de pass' : 'Se Connecter'}
+                </h1>
+                <p>Veulliez choisir une session</p>
+              </div>
+              <div className="flex flex-col w-full justify-center items-center gap-3">
+                <button
+                  className={account == 'chef' ? 'auth_btns text-blue border-blue' : 'auth_btns'}
+                  onClick={(e) => {
+                    handleClick(e, '#2EA7F4')
+                    setChef()
+                  }}
+                >
+                  Chef de département
+                </button>
+                <button
+                  className={
+                    account == 'president' ? 'auth_btns text-blue border-blue' : 'auth_btns'
+                  }
+                  onClick={(e) => {
+                    handleClick(e, '#2EA7F4')
+                    setPresident()
+                  }}
+                >
+                  Président du conseil
+                </button>
+                <input
+                  className="w-3/5 py-3 px-5 border rounded-[10px] outline-none focus:border-blue border-auth-border-gray hover:bg-blue/15"
+                  placeholder={ChangePassword ? 'nouveau mot de passe' : 'mot de passe'}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                  }}
+                  value={password}
+                  type="password"
+                ></input>
+                <button
+                  className="relative w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white hover:opacity-80 overflow-hidden"
+                  onClick={(e) => {
+                    handleClick(e, '#fff')
+                    handleContinue()
+                  }}
+                >
+                  Continuer
+                </button>
+              </div>
+              <button
+                className={ChangePassword ? 'text-red' : 'text-blue'}
+                onClick={() => {
+                  setChangePassword((prev) => !prev)
+                }}
+              >
+                {ChangePassword ? 'Annuler' : 'Changer le mot de passe'}
+              </button>
+              <p className="h-9 text-red">{Msg}</p>
+            </div>
           </div>
         </div>
       )}
