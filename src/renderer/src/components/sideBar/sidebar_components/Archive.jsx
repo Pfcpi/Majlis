@@ -191,10 +191,10 @@ function Archive() {
           </div>
           {currentWindow == win[0] && (
             <div className="flex px-4 justify-end h-16 items-center bg-side-bar-white-theme-color dark:bg-dark-gray">
-              <div className="flex has-[:focus]:border-blue border dark:border-gray bg-white dark:bg-gray rounded-[10px]">
+              <div className="searchDiv">
                 <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
-                  className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
+                  className="searchInput"
                   aria-label="search input"
                   type="search"
                   placeholder="Rapport"
@@ -227,10 +227,10 @@ function Archive() {
                   </div>
                 </button>
               </div>
-              <div className="flex has-[:focus]:border-blue border bg-white dark:border-gray dark:bg-gray rounded-[10px]">
+              <div className="searchDiv">
                 <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
-                  className="p-2 placeholder:text-blue  dark:bg-gray outline-none rounded-[10px]"
+                  className="searchInput"
                   aria-label="search input"
                   type="search"
                   placeholder="Dossier"

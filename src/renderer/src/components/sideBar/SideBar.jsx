@@ -79,7 +79,7 @@ function SideBar() {
                 alt="Outil pour le conseil Discipline"
               />
               {!cliped && (
-                <p className="font-cutive w-36 dark:text-white text-center">Conseil Discipline</p>
+                <p className="font-cutive w-36 text-xl dark:text-white text-center">Conseil Discipline</p>
               )}
             </div>
             <Link

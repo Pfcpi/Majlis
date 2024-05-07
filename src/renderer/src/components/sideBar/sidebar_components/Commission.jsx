@@ -6,8 +6,7 @@ import useAccount from '../../../zustand/account'
 import useDark from '../../../zustand/dark'
 import useApi from '../../../zustand/api'
 
-import UpDownSVG from './../../../assets/UpDown.svg'
-import UpDownGraySVG from './../../../assets/BlueSvgs/UpDownGray.svg'
+import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import WarningSVG from './../../../assets/warning.svg'
@@ -409,22 +408,6 @@ function Archive() {
       ))
     : ''
 
-  const RechercherSvg = (
-    <svg
-      className={'[&>path]:fill-dark-gray dark:[&>path]:fill-white duration-100 ml-2'}
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M10.9007 15.7086C11.9649 15.7086 12.9464 15.3677 13.7493 14.7996L16.77 17.7917C16.9102 17.9306 17.0951 18 17.2926 18C17.7069 18 18 17.6844 18 17.2804C18 17.091 17.9363 16.9079 17.7961 16.7754L14.7945 13.7959C15.4254 12.9753 15.8014 11.959 15.8014 10.8543C15.8014 8.18411 13.5964 6 10.9007 6C8.21136 6 6 8.1778 6 10.8543C6 13.5245 8.20499 15.7086 10.9007 15.7086ZM10.9007 14.6607C8.79766 14.6607 7.05789 12.9374 7.05789 10.8543C7.05789 8.77117 8.79766 7.04787 10.9007 7.04787C13.0037 7.04787 14.7435 8.77117 14.7435 10.8543C14.7435 12.9374 13.0037 14.6607 10.9007 14.6607Z"
-        fill-opacity="0.6"
-      />
-    </svg>
-  )
-
   return (
     <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
       {(renouvelerComMessage ||
@@ -672,10 +655,10 @@ function Archive() {
               <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
             </button>
           )}
-          <div className="flex items-center bg-white dark:bg-light-gray rounded-lg">
-            {RechercherSvg}
+          <div className="searchDiv">
+            <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
             <input
-              className="flex justify-start items-center w-[240px] h-10 px-2 py-1 rounded-lg bg-transparent outline-none text-[#B6BCD1] dark:text-white"
+              className="searchInput"
               type="search"
               onChange={(e) => setQuery(e.target.value)}
               value={query}
@@ -684,27 +667,19 @@ function Archive() {
           </div>
         </div>
         <div className="w-full max-h-[80vh] overflow-y-auto">
-          <table className='w-full'>
+          <table className="w-full">
             <tr className="border-t">
               <th className="w-1/4 border-x">
-                <div>
-                  Titre
-                </div>
+                <div>Titre</div>
               </th>
               <th className="w-1/4 border-x">
-                <div>
-                  Nom
-                </div>
+                <div>Nom</div>
               </th>
               <th className="w-1/4 border-x">
-                <div>
-                  Email
-                </div>
+                <div>Email</div>
               </th>
               <th className="w-1/4 border-x">
-                <div>
-                  Date de début
-                </div>
+                <div>Date de début</div>
               </th>
             </tr>
             {membresTable}
