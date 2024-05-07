@@ -14,6 +14,7 @@ export default {
         'notification-blue': '#0080F5',
         'notification-border-blue': '#2EA7F4',
         'auth-border-gray': 'rgba(101, 101, 101, 0.72)',
+        'active-com-acceil': '#23303C',
         pink: '#FF8C8C',
         brown: '#443434',
         red: '#FF8C8C',

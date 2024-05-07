@@ -401,7 +401,7 @@ function Archive() {
           <td className="border-x">
             <label htmlFor="choice"> {m.role_m}</label>
           </td>
-          <td className="border-x">{[m.nom_m, ' ', m.prenom_m]}</td>
+          <td className="border-x font-semibold">{[m.nom_m, ' ', m.prenom_m]}</td>
           <td className="border-x">{m.email_m}</td>
           <td className="border-x">{m.date_debut_m.substring(0, 10)}</td>
         </tr>
@@ -414,7 +414,7 @@ function Archive() {
         addMemberMessage ||
         modifyMemberMessage ||
         deleteMembersMessage) && (
-        <div className="absolute flex items-center justify-center w-[100vw] h-[100vh] bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
+        <div className="fullBgBlock">
           <div className="flex min-w-fit flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
             <p className="px-4">
               {renouvelerComMessage ? 'Confirmez-vous le renouvellement de la commission' : ''}
@@ -594,23 +594,23 @@ function Archive() {
       <div className="flex flex-col w-full">
         <div className="flex px-[3vw] justify-between h-16 items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
           {account == 'chef' && (
-            <div className="flex w-1/2 justify-evenly items-center">
+            <>
               <button
                 className={
-                  'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
+                  'flex border mix-w-[130px] truncate max-h-12 py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/10 duration-100'
                 }
                 onClick={() => {
                   setRenouvelerComMessage(true)
                 }}
               >
-                Renouveler commission
+                Renouveler la commission
               </button>
               <div className="flex gap-0">
                 <button
                   className={
                     membres.length < 10
-                      ? 'flex border py-2 px-4 rounded-l-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
-                      : 'flex border py-2 px-4 rounded-l-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
+                      ? 'button_active_blue rounded-r-none'
+                      : 'button_inactive rounded-r-none'
                   }
                   onClick={() => {
                     if (membres.length < 10) {
@@ -623,8 +623,8 @@ function Archive() {
                 <button
                   className={
                     currentModifiedMembres.length == 1
-                      ? 'flex border py-2 px-4 gap-2 text-blue bg-blue/15 duration-100'
-                      : 'flex border py-2 px-4 gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
+                      ? 'button_active_blue rounded-none'
+                      : 'button_inactive rounded-none'
                   }
                   onClick={() => handleModify()}
                 >
@@ -633,15 +633,15 @@ function Archive() {
                 <button
                   className={
                     currentModifiedMembres.length != 0
-                      ? 'flex border py-2 px-4 rounded-r-xl gap-2 bg-red/25 dark:bg-brown text-red duration-100'
-                      : 'flex border py-2 px-4 rounded-r-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
+                      ? 'button_active_red rounded-l-none'
+                      : 'button_inactive rounded-l-none'
                   }
                   onClick={() => setDeleteMembersMessage(true)}
                 >
                   {supprimerImage}
                 </button>
               </div>
-            </div>
+            </>
           )}
           {account == 'president' && (
             <button

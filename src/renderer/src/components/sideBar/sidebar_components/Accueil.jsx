@@ -295,8 +295,8 @@ function Archive() {
   const ListCom = Array.isArray(commission) ? (
     commission.map((mem) => (
       <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-        <p className="text-xl">{[mem.nom_m, ' ', mem.prenom_m]}</p>
-        <p className="text-blue">{mem.role_m}</p>
+        <p className="text-xl text-active-com-acceil font-semibold">{[mem.nom_m, ' ', mem.prenom_m]}</p>
+        <p className="text-blue font-semibold">{mem.role_m}</p>
       </div>
     ))
   ) : (
@@ -449,7 +449,7 @@ function Archive() {
   return (
     <div className="flex w-full h-full">
       {supprimer && (
-        <div className="absolute flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
+        <div className="fullBgBlock">
           <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
             Confirmer la suppression du rapport
             <div className="flex w-full justify-between px-8">
@@ -622,7 +622,7 @@ function Archive() {
             </div>
           </div>
           {step === 4 && (
-            <div className="absolute w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20"></div>
+            <div className="fullBgBlock"></div>
           )}
           {step === 4 && (
             <div className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">

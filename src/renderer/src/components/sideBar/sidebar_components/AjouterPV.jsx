@@ -104,7 +104,6 @@ function AjouterPV() {
     </svg>
   )
 
-
   const handleAnuuler = (e) => {
     e.preventDefault()
     setCd({ id: '', dateCd: '' })
@@ -171,7 +170,7 @@ function AjouterPV() {
   return (
     <div className="flex w-full h-full">
       {creerConseilState && (
-        <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
+        <div className="fullBgBlock">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
             <h1 className="text-[36px] py-4">Creation d'un CONSEIL DISCIPLINE</h1>
             <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
@@ -262,7 +261,7 @@ function AjouterPV() {
         </div>
       )}
       {cd.id && currentSelectedRapports != 0 && (
-        <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
+        <div className="fullBgBlock">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
             <h1 className="text-[36px] py-4">
               Détails du PV de {currentSelectedRapports[0].nom_e}
@@ -390,7 +389,7 @@ function AjouterPV() {
       {(!cd.id || currentSelectedRapports.length == 0) && (
         <div className="flex flex-col w-full h-full">
           {supprimer && (
-            <div className="absolute flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.6)] top-0 left-0 z-20">
+            <div className="fullBgBlock">
               <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
                 Confirmer la suppression du PV
                 <div className="flex w-full justify-between px-8">
@@ -451,7 +450,7 @@ function AjouterPV() {
               </button>
             </div>
             <div className="searchDiv">
-                <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
+              <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
               <input
                 className="searchInput"
                 value={query}
@@ -464,19 +463,13 @@ function AjouterPV() {
           <table className="w-full">
             <tr className="border-t">
               <th className="w-1/3 border-x">
-                <div>
-                  Rapport
-                </div>
+                <div>Rapport</div>
               </th>
               <th className="w-1/3 border-x">
-                <div>
-                  Nom Etudiant
-                </div>
+                <div>Nom Etudiant</div>
               </th>
               <th className="w-1/3 border-x">
-                <div>
-                  Date de l'infraction
-                </div>
+                <div>Date de l'infraction</div>
               </th>
             </tr>
             {tableRapport}

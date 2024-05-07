@@ -18,6 +18,14 @@
 - pv generale.
 - use manual animated.
 - remove duplicate for commission
+- check for overflow
+  - accueil
+  - pv
+  - archive
+  - commission
+
+- full blocking bg:
+  - archive
 
 ## pv.js
 
