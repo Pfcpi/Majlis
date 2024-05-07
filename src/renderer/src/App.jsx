@@ -59,9 +59,9 @@ function App() {
 
   function handleContinue() {
     if (account == '') {
-      setMsg('Aucun comple est selectionné')
+      setMsg("Aucun compte n'a été sélectionné")
     } else if (password == '') {
-      setMsg('Mot de pass est vide')
+      setMsg('Le mot de passe est vide')
     } else if (account == 'chef') {
       if (!ChangePassword) {
         axios
@@ -80,7 +80,7 @@ function App() {
           .then((res) => {
             if (res.data == 'Password changed') {
               setChangePassword(false)
-              setTimeout(() => setMsg(`Mot de pass a ete changer pour ${account}`), 500)
+              setTimeout(() => setMsg(`Le mot de passe a été changé pour le chef de département`), 500)
               setTimeout(() => setMsg(''), 3000)
             }
           })
@@ -104,7 +104,7 @@ function App() {
           .then((res) => {
             if (res.data == 'Password changed') {
               setChangePassword(false)
-              setTimeout(() => setMsg(`Mot de pass a ete changer pour ${account}`), 500)
+              setTimeout(() => setMsg(`Le mot de passe a été changé pour le président`), 500)
               setTimeout(() => setMsg(''), 3000)
             }
           })
@@ -131,27 +131,27 @@ function App() {
             </h1>
             <p>Veulliez choisir une session</p>
             <button
-              className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
+              className={["relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"]}
               onClick={(e) => {
-                handleClick(e, '#2B81B8')
+                handleClick(e, '#2EA7F4')
                 setChef()
               }}
               style={{
-                borderColor: account === 'chef' ? '#2B81B8' : '',
-                color: account === 'chef' ? '#2B81B8' : ''
+                borderColor: account === 'chef' ? '#2EA7F4' : '',
+                color: account === 'chef' ? '#2EA7F4' : ''
               }}
             >
-              Chef département
+              Chef de département
             </button>
             <button
               className="relative w-3/5 py-3 border rounded-[10px] hover:bg-blue/15 overflow-hidden"
               onClick={(e) => {
-                handleClick(e, '#2B81B8')
+                handleClick(e, '#2EA7F4')
                 setPresident()
               }}
               style={{
-                borderColor: account === 'president' ? '#2B81B8' : '',
-                color: account === 'president' ? '#2B81B8' : ''
+                borderColor: account === 'president' ? '#2EA7F4' : '',
+                color: account === 'president' ? '#2EA7F4' : ''
               }}
             >
               Président du conseil
@@ -181,7 +181,7 @@ function App() {
                 setChangePassword((prev) => !prev)
               }}
             >
-              {ChangePassword ? 'Annuler ' : 'Changer le mot de pass'}
+              {ChangePassword ? 'Annuler' : 'Changer le mot de passe'}
             </button>
             <p className="h-9 text-red">{Msg}</p>
           </div>

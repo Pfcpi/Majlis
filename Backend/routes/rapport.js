@@ -225,7 +225,8 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    to: result[0].email_m,
+                                    //to: result[0].email_m,
+                                    to: "dounia.yedjour@univ-usto.dz",
                                     subject: 'Nouveau rapport déposé.',
                                     html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
                                   }
@@ -281,7 +282,8 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    to: result[0].email_m,
+                                    //to: result[0].email_m,
+                                    to: "dounia.yedjour@univ-usto.dz",
                                     subject: 'Nouveau rapport déposé.',
                                     html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
                                   }

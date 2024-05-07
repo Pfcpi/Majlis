@@ -19,7 +19,7 @@
     @apply hover:bg-0.08-blue hover:dark:bg-gray;
   }
   .link_button_clicked {
-    @apply border-blue text-blue bg-0.08-blue;
+    @apply text-notification-blue border-notification-blue/40 bg-blue/15;
   }
   .link_btn_cliped {
     @apply justify-center;

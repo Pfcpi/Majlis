@@ -572,9 +572,9 @@ function Archive() {
           )}
           <div className={classNames(['flex flex-col mt-[8vh]', view ? 'w-1/2' : 'w-3/4'])}>
             {Array.isArray(etudiants) && etudiants.length != 0 && (
-              <div className="flex items-center w-fit px-4 gap-4 py-2 text-blue bg-blue/15 border border-blue rounded-lg">
+              <div className="flex items-center w-fit px-4 gap-4 py-2 text-notification-blue bg-notification-blue/10 border border-notification-border-blue rounded-lg">
                 <img className="w-7 aspect-square" src={NotificationsSVG}></img>
-                <p>{etudiants.length} Nouveax rapports ajoutés...</p>
+                <p>{[etudiants.length, etudiants.length == 1 ? " Nouveau rapport ajouté..." : " Nouveax rapports ajoutés..."]}</p>
               </div>
             )}
             <h1 className="text-3xl py-4">Rapport a traiter</h1>
