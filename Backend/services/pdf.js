@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 const puppeteer = require('puppeteer')
 const fs = require('fs')
+const path = require('path')
 
 async function generatePDFpv(data) {
   let html = null
@@ -828,11 +829,17 @@ async function generatePDFrapport(data) {
 </html>
     `
   }
-  const startTime = performance.now()
+
+    // Create a temporary HTML file
+  const tempHtmlPath = path.join(__dirname, 'temp.html');
+  fs.writeFileSync(tempHtmlPath, html, 'utf-8');
+
 
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
-  await page.setContent(html)
+  const startTime = performance.now()
+  //await page.setContent(html)
+  await page.goto('file://' + tempHtmlPath);
 
   const endTime = performance.now()
   console.log('execution generating pdf took: ', endTime - startTime, ' ms')

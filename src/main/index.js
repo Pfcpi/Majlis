@@ -5,6 +5,7 @@ import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
+import { data } from 'autoprefixer'
 const portfinder = require('portfinder')
 
 const pie = require('puppeteer-in-electron')
@@ -100,7 +101,17 @@ async function handlePort() {
 async function getUrl() {
   const browser = await pie.connect(app, puppeteer)
 
-  const window = new BrowserWindow()
+  const window = new BrowserWindow({
+    width: 900,
+    height: 670,
+    show: false,
+    autoHideMenuBar: true,
+    ...(process.platform === 'linux' ? { icon } : {}),
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false
+    }
+  })
 
   window.on('ready-to-show', () => {
     window.maximize()
