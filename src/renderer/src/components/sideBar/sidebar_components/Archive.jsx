@@ -28,6 +28,7 @@ function Archive() {
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
   const [view, setView] = useState(false)
   const [query, setQuery] = useState('')
+  const [queryPV, setQueryPV] = useState('')
 
   const { dark } = useDark()
   const { api } = useApi()
@@ -138,8 +139,20 @@ function Archive() {
     <></>
   )
 
-  const tabPVs = Array.isArray(PVs) ? (
-    PVs.map((m) => (
+  const filteredPVs = useMemo(() => {
+    return Array.isArray(PVs)
+      ? PVs.filter((etudiant) => {
+          return etudiant.nom_e
+            .toLowerCase()
+            .concat(' ')
+            .concat(etudiant.prenom_e.toLowerCase())
+            .includes(queryPV.toLowerCase())
+        })
+      : ''
+  }, [PVs, queryPV])
+
+  const tabPVs = Array.isArray(filteredPVs) ? (
+    filteredPVs.map((m) => (
       <tr
         className={
           selectedPVs.findIndex((el) => el == m) == -1
@@ -246,6 +259,8 @@ function Archive() {
                 <input
                   className="searchInput"
                   aria-label="search input"
+                  value={queryPV}
+                  onChange={(e) => setQueryPV(e.target.value)}
                   type="search"
                   placeholder="Dossier"
                 ></input>

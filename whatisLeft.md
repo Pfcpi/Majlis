@@ -33,7 +33,6 @@
 - rapport:
 
   - modify
-  - search
 
 - pv:
 
