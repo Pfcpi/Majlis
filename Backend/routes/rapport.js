@@ -209,7 +209,9 @@ router.post('/add', (req, res) => {
                             return res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
-                            db.query('SELECT email_m FROM Membre WHERE role_m = "President"', (err, result) => {
+                            db.query(
+                              'SELECT email_m FROM Membre WHERE role_m = "President"',
+                              (err, result) => {
                                 if (err) {
                                   console.log(err)
                                 } else {
@@ -225,7 +227,8 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    to: result[0].email_m,
+                                    //to: result[0].email_m,
+                                    to: 'amirmadjour133@gmail.com',
                                     //to: "dounia.yedjour@univ-usto.dz",
                                     subject: 'Nouveau rapport déposé.',
                                     html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
@@ -266,7 +269,9 @@ router.post('/add', (req, res) => {
                             return res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
-                            db.query('SELECT email_m FROM Membre WHERE role_m = "President"', (err, result) => {
+                            db.query(
+                              'SELECT email_m FROM Membre WHERE role_m = "President"',
+                              (err, result) => {
                                 if (err) {
                                   console.log(err)
                                 } else {
@@ -282,7 +287,8 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    to: result[0].email_m,
+                                    //to: result[0].email_m,
+                                    to: 'amirmadjour133@gmail.com',
                                     //to: "dounia.yedjour@univ-usto.dz",
                                     subject: 'Nouveau rapport déposé.',
                                     html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'

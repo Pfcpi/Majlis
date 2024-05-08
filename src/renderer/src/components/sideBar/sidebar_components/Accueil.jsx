@@ -485,9 +485,9 @@ function Archive() {
       {!modify && (
         <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
           {!view && (
-            <div className="flex flex-col w-1/5 mt-[4vh]">
+            <div className="flex flex-col w-1/5 min-w-[130px] mt-[4vh]">
               <h2 className="text-[1.5vw] text-center py-4">Commission Active</h2>
-              <div className="w-full h-[80vh] bg-side-bar-white-theme-color dark:bg-dark-gray snap-y snap-mandatory overflow-y-scroll scroll-pt-1 flex flex-col gap-1 rounded-lg">
+              <div className="w-full h-[80vh] bg-side-bar-white-theme-color dark:bg-dark-gray snap-y snap-mandatory overflow-x-auto overflow-y-scroll scroll-pt-1 flex flex-col gap-1 rounded-lg">
                 {ListCom}
               </div>
             </div>

@@ -7,7 +7,7 @@ import axios from 'axios'
 import useApi from '../../../zustand/api'
 
 function AjouterRapport() {
-  const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const niveaux = ['ING 1', 'ING 2', 'ING 3', 'ING 4', 'ING 5', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',

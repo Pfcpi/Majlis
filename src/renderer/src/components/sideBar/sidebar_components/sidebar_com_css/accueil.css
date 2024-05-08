@@ -17,7 +17,7 @@
     @apply w-full h-24 flex flex-col bg-blue/35;
   }
   .searchDiv {
-    @apply flex items-center bg-[#C2E6FF] w-1/4 dark:bg-blue/20 rounded-lg; 
+    @apply flex items-center min-w-[150px] bg-[#C2E6FF] w-1/4 dark:bg-blue/20 rounded-lg; 
   }
   .searchInput {
     @apply flex justify-start items-center min-w-[110px] w-full px-2 h-10 py-1 font-medium rounded-lg bg-transparent outline-none text-light-gray placeholder:text-blue dark:text-white;

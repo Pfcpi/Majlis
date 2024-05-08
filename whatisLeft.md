@@ -27,10 +27,6 @@
 - full blocking bg:
   - archive
 
-## pv.js
-
-- addCd does not work.
-
 ## UX
 
 - a blue moving line for indicating fetching data below the nav bar.
@@ -38,7 +34,6 @@
 ## AjouterPv page
 
 - assign to each of the selected reports the sanction and temoins(more user experience(let the user know when the pvs are changing)).
-- button voir pdf.
 
 ## Archive page
 

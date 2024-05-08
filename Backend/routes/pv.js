@@ -201,44 +201,44 @@ router.post('/addCD', (req, res) => {
       res.send(err)
       return
     }
-  })
-
-  // Add multiple members to comission
-  let sqlqueryC = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES (LAST_INSERT_ID(), ?)`
-  var i = 0
-  do {
-    if (idM[i] != null)
-      db.query(sqlqueryC, idM[i], (err, result) => {
-        if (err) {
-          res.send(err)
-          return
+    // Add multiple members to comission
+    let id = result.insertId
+    let sqlqueryC = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES (?, ?)`
+    var i = 0
+    do {
+      if (idM[i] != null)
+        db.query(sqlqueryC, [id, idM[i]], (err, result) => {
+          if (err) {
+            res.send(err)
+            return
+          }
+        })
+      i++
+    } while (i < 5)
+    db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
+      if (err) {
+        res.send(err)
+        return
+      } else {
+        console.log('after executing a query after looping in else')
+        const mail = result[0].email_u
+        const mailOptions = {
+          from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
+          to: mail,
+          subject: 'Nouveau PV déposé.',
+          html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
         }
-      })
-    i++
-  } while (i < 5)
-  console.log('after looping...')
-  /*db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
-    if (err) {
-      res.send(err)
-      return
-    } else {
-      console.log('after executing a query after looping in else')
-      const mail = result[0].email_u
-      const mailOptions = {
-        from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
-        to: mail,
-        subject: 'Nouveau PV déposé.',
-        html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
+        transporter.sendMail(mailOptions, function (err, info) {
+          if (err) {
+            console.log(err)
+          } else {
+            console.log('Email sent!')
+          }
+        })
       }
-      transporter.sendMail(mailOptions, function (err, info) {
-        if (err) {
-          console.log(err)
-        } else {
-          console.log('Email sent!')
-        }
-      })
-    }
-  })*/
+    })
+    res.send({ id: id })
+  })
 })
 
 // Add pv with given num_cd
@@ -287,18 +287,18 @@ router.post('/addPV', (req, res) => {
         if (err && err.errno != 1062) {
           res.status(400).send(err)
         }
-      })
-      db.query(
-        'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?',
-        [temoin[i].nomT, temoin[i].prenomT],
-        (err, result) => {
-          if (err) {
-            res.status(400).send(err)
+        db.query(
+          'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?',
+          [temoin[i].nomT, temoin[i].prenomT],
+          (err, result) => {
+            if (err) {
+              res.status(400).send(err)
+            }
+            num[i] = result[0].num_t
+            console.log(num[i])
           }
-          num[i] = result[0].num_t
-          console.log(num[i])
-        }
-      )
+        )
+      })
     }
     i++
   } while (i < 3)

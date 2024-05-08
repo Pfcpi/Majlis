@@ -348,7 +348,6 @@ function Archive() {
           <div className="flex flex-col w-1/2 justify-center items-center [&>button]:w-1/3 [&>button]:min-w-fit gap-4">
             <button
               onClick={() => {
-                console.log('clicked')
                 handlePreview(currentViewedRapport.num_r)
               }}
               className="modify_rapport_button"

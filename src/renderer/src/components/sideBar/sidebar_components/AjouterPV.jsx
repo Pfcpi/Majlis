@@ -104,6 +104,20 @@ function AjouterPV() {
     </svg>
   )
 
+  function handlePreview(numR) {
+    return new Promise(async () => {
+      console.log('forwarding print preview request...')
+      console.log('numR', numR)
+      const pdfToPreview = await axios
+        .post(api + '/archive/printrapport', { numR: numR })
+        .then((res) => {
+          const result = window.electronAPI.getUrl()
+          console.log(res)
+        })
+        .catch((err) => console.log(err))
+    })
+  }
+
   const handleAnuuler = (e) => {
     e.preventDefault()
     setCd({ id: '', dateCd: '' })
@@ -243,10 +257,10 @@ function AjouterPV() {
                     })
                     .then((res) => {
                       console.log(res)
-                      setCd((prev) => ({ ...prev, id: res.data[0].num_cd }))
+                      setCd((prev) => ({ ...prev, id: res.data.id }))
                       setPv((prev) => ({
                         ...prev,
-                        numCD: res.data[0].num_cd,
+                        numCD: res.data.id,
                         numR: currentSelectedRapports[0].num_r
                       }))
                     })
@@ -431,6 +445,9 @@ function AjouterPV() {
                     ? 'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
                     : 'flex border py-2 px-4 rounded-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
                 }
+                onClick={() => {
+                  handlePreview(currentSelectedRapports[0].num_r)
+                }}
               >
                 {enregistrerImage}
                 Voir PDF
