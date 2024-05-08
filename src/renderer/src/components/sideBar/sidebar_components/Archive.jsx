@@ -26,6 +26,7 @@ function Archive() {
   const [PVs, setPVs] = useState([])
   const [selectedPVs, setSelectedPVs] = useState([])
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
+  const [currentViewedPV, setCurrentViewedPV] = useState({})
   const [view, setView] = useState(false)
   const [query, setQuery] = useState('')
   const [queryPV, setQueryPV] = useState('')
@@ -71,6 +72,60 @@ function Archive() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path d="M1.25 20.75C1.25 21.413 1.51339 22.0489 1.98223 22.5178C2.45107 22.9866 3.08696 23.25 3.75 23.25H13.75C14.413 23.25 15.0489 22.9866 15.5178 22.5178C15.9866 22.0489 16.25 21.413 16.25 20.75V5.75H1.25V20.75ZM3.75 8.25H13.75V20.75H3.75V8.25ZM13.125 2L11.875 0.75H5.625L4.375 2H0V4.5H17.5V2H13.125Z" />
+    </svg>
+  )
+
+  const modifierImage = (
+    <svg
+      width="24"
+      height="25"
+      viewBox="0 0 24 25"
+      className={
+        selectedPVs.length == 1
+          ? '[&>path]:fill-blue duration-100'
+          : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
+      }
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10 20.5044H6V4.50439H13V9.50439H18V12.6044L20 10.6044V8.50439L14 2.50439H6C4.9 2.50439 4 3.40439 4 4.50439V20.5044C4 21.6044 4.9 22.5044 6 22.5044H10V20.5044ZM20.2 13.5044C20.3 13.5044 20.5 13.6044 20.6 13.7044L21.9 15.0044C22.1 15.2044 22.1 15.6044 21.9 15.8044L20.9 16.8044L18.8 14.7044L19.8 13.7044C19.9 13.6044 20 13.5044 20.2 13.5044ZM20.2 17.4044L14.1 23.5044H12V21.4044L18.1 15.3044L20.2 17.4044Z"
+        fill-opacity="0.78"
+      />
+    </svg>
+  )
+
+  const voirDossierImage = (
+    <svg
+      width="24"
+      height="25"
+      viewBox="0 0 24 25"
+      className={
+        selectedPVs.length == 1
+          ? '[&>path]:fill-blue duration-100'
+          : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
+      }
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M17 18.5044C17.56 18.5044 18 18.9444 18 19.5044C18 20.0644 17.56 20.5044 17 20.5044C16.44 20.5044 16 20.0644 16 19.5044C16 18.9444 16.44 18.5044 17 18.5044ZM17 15.5044C14.27 15.5044 11.94 17.1644 11 19.5044C11.94 21.8444 14.27 23.5044 17 23.5044C19.73 23.5044 22.06 21.8444 23 19.5044C22.06 17.1644 19.73 15.5044 17 15.5044ZM17 22.0044C16.337 22.0044 15.7011 21.741 15.2322 21.2722C14.7634 20.8033 14.5 20.1674 14.5 19.5044C14.5 18.8414 14.7634 18.2055 15.2322 17.7366C15.7011 17.2678 16.337 17.0044 17 17.0044C17.663 17.0044 18.2989 17.2678 18.7678 17.7366C19.2366 18.2055 19.5 18.8414 19.5 19.5044C19.5 20.1674 19.2366 20.8033 18.7678 21.2722C18.2989 21.741 17.663 22.0044 17 22.0044ZM9.27 20.5044H6V4.50439H13V9.50439H18V13.5744C18.7 13.6544 19.36 13.8244 20 14.0644V8.50439L14 2.50439H6C5.46957 2.50439 4.96086 2.71511 4.58579 3.09018C4.21071 3.46525 4 3.97396 4 4.50439V20.5044C4 21.0348 4.21071 21.5435 4.58579 21.9186C4.96086 22.2937 5.46957 22.5044 6 22.5044H10.5C9.99562 21.9006 9.58132 21.2269 9.27 20.5044Z" />
+    </svg>
+  )
+
+  const PdfImage = (
+    <svg
+      width="23"
+      height="24"
+      viewBox="0 0 23 24"
+      className={
+        selectedPVs.length == 1
+          ? '[&>path]:fill-blue duration-100'
+          : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
+      }
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M20 0.75H2.5C1.125 0.75 0 1.875 0 3.25V20.75C0 22.125 1.125 23.25 2.5 23.25H20C21.375 23.25 22.5 22.125 22.5 20.75V3.25C22.5 1.875 21.375 0.75 20 0.75ZM8.125 11.375C8.125 12.375 7.25 13.25 6.25 13.25H5V15.75H3.125V8.25H6.25C7.25 8.25 8.125 9.125 8.125 10.125V11.375ZM14.375 13.875C14.375 14.875 13.5 15.75 12.5 15.75H9.375V8.25H12.5C13.5 8.25 14.375 9.125 14.375 10.125V13.875ZM19.375 10.125H17.5V11.375H19.375V13.25H17.5V15.75H15.625V8.25H19.375V10.125ZM11.25 10.125H12.5V13.875H11.25V10.125ZM5 10.125H6.25V11.375H5V10.125Z" />
     </svg>
   )
 
@@ -127,9 +182,6 @@ function Archive() {
             </button>
             <button>
               <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
-            </button>
-            <button>
-              <img src={SupprimerSVG} alt=""></img>
             </button>
           </div>
         </td>
@@ -236,21 +288,31 @@ function Archive() {
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
-                    <img src={PdfSVG} alt="pdf icon"></img>PDF
+                    {PdfImage}PDF
                   </div>
                 </button>
-                <button className="text-pink">
+                <button>
                   <div
-                    className={selectedPVs.length != 0 ? 'button_active_red' : 'button_inactive'}
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
-                    {supprimerImage}Supprimer
+                    {modifierImage}Modifier
                   </div>
                 </button>
                 <button className="text-blue">
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    onClick={async () => {
+                      setView(true)
+                      const tache1 = await axios
+                        .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
+                        .then((res) => {
+                          console.log(res.data)
+                          setCurrentViewedPV({ ...res.data[0], num_pv: selectedPVs[0].num_pv })
+                        })
+                        .catch((err) => console.log(err))
+                    }}
                   >
-                    <img src={VoirDossierSVG} alt=""></img>Voir
+                    {voirDossierImage}Voir
                   </div>
                 </button>
               </div>
@@ -387,6 +449,47 @@ function Archive() {
             <button className="modify_rapport_button">
               <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
             </button>
+          </div>
+        </div>
+      )}
+      {view && currentWindow == win[1] && (
+        <div className="w-full h-full flex">
+          <div className="h-full w-1/2 bg-side-bar-white-theme-color dark:bg-dark-gray flex flex-col">
+            <button
+              className="w-10 aspect-square"
+              onClick={() => {
+                setView(false)
+              }}
+            >
+              <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
+            </button>
+            <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
+              <h2 className="text-4xl">Details du Dossier </h2>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
+                <div className="flex flex-col gap-3">
+                  <p>matricule: </p>
+                  <p>Nom: </p>
+                  <p>Niveau: </p>
+                  <p>Section: </p>
+                  <p>Groupe: </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-blue text-2xl">Informations du plaignant</h3>
+                <div className="flex flex-col gap-3">
+                  <p>Nom: </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-blue text-2xl">Informations globales</h3>
+                <div className="flex flex-col gap-3">
+                  <p>Lieu: </p>
+                  <p>Motif: </p>
+                  <p>Degre: </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -454,6 +454,7 @@ FROM
   */
 router.post('/getspv', (req, res) => {
   let numpv = req.body.numPV
+  console.log(numpv)
   let sqlquery = `SELECT
     r.num_r,
     e.matricule_e,
@@ -534,8 +535,10 @@ GROUP BY
 
   db.query(sqlquery, numpv, (err, result) => {
     if (err) {
+      console.log('err executing /archive/getspv:', err)
       res.status(400).send(err)
     } else {
+      console.log('result /archive/getspv: ', result)
       res.send(result)
     }
   })
@@ -727,8 +730,7 @@ WHERE r.num_r = ?`
         console.log('execution of generatePDFrapport func took: ', endTime - startTime, ' ms')
         res.send(pdfBuffer)
       } catch (err) {
-        console.error(err)
-        res.status(200).send('An error occurred while generating the PDF')
+        res.send(err)
       }
     }
   })

@@ -13,6 +13,7 @@
 - use manual animated.
 - remove duplicate for commission
 - check for overflow
+
   - accueil
   - pv
   - archive
@@ -36,10 +37,9 @@
 
 - pv:
 
-  - view.
+  - view(problem with the route /archive/getspv).
   - pdf.
   - modify
-  - search
 
 - commissions.
 
