@@ -11,8 +11,7 @@ function AjouterRapport() {
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
-    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité",
-    'autres...'
+    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant chercheur ou de sécurité"
   ]
   const motif2 = [
     'Les récidives des infractions du 1er degré',

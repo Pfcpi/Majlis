@@ -1,11 +1,10 @@
 'use strict'
 
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { dirname, join } from 'path'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
-import { data } from 'autoprefixer'
 const portfinder = require('portfinder')
 
 const pie = require('puppeteer-in-electron')
@@ -33,6 +32,10 @@ async function createWindow() {
   console.log('used_port: ', used_port)
   ipcMain.handle('get-Port', async (ev, args) => {
     return used_port
+  })
+
+  ipcMain.handle('get-Path', async (ev, args) => {
+    return app.getPath('userData')
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -116,7 +119,8 @@ async function getUrl() {
   window.on('ready-to-show', () => {
     window.maximize()
   })
-  const url = __dirname + '../../s.pdf'
+  const url = path.join(app.getPath('userData'), 'sortie.pdf')
+  console.log('url', url)
   await window.loadURL(url)
 
   const page = await pie.getPage(browser, window)

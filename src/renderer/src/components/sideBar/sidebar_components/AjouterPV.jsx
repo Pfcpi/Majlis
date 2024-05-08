@@ -108,8 +108,9 @@ function AjouterPV() {
     return new Promise(async () => {
       console.log('forwarding print preview request...')
       console.log('numR', numR)
+      let path = await window.electronAPI.getPath()
       const pdfToPreview = await axios
-        .post(api + '/archive/printrapport', { numR: numR })
+        .post(api + '/archive/printrapport', { numR: numR, path: path })
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)

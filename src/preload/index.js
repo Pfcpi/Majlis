@@ -29,5 +29,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     callback(response)
   },
   getUrl: async () => await ipcRenderer.invoke('get-url'),
-  getPort: async () => await ipcRenderer.invoke('get-Port')
+  getPort: async () => await ipcRenderer.invoke('get-Port'),
+  getPath: async () => await ipcRenderer.invoke('get-Path')
 })

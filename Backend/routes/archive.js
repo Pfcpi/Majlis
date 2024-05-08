@@ -722,7 +722,7 @@ WHERE r.num_r = ?`
       }
       try {
         const startTime = performance.now()
-        const pdfBuffer = await generatePDFrapport(data)
+        const pdfBuffer = await generatePDFrapport(data, req.body.path)
         const endTime = performance.now()
         console.log('execution of generatePDFrapport func took: ', endTime - startTime, ' ms')
         res.send('it worked')

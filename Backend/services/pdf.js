@@ -2,6 +2,7 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
 const path = require('path')
+const { app } = require('electron')
 
 async function generatePDFpv(data) {
   let html = null
@@ -484,7 +485,7 @@ async function generatePDFpv(data) {
   return page.pdf({ format: 'A4' })
 }
 
-async function generatePDFrapport(data) {
+async function generatePDFrapport(data, pathReq) {
   let html = null
   if (data.sectionE != null) {
     html = `
@@ -830,29 +831,31 @@ async function generatePDFrapport(data) {
     `
   }
 
-    // Create a temporary HTML file
-  const tempHtmlPath = path.join(__dirname, 'temp.html');
-  fs.writeFileSync(tempHtmlPath, html, 'utf-8');
-
+  // Create a temporary HTML file
+  const tempHtmlPath = path.join(pathReq, 'temp.html')
+  fs.writeFileSync(tempHtmlPath, html, 'utf-8')
 
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   const startTime = performance.now()
   //await page.setContent(html)
-  await page.goto('file://' + tempHtmlPath);
+  await page.goto(tempHtmlPath)
 
   const endTime = performance.now()
   console.log('execution generating pdf took: ', endTime - startTime, ' ms')
 
   // Generate PDF
   const pdfBuffer = await page.pdf({ format: 'A4' })
-
+  console.log(pdfBuffer)
 
   // Define file path
-  const pdfFilePath = './out/s.pdf' // Adjust the path as needed
+  const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
+  console.log('pdfFilePath', pathReq)
+
+  let pathPDF = path.join(pathReq, 'sortie.pdf')
 
   // Write PDF to file system
-  fs.writeFile(pdfFilePath, pdfBuffer, (err) => {
+  fs.writeFile(pathPDF, pdfBuffer, (err) => {
     if (err) {
       console.error('Error writing PDF:', err)
     } else {
