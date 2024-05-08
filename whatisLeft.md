@@ -38,15 +38,12 @@
 - pv:
 
   - view(problem with the route /archive/getspv).
-  - pdf.
+  - pdf(previous problem).
   - modify
 
 - commissions.
 
-  - display.
-  - view. (see members)
   - modify.
-  - search
 
 - conseils:
 

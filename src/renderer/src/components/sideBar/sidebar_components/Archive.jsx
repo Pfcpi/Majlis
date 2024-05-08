@@ -26,15 +26,16 @@ function Archive() {
   const [PVs, setPVs] = useState([])
   const [selectedPVs, setSelectedPVs] = useState([])
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
+  const [commissions, setCommissions] = useState([])
   const [currentViewedPV, setCurrentViewedPV] = useState({})
+  const [selectedMem, setSelectedMem] = useState([])
   const [view, setView] = useState(false)
   const [query, setQuery] = useState('')
   const [queryPV, setQueryPV] = useState('')
+  const [queryCom, setQueryCom] = useState('')
 
   const { dark } = useDark()
   const { api } = useApi()
-
-  const printComponent = useRef(null)
 
   async function fetchData() {
     const tache1 = await axios
@@ -50,6 +51,14 @@ function Archive() {
       .then((res) => {
         console.log(res.data)
         setPVs(res.data)
+      })
+      .catch((err) => console.log(err))
+
+    const tache3 = await axios
+      .get(api + '/archive/getcommission')
+      .then((res) => {
+        console.log(res.data)
+        setCommissions(res.data)
       })
       .catch((err) => console.log(err))
   }
@@ -232,6 +241,46 @@ function Archive() {
     <></>
   )
 
+  const filteredMembers = useMemo(() => {
+    return Array.isArray(commissions)
+      ? commissions.filter((m) => {
+          return m.nom_m
+            .toLowerCase()
+            .concat(' ')
+            .concat(m.prenom_m.toLowerCase())
+            .includes(queryCom.toLowerCase())
+        })
+      : ''
+  }, [commissions, queryCom])
+
+  const tabComs = Array.isArray(filteredMembers) ? (
+    filteredMembers.map((m) => (
+      <tr
+        className={
+          selectedPVs.findIndex((el) => el == m) == -1
+            ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
+            : 'border-y duration-150 ease-linear bg-blue/25'
+        }
+        onClick={() => {
+          const found = selectedMem.findIndex((el) => el == m)
+          if (found == -1) setSelectedMem((prev) => [...prev, m])
+          else {
+            selectedMem((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
+          }
+        }}
+      >
+        <td>
+          <span>{m.id_m}</span>
+        </td>
+        <td>{[m.nom_m, ' ', m.prenom_m]}</td>
+        <td>{m.date_debut_c.slice(0, m.date_debut_c.indexOf('T'))}</td>
+        <td>{m.date_fin_c.slice(0, m.date_fin_c.indexOf('T'))}</td>
+        <td>{m.role_m}</td>
+      </tr>
+    ))
+  ) : (
+    <></>
+  )
   return (
     <div className="w-full h-full">
       {!view && (
@@ -329,48 +378,140 @@ function Archive() {
               </div>
             </div>
           )}
+          {currentWindow == win[2] && (
+            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
+              <div className="w-fit flex gap-4">
+                <button>
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                  >
+                    {modifierImage}Modifier
+                  </div>
+                </button>
+              </div>
+              <div className="searchDiv">
+                <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
+                <input
+                  className="searchInput"
+                  aria-label="search input"
+                  value={queryCom}
+                  onChange={(e) => setQueryCom(e.target.value)}
+                  type="search"
+                  placeholder="Membre"
+                ></input>
+              </div>
+            </div>
+          )}
+          {currentWindow == win[3] && (
+            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
+              <div className="w-fit flex gap-4">
+                <button onClick={() => handlePreview()} className="text-blue">
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                  >
+                    {PdfImage}PDF
+                  </div>
+                </button>
+                <button>
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                  >
+                    {modifierImage}Modifier
+                  </div>
+                </button>
+                <button className="text-blue">
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    onClick={async () => {
+                      setView(true)
+                      const tache1 = await axios
+                        .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
+                        .then((res) => {
+                          console.log(res.data)
+                          setCurrentViewedPV({ ...res.data[0], num_pv: selectedPVs[0].num_pv })
+                        })
+                        .catch((err) => console.log(err))
+                    }}
+                  >
+                    {voirDossierImage}Voir
+                  </div>
+                </button>
+              </div>
+              <div className="searchDiv">
+                <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
+                <input
+                  className="searchInput"
+                  aria-label="search input"
+                  value={queryPV}
+                  onChange={(e) => setQueryPV(e.target.value)}
+                  type="search"
+                  placeholder="Dossier"
+                ></input>
+              </div>
+            </div>
+          )}
           <div className="w-full grow h-[50vh]">
             <div className="w-full max-h-full overflow-y-auto">
               <table className="w-full">
                 <tr className="border-t-[1px]">
-                  <th
-                    data-rapportdossier={currentWindow == win[1]}
-                    className="w-1/4 data-[rapportdossier=true]:w-1/5 "
-                  >
-                    <div>
-                      {currentWindow == win[0] ? 'Rapport' : currentWindow == win[1] ? 'PV' : ''}
-                    </div>
-                  </th>
-                  <th
-                    data-rapportdossier={currentWindow == win[1]}
-                    className="w-1/4 data-[rapportdossier=true]:w-1/5 "
-                  >
-                    <div>Nom Etudiant</div>
-                  </th>
-                  <th
-                    data-rapportdossier={currentWindow == win[1]}
-                    className="w-1/4 data-[rapportdossier=true]:w-1/5 "
-                  >
-                    <div>Date de l'infraction</div>
-                  </th>
                   {currentWindow == win[0] && (
-                    <th className="w-1/4">
-                      <div>Action</div>
-                    </th>
+                    <>
+                      <th className="w-1/4">
+                        <div>Rapport</div>
+                      </th>
+                      <th className="w-1/4 ">
+                        <div>Nom Etudiant</div>
+                      </th>
+                      <th className="w-1/4">
+                        <div>Date de l'infraction</div>
+                      </th>
+                      <th className="w-1/4">
+                        <div>Action</div>
+                      </th>
+                    </>
                   )}
                   {currentWindow == win[1] && (
-                    <th className="w-1/5">
-                      <div>Date de PV</div>
-                    </th>
+                    <>
+                      <th className="w-1/5 ">
+                        <div>PV</div>
+                      </th>
+                      <th className="w-1/5">
+                        <div>Nom Etudiant</div>
+                      </th>
+                      <th className="w-1/5 ">
+                        <div>Date de l'infraction</div>
+                      </th>
+                      <th className="w-1/5">
+                        <div>Date de PV</div>
+                      </th>
+                      <th className="w-1/5">
+                        <div>Sanction </div>
+                      </th>
+                    </>
                   )}
-                  {currentWindow == win[1] && (
-                    <th className="w-1/5">
-                      <div>Sanction </div>
-                    </th>
+                  {currentWindow == win[2] && (
+                    <>
+                      <th className="w-1/5">
+                        <div>Membre</div>
+                      </th>
+                      <th className="w-1/5 ">
+                        <div>Nom Membre</div>
+                      </th>
+                      <th className="w-1/5 ">
+                        <div>Date de debut</div>
+                      </th>
+                      <th className="w-1/5">
+                        <div>Date de fin</div>
+                      </th>
+                      <th className="w-1/5">
+                        <div>Role </div>
+                      </th>
+                    </>
                   )}
                 </tr>
                 {currentWindow == win[0] && tabRapports}
                 {currentWindow == win[1] && tabPVs}
+                {currentWindow == win[2] && tabComs}
               </table>
             </div>
           </div>
