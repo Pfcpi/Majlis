@@ -666,24 +666,26 @@ function Archive() {
             ></input>
           </div>
         </div>
-        <div className="w-full max-h-[80vh] overflow-y-auto">
-          <table className="w-full">
-            <tr className="border-t">
-              <th className="w-1/4 border-x">
-                <div>Titre</div>
-              </th>
-              <th className="w-1/4 border-x">
-                <div>Nom</div>
-              </th>
-              <th className="w-1/4 border-x">
-                <div>Email</div>
-              </th>
-              <th className="w-1/4 border-x">
-                <div>Date de début</div>
-              </th>
-            </tr>
-            {membresTable}
-          </table>
+        <div className="w-full grow h-[50vh]">
+          <div className="w-full h-full overflow-y-auto">
+            <table className="w-full">
+              <tr className="border-t">
+                <th className="w-1/4 border-x">
+                  <div>Titre</div>
+                </th>
+                <th className="w-1/4 border-x">
+                  <div>Nom</div>
+                </th>
+                <th className="w-1/4 border-x">
+                  <div>Email</div>
+                </th>
+                <th className="w-1/4 border-x">
+                  <div>Date de début</div>
+                </th>
+              </tr>
+              {membresTable}
+            </table>
+          </div>
         </div>
       </div>
     </div>
