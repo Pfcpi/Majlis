@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 
 import './sidebar_com_css/archives.css'
 
@@ -20,15 +20,14 @@ import axios from 'axios'
 //Need to modify:
 function Archive() {
   const win = ['rapport', 'pv', 'conseil', 'commission']
+
   const [currentWindow, setCurrentWindow] = useState(win[0])
   const [rapports, setRapports] = useState([])
   const [PVs, setPVs] = useState([])
-
   const [selectedPVs, setSelectedPVs] = useState([])
-
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
-
   const [view, setView] = useState(false)
+  const [query, setQuery] = useState('')
 
   const { dark } = useDark()
   const { api } = useApi()
@@ -89,8 +88,20 @@ function Archive() {
     })
   }
 
-  const tabRapports = Array.isArray(rapports) ? (
-    rapports.map((m) => (
+  const filteredEtudiants = useMemo(() => {
+    return Array.isArray(rapports)
+      ? rapports.filter((etudiant) => {
+          return etudiant.nom_e
+            .toLowerCase()
+            .concat(' ')
+            .concat(etudiant.prenom_e.toLowerCase())
+            .includes(query.toLowerCase())
+        })
+      : ''
+  }, [rapports, query])
+
+  const tabRapports = Array.isArray(filteredEtudiants) ? (
+    filteredEtudiants.map((m) => (
       <tr className="border-y-[1px]">
         <td>
           <span>{m.num_r}</span>
@@ -197,6 +208,8 @@ function Archive() {
                 <input
                   className="searchInput"
                   aria-label="search input"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   type="search"
                   placeholder="Rapport"
                 ></input>

@@ -33,7 +33,6 @@
 - rapport:
 
   - modify
-  - delete
   - search
 
 - pv:
@@ -41,7 +40,6 @@
   - view.
   - pdf.
   - modify
-  - delete
   - search
 
 - commissions.

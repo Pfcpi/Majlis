@@ -863,7 +863,7 @@ async function generatePDFrapport(data, pathReq) {
     }
   })
 
-  return 'worked'
+  return pathPDF
 }
 
 module.exports = { generatePDFpv, generatePDFrapport }

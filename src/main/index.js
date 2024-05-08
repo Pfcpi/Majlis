@@ -29,13 +29,12 @@ async function createWindow() {
   })
 
   let used_port = await handlePort()
-  console.log('used_port: ', used_port)
   ipcMain.handle('get-Port', async (ev, args) => {
     return used_port
   })
 
   ipcMain.handle('get-Path', async (ev, args) => {
-    return app.getPath('userData')
+    return app.getPath('sessionData')
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -119,7 +118,7 @@ async function getUrl() {
   window.on('ready-to-show', () => {
     window.maximize()
   })
-  const url = path.join(app.getPath('userData'), 'sortie.pdf')
+  const url = path.join(app.getPath('sessionData'), 'sortie.pdf')
   console.log('url', url)
   await window.loadURL(url)
 

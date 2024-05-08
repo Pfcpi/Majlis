@@ -725,7 +725,7 @@ WHERE r.num_r = ?`
         const pdfBuffer = await generatePDFrapport(data, req.body.path)
         const endTime = performance.now()
         console.log('execution of generatePDFrapport func took: ', endTime - startTime, ' ms')
-        res.send('it worked')
+        res.send(pdfBuffer)
       } catch (err) {
         console.error(err)
         res.status(200).send('An error occurred while generating the PDF')

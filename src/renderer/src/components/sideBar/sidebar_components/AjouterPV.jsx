@@ -22,6 +22,9 @@ function AjouterPV() {
   const [temoinBuffer, setTemoinBuffer] = useState({ nomT: '', prenomT: '', roleT: '' })
   const [temoinArray, setTemoinArray] = useState([])
 
+  const [pathMainProcess, setPathMainProcess] = useState('')
+  const [pathBackend, setPathBackend] = useState('')
+
   useEffect(() => {
     axios
       .get(api + '/rapport/get')
@@ -109,11 +112,13 @@ function AjouterPV() {
       console.log('forwarding print preview request...')
       console.log('numR', numR)
       let path = await window.electronAPI.getPath()
+      setPathMainProcess(path)
       const pdfToPreview = await axios
         .post(api + '/archive/printrapport', { numR: numR, path: path })
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)
+          setPathBackend(res.data)
         })
         .catch((err) => console.log(err))
     })
@@ -491,6 +496,8 @@ function AjouterPV() {
               </th>
             </tr>
             {tableRapport}
+            {pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
+            {pathBackend && <div>Main process Path: {pathBackend}</div>}
           </table>
         </div>
       )}
