@@ -826,4 +826,43 @@ WHERE
   })
 })
 
+//Get all conseils
+router.get('/getcd', (req, res) => {
+  const sqlquery = `SELECT * FROM Conseil_Discipline ORDER BY date_cd DESC`
+  db.query(sqlquery, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+    res.send(result[0])
+  })
+})
+
+//get detail for selected cd
+/*
+{
+  "numCD": int value,
+}
+*/
+router.get('/getscd', (req, res) => {
+  let numcd = req.body.numCD
+  const sqlquery = `SELECT
+    num_cd, date_cd,
+    r.num_r, e.nom_e, e.prenom_e
+    m.nom_m, m.prenom_m
+    FROM Conseil_Discipline cd
+
+    INNER JOIN PV pv ON pv.num_cd = cd.num_cd
+    LEFT JOIN Rapport r ON r.num_r = pv.num_r
+    INNER JOIN Commission_Presente cp num_cd = cd.num_cd
+    
+    
+    `
+  db.query(sqlquery, numcd, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+    res.send(result[0])
+  })
+})
+
 module.exports = router
