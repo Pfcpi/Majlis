@@ -34,6 +34,8 @@ function Archive() {
   const [dropRole, setDropRole] = useState(false)
   const [dropRoleValue, setDropRoleValue] = useState('')
 
+  const [membreExiste, setMembreExiste] = useState(false)
+
   const [errors, setErrors] = useState({
     nomError: '',
     prenomError: '',
@@ -41,7 +43,7 @@ function Archive() {
     roleError: ''
   })
 
-  const dataFin = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const dataFin = new Date().toISOString().slice(0, 10)
 
   const commissionPage = useRef(null)
 
@@ -61,7 +63,7 @@ function Archive() {
     roleM: '',
     nomM: '',
     prenomM: '',
-    dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    dateDebutM: new Date().toISOString().slice(0, 10),
     emailM: '',
     idM: 0
   })
@@ -288,7 +290,7 @@ function Archive() {
       roleM: '',
       nomM: '',
       prenomM: '',
-      dateDebutM: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      dateDebutM: new Date().toISOString().slice(0, 10),
       emailM: '',
       idM: 0
     })
@@ -344,7 +346,6 @@ function Archive() {
       ...prevState,
       [name]: value
     }))
-    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const validateForm = (data) => {
@@ -354,7 +355,7 @@ function Archive() {
       setErrors((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomM.length < 3) {
-      errors.nom = 'la longueur doit etre > 3'
+      errors.nom = "Ce n'est pas valid"
       setErrors((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomM.search(/^[a-zA-Z]*$/)) {
@@ -363,13 +364,18 @@ function Archive() {
       return errors
     } else {
       setErrors((prev) => ({ ...prev, nomError: '' }))
+      membres.forEach((m) => {
+        if (m.nom_m == data.nomM) {
+          setMembreExiste(true)
+        }
+      })
     }
     if (data.prenomM.length == 0) {
       errors.prenom = 'Prenom est vide!'
       setErrors((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else if (data.prenomM.length < 3) {
-      errors.prenom = 'la longueur doit etre > 3'
+      errors.prenom = "Ce n'est pas valid"
       setErrors((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else if (data.prenomM.search(/^[a-zA-Z\s]*$/)) {
@@ -378,6 +384,14 @@ function Archive() {
       return errors
     } else {
       setErrors((prev) => ({ ...prev, prenomError: '' }))
+      membres.forEach((m) => {
+        if (m.prenom_m == data.prenomM) {
+          if (membreExiste) {
+            setErrors((prev) => ({ ...prev, prenomError: 'ce membre existe déjà' }))
+            return errors
+          }
+        }
+      })
     }
     if (data.emailM.length == 0) {
       errors.email = 'email est vide!'

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef} from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import axios from 'axios'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
@@ -503,22 +503,26 @@ function AjouterPV() {
               ></input>
             </div>
           </div>
-          <table className="w-full">
-            <tr className="border-t">
-              <th className="w-1/3 border-x">
-                <div>Rapport</div>
-              </th>
-              <th className="w-1/3 border-x">
-                <div>Nom Etudiant</div>
-              </th>
-              <th className="w-1/3 border-x">
-                <div>Date de l'infraction</div>
-              </th>
-            </tr>
-            {tableRapport}
-            {pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
-            {pathBackend && <div>Main process Path: {pathBackend}</div>}
-          </table>
+          <div className="w-full grow h-[50vh]">
+            <div className="w-full h-full overflow-y-auto">
+              <table className="w-full">
+                <tr className="border-t">
+                  <th className="w-1/3 border-x">
+                    <div>Rapport</div>
+                  </th>
+                  <th className="w-1/3 border-x">
+                    <div>Nom Etudiant</div>
+                  </th>
+                  <th className="w-1/3 border-x">
+                    <div>Date de l'infraction</div>
+                  </th>
+                </tr>
+                {tableRapport}
+                {pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
+                {pathBackend && <div>Main process Path: {pathBackend}</div>}
+              </table>
+            </div>
+          </div>
         </div>
       )}
     </div>

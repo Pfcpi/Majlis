@@ -595,11 +595,6 @@ function AjouterRapport() {
               <div className="container_input_rapport">
                 <input
                   className="input_dossier"
-                  onClick={() => {
-                    if (!dropDegre) {
-                      setDropDegre(true)
-                    }
-                  }}
                   name="degreI"
                   id="degreI"
                   onChange={handleInputChange}

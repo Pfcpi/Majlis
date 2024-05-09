@@ -4,12 +4,6 @@
 
 - pv generale.
 - use manual animated.
-- remove duplicate for commission
-- check for overflow
-
-  - accueil
-  - pv
-  - archive
 
 - full blocking bg:
   - archive
