@@ -10,6 +10,23 @@
     @apply relative w-3/5 py-3 px-1 border rounded-[10px] hover:bg-blue/15 border-auth-border-gray overflow-hidden font-semibold;
   }
   button:active {
-   @apply animate-clickDownUp; 
+    @apply animate-clickDownUp;
   }
+
+  .loadingBar {
+    @apply absolute block visible top-0 left-0 w-full h-2 bg-blue;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.37);
+  }
+}
+.loadingBarAni {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

@@ -28,6 +28,7 @@
 ## AjouterPv page
 
 - assign to each of the selected reports the sanction and temoins(more user experience(let the user know when the pvs are changing)).
+- link temoin with pv in the database and the route.
 
 ## Archive page
 
@@ -39,7 +40,7 @@
 
   - view(problem with the route /archive/getspv).
   - pdf(previous problem).
-  - modify
+  - modify(previous problem)
 
 - commissions.
 
@@ -47,9 +48,9 @@
 
 - conseils:
 
-  - display.
+  - display(no route).
   - view. (all related details)
-  - search
+  - search(prev problem)
 
 - (to expand)
 
@@ -60,6 +61,7 @@
 ## Bugs
 
 - matricule for plaignant in form and database and request.
+- email for student
 - not every pv has its own temoins.
 - date always removes one day.
 - not updating immediately when deleting a member(commission).
