@@ -14,7 +14,6 @@ import authAni from './assets/animations/authentication.json'
 import './index.css'
 import axios from 'axios'
 import Lottie from 'lottie-web'
-import { useLoaderData } from 'react-router-dom'
 
 function App() {
   const { auth, authentificate } = useAuth()
@@ -24,7 +23,6 @@ function App() {
   const [password, setPassword] = useState('')
   const [blurBg, setBlurBg] = useState(false)
   const [authState, setAuthState] = useState(false)
-  const [isLoadingForAuth, setIsLoadingForAuth] = useState(false)
   const [Msg, setMsg] = useState('')
 
   //const api = 'http://localhost:3000'

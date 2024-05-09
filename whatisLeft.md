@@ -1,12 +1,5 @@
 # Tasks:
 
-## Backend
-
-- ensure all routes are working
-
-  - rapport routes: all working
-  - commission routes: all working besides (/editcom, /getcom) (not tested)
-
 ## Overall
 
 - pv generale.
@@ -21,13 +14,10 @@
 - full blocking bg:
   - archive
 
-## UX
-
-- a red line for connectivity err
-
 ## AjouterPv page
 
 - assign to each of the selected reports the sanction and temoins(more user experience(let the user know when the pvs are changing)).
+- send a file containing the pv to the commision members.
 - link temoin with pv in the database and the route.
 
 ## Archive page
@@ -53,10 +43,6 @@
   - search(prev problem)
 
 - (to expand)
-
-## Se deconnecter page
-
-- A confirmation page
 
 ## Bugs
 

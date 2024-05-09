@@ -42,6 +42,7 @@ import './SideBarcss.css'
 
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const { cliped, setCliped } = useCliped()
   const { logOut } = useAuth()
   const { dark } = useDark()
@@ -57,6 +58,27 @@ function SideBar() {
 
   return (
     <div className="flex h-full w-full">
+      {isLoggingOut && (
+        <div className="fullBgBlock">
+          <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
+            Êtes-vous sûr de vouloir vous déconnecter ?
+            <div className="flex w-full justify-between px-8">
+              <button
+                onClick={() => setIsLoggingOut(false)}
+                className="flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={logOut}
+                className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
+              >
+                Oui
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Router>
         <div
           className={
@@ -79,7 +101,9 @@ function SideBar() {
                 alt="Outil pour le conseil Discipline"
               />
               {!cliped && (
-                <p className="font-cutive w-36 text-xl dark:text-white text-center">Conseil Discipline</p>
+                <p className="font-cutive w-36 text-xl dark:text-white text-center">
+                  Conseil Discipline
+                </p>
               )}
             </div>
             <Link
@@ -213,7 +237,9 @@ function SideBar() {
             </Link>
             <button
               data-cliped={cliped}
-              onClick={logOut}
+              onClick={() => {
+                setIsLoggingOut(true)
+              }}
               className="link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped"
             >
               <img src={dark ? LogOutWhiteSVG : LogOutSVG}></img>
