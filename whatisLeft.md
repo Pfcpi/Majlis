@@ -8,14 +8,15 @@
 - full blocking bg:
   - archive
 
+- animation of displaying nothing
+
 ## Commission
 
 - form email (date, rapport a traiter)
 
-## AjouterPv page
+## AjouterPv
 
-- assign to each of the selected reports the sanction and temoins(more user experience(let the user know when the pvs are changing)).
-- send a file containing the pv to the commision members.
+- send a pdf attachement to present members of the pvs created.
 
 ## Archive page
 

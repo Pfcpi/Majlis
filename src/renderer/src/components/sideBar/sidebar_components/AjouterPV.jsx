@@ -153,6 +153,7 @@ function AjouterPV() {
 
   const handleAjouter = async (e) => {
     e.preventDefault()
+    addLoadingBar()
     const tache = await axios
       .post(api + '/pv/addPV', {
         numR: pv.numR,
@@ -160,8 +161,14 @@ function AjouterPV() {
         numCD: pv.numCD,
         temoin: temoinArray
       })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err))
+      .then((res) => {
+        RemoveLoadingBar()
+        console.log(res)
+      })
+      .catch((err) => {
+        RemoveLoadingBar()
+        console.log(err)
+      })
 
     if (currentSelectedRapports.length > 1) {
       setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
@@ -221,6 +228,7 @@ function AjouterPV() {
                   name="dateCd"
                   onChange={async (e) => {
                     setCd((prev) => ({ ...prev, dateCd: e.target.value }))
+                    addLoadingBar()
                     const tache = await axios
                       .post(api + '/pv/getActiveCommissionAndMembersByData', {
                         date: e.target.value
@@ -230,6 +238,7 @@ function AjouterPV() {
                         console.log(res.data)
                       })
                       .catch((err) => console.log(err))
+                    RemoveLoadingBar()
                   }}
                   value={cd.dateCd}
                   type="date"
@@ -276,6 +285,7 @@ function AjouterPV() {
                 type="submit"
                 onClick={async (e) => {
                   e.preventDefault()
+                  addLoadingBar()
                   const tache = await axios
                     .post(api + '/pv/addCD', {
                       dateCd: cd.dateCd,
@@ -291,6 +301,7 @@ function AjouterPV() {
                       }))
                     })
                     .catch((err) => console.log(err))
+                    RemoveLoadingBar()
                   setCreerConseildState(false)
                 }}
               >

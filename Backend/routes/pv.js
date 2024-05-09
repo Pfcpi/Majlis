@@ -264,7 +264,8 @@ router.post('/addCD', (req, res) => {
 */
 router.post('/addPV', (req, res) => {
   let { numCD, libeleS, temoin, numR } = req.body
-  let pvId
+  let pvId,
+    sent = false
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
   db.query(sqlqueryS, libeleS, (err, result) => {
     if (err) {
@@ -287,7 +288,10 @@ router.post('/addPV', (req, res) => {
                 console.log(t)
                 db.query(sqlqueryT, [t.nomT, t.prenomT, t.roleT], (err, result) => {
                   if (err && err.errno != 1062) {
-                    res.status(400).send(err)
+                    if (!sent) {
+                      res.status(400).send(err)
+                      sent = true
+                    }
                   } else {
                     // Connect temoins to cd and pv
                     let sqlquerytem =
@@ -295,13 +299,19 @@ router.post('/addPV', (req, res) => {
                     console.log('pvId:', pvId)
                     db.query(sqlquerytem, [numCD, result.insertId, pvId], (err, result) => {
                       if (err) {
-                        res.status(400).send(err)
+                        if (!sent) {
+                          res.status(400).send(err)
+                          sent = true
+                        }
                       }
                     })
                   }
                 })
               })
-              res.status(204).send('added')
+              if (!sent) {
+                console.log('arrivedHere')
+                res.send('added')
+              }
             }
           })
         }

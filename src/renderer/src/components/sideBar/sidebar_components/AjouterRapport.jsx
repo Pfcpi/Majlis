@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import WarningSVG from './../../../assets/warning.svg'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
@@ -7,7 +7,19 @@ import axios from 'axios'
 import useApi from '../../../zustand/api'
 
 function AjouterRapport() {
-  const niveaux = ['ING 1', 'ING 2', 'ING 3', 'ING 4', 'ING 5', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const niveaux = [
+    'ING 1',
+    'ING 2',
+    'ING 3',
+    'ING 4',
+    'ING 5',
+    'L1',
+    'L2',
+    'L3',
+    'M1',
+    'M2',
+    'Doctorat'
+  ]
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
@@ -101,6 +113,20 @@ function AjouterRapport() {
       setRapport((prev) => ({ ...prev, motifI: '' }))
     }
   }, [dropMotifValue])
+
+  const ajouterRapportPage = useRef(null)
+
+  let loadingBar = document.createElement('div')
+  loadingBar.classList.add('loadingBar')
+  loadingBar.classList.add('loadingBarAni')
+
+  function addLoadingBar() {
+    ajouterRapportPage.current.appendChild(loadingBar)
+  }
+
+  function RemoveLoadingBar() {
+    loadingBar.remove()
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -298,7 +324,7 @@ function AjouterRapport() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6">
+    <div ref={ajouterRapportPage} className="h-full w-full flex flex-col justify-center items-center gap-6">
       <div className="w-full flex flex-col items-center justify-center">
         <div className="flex w-5/6 h-2 stretch-0 bg-[#D9D9D9] justify-evenly items-center [&>div]: [&>div]:h-8 [&>div]:aspect-square [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:rounded-full [&>div]:z-10">
           <div className={step >= 2 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>1</div>
@@ -312,9 +338,7 @@ function AjouterRapport() {
           <div className={step >= 4 ? 'w-1/4 bg-blue h-2' : ''}></div>
         </div>
       </div>
-      {step === 4 && (
-        <div className="fullBgBlock"></div>
-      )}
+      {step === 4 && <div className="fullBgBlock"></div>}
       {step === 4 && (
         <div className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
           Confirmer la création du rapport
@@ -332,14 +356,16 @@ function AjouterRapport() {
             </button>
             <button
               onClick={() => {
-                setStep(1)
-                setdropNiveauValue('')
-                setDropMotifValue('')
-                setRapport({})
+                addLoadingBar()
                 axios
                   .post(api + '/rapport/add', rapport)
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err))
+                setStep(1)
+                setdropNiveauValue('')
+                setDropMotifValue('')
+                setRapport({})
+                RemoveLoadingBar()
               }}
               className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
             >

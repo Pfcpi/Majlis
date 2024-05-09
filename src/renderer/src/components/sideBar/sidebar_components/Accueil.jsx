@@ -314,7 +314,7 @@ function Archive() {
   const ListCom = Array.isArray(commission) ? (
     commission.map((mem) => (
       <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-        <p className="text-xl text-active-com-acceil font-semibold">
+        <p className="text-xl text-active-com-acceil dark:text-white font-semibold">
           {[mem.nom_m, ' ', mem.prenom_m]}
         </p>
         <p className="text-blue font-semibold">{mem.role_m}</p>
@@ -663,6 +663,7 @@ function Archive() {
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
+                    addLoadingBar()
                     const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
@@ -673,6 +674,7 @@ function Archive() {
                         setEtudiants(res.data)
                       })
                       .catch((err) => console.log(err))
+                    RemoveLoadingBar()
                   }}
                   className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
                 >
