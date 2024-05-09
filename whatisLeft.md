@@ -23,7 +23,7 @@
 
 ## UX
 
-- a blue moving line for indicating fetching data below the nav bar.
+- a red line for connectivity err
 
 ## AjouterPv page
 

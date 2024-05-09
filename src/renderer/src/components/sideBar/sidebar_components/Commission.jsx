@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 
 import './sidebar_com_css/archives.css'
 
@@ -43,6 +43,8 @@ function Archive() {
 
   const dataFin = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
+  const commissionPage = useRef(null)
+
   // edit a member information
   /* Body being in the format of :
   {
@@ -64,13 +66,19 @@ function Archive() {
     idM: 0
   })
 
-  useEffect(() => {
-    axios
+  async function fetchData() {
+    addLoadingBar()
+    const tache = await axios
       .get(api + '/commission/get')
       .then((res) => {
         setMembres(res.data)
       })
       .catch((err) => console.log(err))
+    RemoveLoadingBar()
+  }
+
+  useEffect(() => {
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -80,6 +88,18 @@ function Archive() {
   useEffect(() => {
     setCurrentAddedMember((prev) => ({ ...prev, roleM: dropRoleValue }))
   }, [dropRoleValue])
+
+  let loadingBar = document.createElement('div')
+  loadingBar.classList.add('loadingBar')
+  loadingBar.classList.add('loadingBarAni')
+
+  function addLoadingBar() {
+    commissionPage.current.appendChild(loadingBar)
+  }
+
+  function RemoveLoadingBar() {
+    loadingBar.remove()
+  }
 
   const filteredMembres = useMemo(() => {
     return Array.isArray(membres)
@@ -409,7 +429,10 @@ function Archive() {
     : ''
 
   return (
-    <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
+    <div
+      ref={commissionPage}
+      className="flex w-full h-full font-poppins flex-row-reverse justify-evenly"
+    >
       {(renouvelerComMessage ||
         addMemberMessage ||
         modifyMemberMessage ||

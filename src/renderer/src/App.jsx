@@ -66,16 +66,10 @@ function App() {
 
   function addLoadingBar() {
     authPage.current.appendChild(loadingBar)
-    console.log('isloadingforauth:', isLoadingForAuth)
-    console.log('added')
   }
 
   function RemoveLoadingBar() {
-    console.log(authPage.current.childNodes)
     loadingBar.remove()
-    console.log('loadingBar:', loadingBar)
-    console.log('isloadingforauth:', isLoadingForAuth)
-    console.log('removed')
   }
 
   function handleClick(e, color) {

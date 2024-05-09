@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef} from 'react'
 import axios from 'axios'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
@@ -25,14 +25,34 @@ function AjouterPV() {
   const [pathMainProcess, setPathMainProcess] = useState('')
   const [pathBackend, setPathBackend] = useState('')
 
-  useEffect(() => {
-    axios
+  const AjouterPVPage = useRef(null)
+
+  async function fetchData() {
+    addLoadingBar()
+    const tache = await axios
       .get(api + '/rapport/get')
       .then((res) => {
         setRapports(res.data)
       })
       .catch((err) => console.log(err))
+    RemoveLoadingBar()
+  }
+
+  useEffect(() => {
+    fetchData()
   }, [])
+
+  let loadingBar = document.createElement('div')
+  loadingBar.classList.add('loadingBar')
+  loadingBar.classList.add('loadingBarAni')
+
+  function addLoadingBar() {
+    AjouterPVPage.current.appendChild(loadingBar)
+  }
+
+  function RemoveLoadingBar() {
+    loadingBar.remove()
+  }
 
   const filteredRapports = useMemo(() => {
     return Array.isArray(rapports)
@@ -188,7 +208,7 @@ function AjouterPV() {
   }
 
   return (
-    <div className="flex w-full h-full">
+    <div ref={AjouterPVPage} className="flex w-full h-full">
       {creerConseilState && (
         <div className="fullBgBlock">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">

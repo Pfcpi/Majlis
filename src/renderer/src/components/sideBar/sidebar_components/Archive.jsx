@@ -37,7 +37,10 @@ function Archive() {
   const { dark } = useDark()
   const { api } = useApi()
 
+  const archivePage = useRef(null)
+
   async function fetchData() {
+    addLoadingBar()
     const tache1 = await axios
       .get(api + '/archive/getrapport')
       .then((res) => {
@@ -61,11 +64,24 @@ function Archive() {
         setCommissions(res.data)
       })
       .catch((err) => console.log(err))
+    RemoveLoadingBar()
   }
 
   useEffect(() => {
     fetchData()
   }, [])
+
+  let loadingBar = document.createElement('div')
+  loadingBar.classList.add('loadingBar')
+  loadingBar.classList.add('loadingBarAni')
+
+  function addLoadingBar() {
+    archivePage.current.appendChild(loadingBar)
+  }
+
+  function RemoveLoadingBar() {
+    loadingBar.remove()
+  }
 
   const supprimerImage = (
     <svg
@@ -282,7 +298,7 @@ function Archive() {
     <></>
   )
   return (
-    <div className="w-full h-full">
+    <div ref={archivePage} className="w-full h-full">
       {!view && (
         <div className="w-full h-full flex flex-col">
           <div className="flex w-full">

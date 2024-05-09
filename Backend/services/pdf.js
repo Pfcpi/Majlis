@@ -480,7 +480,6 @@ async function generatePDFpv(data) {
   const page = await browser.newPage()
   await page.setContent(html)
   await page.pdf({ path: './out/s.pdf', format: 'A4' })
-  console.log('passed by here pdf.js generatePdfPV')
 
   return page.pdf({ format: 'A4' })
 }
@@ -837,20 +836,14 @@ async function generatePDFrapport(data, pathReq) {
 
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
-  const startTime = performance.now()
   //await page.setContent(html)
   await page.goto(tempHtmlPath)
 
-  const endTime = performance.now()
-  console.log('execution generating pdf took: ', endTime - startTime, ' ms')
-
   // Generate PDF
   const pdfBuffer = await page.pdf({ format: 'A4' })
-  console.log(pdfBuffer)
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
-  console.log('pdfFilePath', pathReq)
 
   let pathPDF = path.join(pathReq, 'sortie.pdf')
 

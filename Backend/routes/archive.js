@@ -689,7 +689,6 @@ WHERE
   }
 */
 router.post('/printrapport', async (req, res) => {
-  console.log(req.body.numR)
   let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
   p.nom_p, p.prenom_p,
   DATE(i.date_i) AS date_i, i.lieu_i, i.motif_i,
@@ -706,7 +705,6 @@ WHERE r.num_r = ?`
       res.status(400).send(err)
     }
     if (result) {
-      console.log('result', result)
       const data = {
         matriculeE: result[0].matricule_e,
         nomE: result[0].nom_e.toUpperCase(),
@@ -724,10 +722,7 @@ WHERE r.num_r = ?`
         prenomC: result[0].prenom_chef
       }
       try {
-        const startTime = performance.now()
         const pdfBuffer = await generatePDFrapport(data, req.body.path)
-        const endTime = performance.now()
-        console.log('execution of generatePDFrapport func took: ', endTime - startTime, ' ms')
         res.send(pdfBuffer)
       } catch (err) {
         res.send(err)

@@ -1,7 +1,7 @@
 //Tasks:
 //In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 
 import './sidebar_com_css/archives.css'
 import './sidebar_com_css/scroll.css'
@@ -28,7 +28,7 @@ import axios from 'axios'
 
 function Archive() {
   const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
-  const degre = ['1', '2']
+  const accueilPage = useRef(null)
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
@@ -99,21 +99,28 @@ function Archive() {
     numR: 0
   })
 
-  useEffect(() => {
-    axios
+  async function fetchData() {
+    addLoadingBar()
+    const tache1 = await axios
       .get(api + '/rapport/get')
       .then((res) => {
         setEtudiants(res.data)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+      })
 
-    axios
+    const tache2 = await axios
       .get(api + '/commission/get')
       .then((res) => {
         setCommission(res.data)
         console.log(res)
       })
       .catch((err) => console.log(err))
+    RemoveLoadingBar()
+  }
+  useEffect(() => {
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -148,6 +155,18 @@ function Archive() {
       setRapport((prev) => ({ ...prev, motifI: '' }))
     }
   }, [dropMotifValue])
+
+  let loadingBar = document.createElement('div')
+  loadingBar.classList.add('loadingBar')
+  loadingBar.classList.add('loadingBarAni')
+
+  function addLoadingBar() {
+    accueilPage.current.appendChild(loadingBar)
+  }
+
+  function RemoveLoadingBar() {
+    loadingBar.remove()
+  }
 
   const filteredEtudiants = useMemo(() => {
     return Array.isArray(etudiants)
@@ -295,7 +314,9 @@ function Archive() {
   const ListCom = Array.isArray(commission) ? (
     commission.map((mem) => (
       <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-        <p className="text-xl text-active-com-acceil font-semibold">{[mem.nom_m, ' ', mem.prenom_m]}</p>
+        <p className="text-xl text-active-com-acceil font-semibold">
+          {[mem.nom_m, ' ', mem.prenom_m]}
+        </p>
         <p className="text-blue font-semibold">{mem.role_m}</p>
       </div>
     ))
@@ -447,7 +468,7 @@ function Archive() {
     return errors
   }
   return (
-    <div className="flex w-full h-full">
+    <div ref={accueilPage} className="flex w-full h-full">
       {supprimer && (
         <div className="fullBgBlock">
           <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
@@ -621,9 +642,7 @@ function Archive() {
               <div className={step >= 4 ? 'w-1/4 bg-blue h-2' : ''}></div>
             </div>
           </div>
-          {step === 4 && (
-            <div className="fullBgBlock"></div>
-          )}
+          {step === 4 && <div className="fullBgBlock"></div>}
           {step === 4 && (
             <div className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
               Confirmer la modification du rapport
