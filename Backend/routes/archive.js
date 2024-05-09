@@ -189,7 +189,7 @@ router.patch('/editrapport', (req, res) => {
 //VALID
 // Get inactive commissions and it's members
 router.get('/getcommission', (req, res) => {
-  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE`
+  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE ORDER BY c.num_c`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -833,7 +833,7 @@ router.get('/getcd', (req, res) => {
     if (err) {
       res.status(400).send(err)
     }
-    res.send(result[0])
+    res.send(result)
   })
 })
 
@@ -846,15 +846,25 @@ router.get('/getcd', (req, res) => {
 router.get('/getscd', (req, res) => {
   let numcd = req.body.numCD
   const sqlquery = `SELECT
-    num_cd, date_cd,
-    r.num_r, e.nom_e, e.prenom_e
-    m.nom_m, m.prenom_m
+    cd.num_cd, cd.date_cd,
+
+    GROUP_CONCAT(DISTINCT r.num_r) AS num_rapport,
+    GROUP_CONCAT(DISTINCT r.date_r) AS date_rapport,
+
+    GROUP_CONCAT(DISTINCT CONCAT_WS(' ', e.nom_e, e.prenom_e) SEPARATOR ', ') AS etudiants,
+    GROUP_CONCAT(DISTINCT CONCAT_WS(' ', m.nom_m, m.prenom_m) SEPARATOR ', ') AS membres
     FROM Conseil_Discipline cd
 
     INNER JOIN PV pv ON pv.num_cd = cd.num_cd
     LEFT JOIN Rapport r ON r.num_r = pv.num_r
-    INNER JOIN Commission_Presente cp num_cd = cd.num_cd
-    
+    INNER JOIN Commission_Presente cp ON cp.num_cd = cd.num_cd
+    LEFT JOIN Membre m ON cp.id_m = m.id_m
+    LEFT JOIN Etudiant e ON e.matricule_e = r.matricule_e
+
+    WHERE cd.num_cd = ?
+
+    GROUP BY
+        cd.num_cd
     
     `
   db.query(sqlquery, numcd, (err, result) => {
