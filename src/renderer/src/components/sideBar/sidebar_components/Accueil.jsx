@@ -603,26 +603,29 @@ function Archive() {
                 ></input>
               </div>
             </div>
-            <div className="max-h-[56vh] overflow-y-auto w-full">
-              <table className="w-full">
-                <tr className="border-t">
-                  <th className="w-1/4 border-x">
-                    <div>Rapport</div>
-                  </th>
-                  <th className="w-1/4 border-x">
-                    <div>Nom Etudiant</div>
-                  </th>
-                  <th className="w-1/4 border-x">
-                    <div>Date de l'infraction</div>
-                  </th>
-                  {!view && (
+
+            <div className="w-full grow h-[50vh]">
+              <div className="w-full h-full overflow-y-auto">
+                <table className="w-full">
+                  <tr className="border-t">
                     <th className="w-1/4 border-x">
-                      <div>Action</div>
+                      <div>Rapport</div>
                     </th>
-                  )}
-                </tr>
-                {tableEtu}
-              </table>
+                    <th className="w-1/4 border-x">
+                      <div>Nom Etudiant</div>
+                    </th>
+                    <th className="w-1/4 border-x">
+                      <div>Date de l'infraction</div>
+                    </th>
+                    {!view && (
+                      <th className="w-1/4 border-x">
+                        <div>Action</div>
+                      </th>
+                    )}
+                  </tr>
+                  {tableEtu}
+                </table>
+              </div>
             </div>
           </div>
         </div>

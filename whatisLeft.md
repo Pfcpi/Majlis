@@ -8,11 +8,14 @@
 - full blocking bg:
   - archive
 
+## Commission
+
+- form email (date, rapport a traiter)
+
 ## AjouterPv page
 
 - assign to each of the selected reports the sanction and temoins(more user experience(let the user know when the pvs are changing)).
 - send a file containing the pv to the commision members.
-- link temoin with pv in the database and the route.
 
 ## Archive page
 
