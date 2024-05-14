@@ -8,11 +8,13 @@
 - full blocking bg:
   - archive
 
-- animation of displaying nothing
-
 ## Commission
 
-- form email (date, rapport a traiter)
+- form email (date, rapports a traiter)
+
+## Ajouter rapport 
+
+- email for student
 
 ## AjouterPv
 
@@ -22,7 +24,7 @@
 
 - rapport:
 
-  - modify
+  - modify(zustand/Rapport/Rapport.js, forms/InputField.jsx, forms/ModifyRapport.jsx).
 
 - pv:
 
@@ -44,10 +46,6 @@
 
 ## Bugs
 
+- in modifying the member, the warning the member exists should not be there.
 - matricule for plaignant in form and database and request.
-- email for student
-- not every pv has its own temoins.
 - date always removes one day.
-- not updating immediately when deleting a member(commission).
-- when deleting a report it does not update immediately(pv).
-- commission should at least has 5 members in commission page.

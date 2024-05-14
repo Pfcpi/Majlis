@@ -47,10 +47,12 @@ function AjouterPV() {
   loadingBar.classList.add('loadingBarAni')
 
   function addLoadingBar() {
+    console.log('loading bar added')
     AjouterPVPage.current.appendChild(loadingBar)
   }
 
   function RemoveLoadingBar() {
+    console.log('loading bar removed')
     loadingBar.remove()
   }
 
@@ -187,13 +189,15 @@ function AjouterPV() {
 
   async function handleSupprimer() {
     if (currentSelectedRapports.length != 0) {
-      currentSelectedRapports.map(async (sr) => {
-        const tache = await axios
-          .delete(api + '/rapport/delete', { data: { numR: sr.num_r } })
-          .then((res) => console.log(res))
-          .catch((err) => console.log(err))
-      })
-
+      addLoadingBar()
+      const result = await Promise.all(
+        currentSelectedRapports.map(async (sr) => {
+          const tache = await axios
+            .delete(api + '/rapport/delete', { data: { numR: sr.num_r } })
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err))
+        })
+      )
       const tache1 = await axios
         .get(api + '/rapport/get')
         .then((res) => {
@@ -201,6 +205,9 @@ function AjouterPV() {
           console.log(res.data)
         })
         .catch((err) => console.log(err))
+
+      setCurrentSelectedRapports([])
+      RemoveLoadingBar()
 
       setSupprimer(false)
     }
@@ -301,7 +308,7 @@ function AjouterPV() {
                       }))
                     })
                     .catch((err) => console.log(err))
-                    RemoveLoadingBar()
+                  RemoveLoadingBar()
                   setCreerConseildState(false)
                 }}
               >

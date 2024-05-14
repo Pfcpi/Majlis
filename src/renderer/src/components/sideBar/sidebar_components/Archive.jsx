@@ -169,6 +169,21 @@ function Archive() {
     })
   }
 
+  async function handleDetailedViewRapport(numR) {
+    setView(true)
+    const tache1 = await axios
+      .post(api + '/rapport/gets', { numR: numR })
+      .then((res) => {
+        console.log(res.data)
+        setCurrentViewedRappport({ ...res.data[0], num_r: numR })
+      })
+      .catch((err) => console.log(err))
+  }
+
+  function handleModifyRapport() {
+
+  }
+
   const filteredEtudiants = useMemo(() => {
     return Array.isArray(rapports)
       ? rapports.filter((etudiant) => {
@@ -192,20 +207,13 @@ function Archive() {
         <td>
           <div className="w-full flex justify-evenly">
             <button
-              onClick={async () => {
-                setView(true)
-                const tache1 = await axios
-                  .post(api + '/rapport/gets', { numR: m.num_r })
-                  .then((res) => {
-                    console.log(res.data)
-                    setCurrentViewedRappport({ ...res.data[0], num_r: m.num_r })
-                  })
-                  .catch((err) => console.log(err))
+              onClick={() => {
+                handleDetailedViewRapport(m.num_r)
               }}
             >
               <img src={VoirDossierSVG} alt=""></img>
             </button>
-            <button>
+            <button onClick={() => handleModifyRapport()}>
               <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
             </button>
           </div>

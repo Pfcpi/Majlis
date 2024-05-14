@@ -114,7 +114,6 @@ function Archive() {
       .get(api + '/commission/get')
       .then((res) => {
         setCommission(res.data)
-        console.log(res)
       })
       .catch((err) => console.log(err))
     RemoveLoadingBar()
@@ -606,7 +605,7 @@ function Archive() {
 
             <div className="w-full grow h-[50vh]">
               <div className="w-full h-full overflow-y-auto">
-                <table className="w-full">
+                <table  className="w-full">
                   <tr className="border-t">
                     <th className="w-1/4 border-x">
                       <div>Rapport</div>

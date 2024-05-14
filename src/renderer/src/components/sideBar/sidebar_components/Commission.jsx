@@ -96,24 +96,14 @@ function Archive() {
   loadingBar.classList.add('loadingBarAni')
 
   function addLoadingBar() {
+    console.log('loading bar added')
     commissionPage.current.appendChild(loadingBar)
   }
 
   function RemoveLoadingBar() {
+    console.log('loading bar removed')
     loadingBar.remove()
   }
-
-  const filteredMembres = useMemo(() => {
-    return Array.isArray(membres)
-      ? membres.filter((membres) => {
-          return membres.nom_m
-            .toLowerCase()
-            .concat(' ')
-            .concat(membres.prenom_m.toLowerCase())
-            .includes(query.toLowerCase())
-        })
-      : ''
-  }, [membres, query])
 
   const dropRoledownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
@@ -218,19 +208,27 @@ function Archive() {
   async function handleRemoveMembers() {
     console.log('currentModifiedMembres: ', currentModifiedMembres)
     if (currentModifiedMembres.length > 0) {
-      currentModifiedMembres.map(async (m) => {
-        const tache1 = await axios
-          .patch(api + '/commission/remove', {
-            dataFin: dataFin,
-            idM: m.id_m
-          })
-          .catch((err) => console.log(err))
-      })
+      addLoadingBar()
+      const result = await Promise.all(
+        currentModifiedMembres.map(async (m) => {
+          const tache1 = await axios
+            .patch(api + '/commission/remove', {
+              dataFin: dataFin,
+              idM: m.id_m
+            })
+            .then((res) => console.log('patch: ', res.data))
+            .catch((err) => console.log(err))
+          const tache2 = await axios
+            .get(api + '/commission/get')
+            .then((res) => {
+              setMembres(res.data)
+              console.log('commission/get: ', res.data)
+            })
+            .catch((err) => console.log(err))
+        })
+      )
       setCurrentModifiedMembres([])
-      const tache2 = await axios
-        .get(api + '/commission/get')
-        .then((res) => setMembres(res.data))
-        .catch((err) => console.log(err))
+      RemoveLoadingBar()
     }
   }
 
@@ -251,11 +249,13 @@ function Archive() {
   }
 
   async function handleAddMember() {
+    addLoadingBar()
     const tache1 = await axios
       .post(api + '/commission/add', currentAddedMember)
       .then((res) => console.log(res))
       .catch((err) => console.log(err))
     setAddMember(false)
+    RemoveLoadingBar()
 
     setCurrentModifiedMembres([])
     const tache2 = await axios
@@ -413,6 +413,18 @@ function Archive() {
     }
     return errors
   }
+
+  const filteredMembres = useMemo(() => {
+    return Array.isArray(membres)
+      ? membres.filter((membres) => {
+          return membres.nom_m
+            .toLowerCase()
+            .concat(' ')
+            .concat(membres.prenom_m.toLowerCase())
+            .includes(query.toLowerCase())
+        })
+      : ''
+  }, [membres, query])
 
   const membresTable = Array.isArray(filteredMembres)
     ? filteredMembres.map((m) => (
