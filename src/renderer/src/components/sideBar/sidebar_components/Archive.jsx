@@ -22,17 +22,22 @@ function Archive() {
   const win = ['rapport', 'pv', 'conseil', 'commission']
 
   const [currentWindow, setCurrentWindow] = useState(win[0])
+
   const [rapports, setRapports] = useState([])
-  const [PVs, setPVs] = useState([])
-  const [selectedPVs, setSelectedPVs] = useState([])
   const [currentViewedRapport, setCurrentViewedRappport] = useState({})
-  const [commissions, setCommissions] = useState([])
-  const [currentViewedPV, setCurrentViewedPV] = useState({})
-  const [selectedMem, setSelectedMem] = useState([])
-  const [view, setView] = useState(false)
   const [query, setQuery] = useState('')
-  const [queryPV, setQueryPV] = useState('')
+
+  const [commissions, setCommissions] = useState([])
+  const [selectedMem, setSelectedMem] = useState([])
   const [queryCom, setQueryCom] = useState('')
+
+  const [PVs, setPVs] = useState([])
+  const [currentViewedPV, setCurrentViewedPV] = useState({})
+  const [selectedPVs, setSelectedPVs] = useState([])
+  const [queryPV, setQueryPV] = useState('')
+  const [membresPV, setMembresPV] = useState([])
+
+  const [view, setView] = useState(false)
 
   const { dark } = useDark()
   const { api } = useApi()
@@ -45,14 +50,12 @@ function Archive() {
       .get(api + '/archive/getrapport')
       .then((res) => {
         setRapports(res.data)
-        console.log(res.data)
       })
       .catch((err) => console.log(err))
 
     const tache2 = await axios
       .get(api + '/archive/getpv')
       .then((res) => {
-        console.log(res.data)
         setPVs(res.data)
       })
       .catch((err) => console.log(err))
@@ -60,7 +63,6 @@ function Archive() {
     const tache3 = await axios
       .get(api + '/archive/getcommission')
       .then((res) => {
-        console.log(res.data)
         setCommissions(res.data)
       })
       .catch((err) => console.log(err))
@@ -156,14 +158,11 @@ function Archive() {
 
   function handlePreview(numR) {
     return new Promise(async () => {
-      console.log('forwarding print preview request...')
-      console.log('numR', numR)
       let path = await window.electronAPI.getPath()
       const pdfToPreview = await axios
         .post(api + '/archive/printrapport', { numR: numR, path: path })
         .then((res) => {
           const result = window.electronAPI.getUrl()
-          console.log(res)
         })
         .catch((err) => console.log(err))
     })
@@ -174,14 +173,33 @@ function Archive() {
     const tache1 = await axios
       .post(api + '/rapport/gets', { numR: numR })
       .then((res) => {
-        console.log(res.data)
         setCurrentViewedRappport({ ...res.data[0], num_r: numR })
       })
       .catch((err) => console.log(err))
   }
 
-  function handleModifyRapport() {
+  function handleModifyRapport() {}
 
+  async function handleViewPV() {
+    addLoadingBar()
+    setView(true)
+    const tache1 = await axios
+      .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
+      .then((res) => {
+        console.log(res.data)
+        if (res.data[0].noms_membres && res.data[0].prenoms_membres && res.data[0].roles_membres) {
+          const array1 = res.data[0].noms_membres.split(',')
+          const array2 = res.data[0].prenoms_membres.split(',')
+          const array3 = res.data[0].roles_membres.split(',')
+
+          for (let i = 0; i < array1.length; i++) {
+            setMembresPV((prev) => [prev, [array1[i], array2[i], array3[i]]])
+          }
+        }
+        setCurrentViewedPV({ ...res.data[0], num_pv: selectedPVs[0].num_pv })
+      })
+      .catch((err) => console.log(err))
+    RemoveLoadingBar()
   }
 
   const filteredEtudiants = useMemo(() => {
@@ -374,16 +392,7 @@ function Archive() {
                 <button className="text-blue">
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                    onClick={async () => {
-                      setView(true)
-                      const tache1 = await axios
-                        .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
-                        .then((res) => {
-                          console.log(res.data)
-                          setCurrentViewedPV({ ...res.data[0], num_pv: selectedPVs[0].num_pv })
-                        })
-                        .catch((err) => console.log(err))
-                    }}
+                    onClick={() => handleViewPV()}
                   >
                     {voirDossierImage}Voir
                   </div>
@@ -446,16 +455,7 @@ function Archive() {
                 <button className="text-blue">
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                    onClick={async () => {
-                      setView(true)
-                      const tache1 = await axios
-                        .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
-                        .then((res) => {
-                          console.log(res.data)
-                          setCurrentViewedPV({ ...res.data[0], num_pv: selectedPVs[0].num_pv })
-                        })
-                        .catch((err) => console.log(err))
-                    }}
+                    onClick={() => handleViewPV()}
                   >
                     {voirDossierImage}Voir
                   </div>
@@ -629,29 +629,84 @@ function Archive() {
               <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
             </button>
             <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
-              <h2 className="text-4xl">Details du Dossier </h2>
+              <h2 className="text-4xl">Details du PV</h2>
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
                 <div className="flex flex-col gap-3">
-                  <p>matricule: </p>
-                  <p>Nom: </p>
-                  <p>Niveau: </p>
-                  <p>Section: </p>
-                  <p>Groupe: </p>
+                  <p>matricule: {currentViewedPV.matricule_e}</p>
+                  <p>Nom: {[currentViewedPV.nom_e, ' ', currentViewedPV.prenom_e]}</p>
+                  <p>Niveau: {currentViewedPV.niveau_e}</p>
+                  <p>Section: {currentViewedPV.section_e}</p>
+                  <p>Groupe: {currentViewedPV.groupe_e}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Nom: </p>
+                  <p>Nom: {[currentViewedPV.nom_p, ' ', currentViewedPV.prenom_e]}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
-                <h3 className="text-blue text-2xl">Informations globales</h3>
+                <h3 className="text-blue text-2xl">Informations du l'infraction</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Lieu: </p>
-                  <p>Motif: </p>
-                  <p>Degre: </p>
+                  <p>Date: {currentViewedPV.date_i ? currentViewedPV.date_i.slice(0, 10) : ''}</p>
+                  <p>Lieu: {currentViewedPV.lieu_i}</p>
+                  <p>Motif: {currentViewedPV.motif_i}</p>
+                  {/* <p>Degre: {currentViewedPV.degre_i}</p> */}
+                  <p>Description: {currentViewedPV.description_i}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="h-full w-1/2 bg-side-bar-white-theme-color dark:bg-dark-gray flex flex-col">
+            <div className="w-full grow h-[50vh]">
+              <div className="w-full h-full overflow-y-auto">
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-blue text-2xl">Informations du Conseil discipline</h3>
+                  <div className="flex flex-col gap-3">
+                    <p>
+                      matricule:{' '}
+                      {currentViewedPV.date_cd ? currentViewedPV.date_cd.slice(0, 10) : ''}
+                    </p>
+                    <div>
+                      membres:{' '}
+                      <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          {currentViewedPV.noms_membres}
+                        </div>
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          {currentViewedPV.prenoms_membres}
+                        </div>
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          {currentViewedPV.roles_membres}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-blue text-2xl">Informations du PV</h3>
+                  <div className="flex flex-col gap-3">
+                    <p>Sanction: {currentViewedPV.libele_s}</p>
+                    <p>
+                      Date: {currentViewedPV.date_pv ? currentViewedPV.date_pv.slice(0, 10) : ''}
+                    </p>
+
+                    <p>
+                      temoins:{' '}
+                      <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          {currentViewedPV.noms_temoins}
+                        </div>
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          {currentViewedPV.prenoms_temoins}
+                        </div>
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          {currentViewedPV.roles_temoins}
+                        </div>
+                      </div>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

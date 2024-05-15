@@ -12,7 +12,7 @@
 
 - form email (date, rapports a traiter)
 
-## Ajouter rapport 
+## Ajouter rapport
 
 - email for student
 
@@ -28,9 +28,8 @@
 
 - pv:
 
-  - view(problem with the route /archive/getspv).
-  - pdf(previous problem).
-  - modify(previous problem)
+  - pdf.
+  - modify
 
 - commissions.
 
@@ -49,3 +48,4 @@
 - in modifying the member, the warning the member exists should not be there.
 - matricule for plaignant in form and database and request.
 - date always removes one day.
+- viewing the membres and temoins for pv is disgusting.
