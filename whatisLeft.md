@@ -36,14 +36,25 @@
 
 - conseils:
 
-  - display(no route).
+  - display.
   - view. (all related details)
-  - search(prev problem)
+  - search
 
 - (to expand)
 
 ## Bugs
 
+- all forms should be able to press the enter key and it works
+  - sign in
+  - change password
+  - ajouter pv
+  - ajouter member
+  - modifier member
+  - ajouter rapport 
+  - modifier rapport
+    - Accueil
+    - archive
+  - modifier pv
 - nom et prenom de president de conseil manque dans le pv pdf el le format html doit etre changé.
 - in modifying the member, the warning the member exists should not be there.
 - matricule for plaignant in form and database and request.

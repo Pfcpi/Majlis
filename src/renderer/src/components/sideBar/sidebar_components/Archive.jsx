@@ -4,6 +4,7 @@ import './sidebar_com_css/archives.css'
 
 import useDark from '../../../zustand/dark'
 import useApi from '../../../zustand/api'
+import useAccount from '../../../zustand/account'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
@@ -41,6 +42,7 @@ function Archive() {
 
   const { dark } = useDark()
   const { api } = useApi()
+  const { account } = useAccount()
 
   const archivePage = useRef(null)
 
@@ -159,8 +161,8 @@ function Archive() {
   function handlePreview(num, rapport_ou_pv) {
     return new Promise(async () => {
       let path = await window.electronAPI.getPath()
-      if ((rapport_ou_pv == win[0])) {
-        console.log("in rapport")
+      if (rapport_ou_pv == win[0]) {
+        console.log('in rapport')
         const pdfToPreview = await axios
           .post(api + '/archive/printrapport', { numR: num, path: path })
           .then((res) => {
@@ -168,7 +170,7 @@ function Archive() {
           })
           .catch((err) => console.log(err))
       } else {
-        console.log("in pv")
+        console.log('in pv')
         const pdfToPreview = await axios
           .post(api + '/archive/printpv', { numPV: num, path: path })
           .then((res) => {
@@ -242,9 +244,11 @@ function Archive() {
             >
               <img src={VoirDossierSVG} alt=""></img>
             </button>
-            <button onClick={() => handleModifyRapport()}>
-              <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
-            </button>
+            {account == 'chef' && (
+              <button onClick={() => handleModifyRapport()}>
+                <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
+              </button>
+            )}
           </div>
         </td>
       </tr>
@@ -365,7 +369,7 @@ function Archive() {
               className="w-1/2 text-2xl py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
               onClick={() => setCurrentWindow(win[3])}
             >
-              Conseils Discipline
+              Conseil de Discipline
             </button>
           </div>
           {currentWindow == win[0] && (
@@ -384,7 +388,7 @@ function Archive() {
             </div>
           )}
           {currentWindow == win[1] && (
-            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
+            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color text-[18px] dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
                 <button
                   onClick={() => handlePreview(selectedPVs[0].num_pv, win[1])}
@@ -396,13 +400,15 @@ function Archive() {
                     {PdfImage}PDF
                   </div>
                 </button>
-                <button>
-                  <div
-                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                  >
-                    {modifierImage}Modifier
-                  </div>
-                </button>
+                {account == 'president'  && (
+                  <button>
+                    <div
+                      className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    >
+                      {modifierImage}Modifier
+                    </div>
+                  </button>
+                )}
                 <button className="text-blue">
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
@@ -426,7 +432,7 @@ function Archive() {
             </div>
           )}
           {currentWindow == win[2] && (
-            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
+            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color text-[18px] dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
                 <button>
                   <div
@@ -450,7 +456,7 @@ function Archive() {
             </div>
           )}
           {currentWindow == win[3] && (
-            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
+            <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color text-[18px] dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
                 <button onClick={() => handlePreview()} className="text-blue">
                   <div

@@ -375,7 +375,7 @@ function AjouterRapport() {
         </div>
       )}
       <form className="overflow-y-auto flex flex-col justify-center items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray w-1/2 max-h-[84vh] min-w-[500px] ">
-        <h1 className="text-[36px] py-4">Detail du rapport</h1>
+        <h1 className="text-[36px] py-4">Détail du rapport</h1>
         <hr className="w-full dark:text-gray"></hr>
         {step == 1 && (
           <div className="flex flex-col w-5/6 my-2">
@@ -429,7 +429,7 @@ function AjouterRapport() {
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="prenomE">
-                  Prenom
+                  Prénom
                 </label>
                 {errorsStep1.prenomError && (
                   <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -647,8 +647,7 @@ function AjouterRapport() {
             </div>
           </div>
         )}
-        <hr className="w-full dark:text-gray"></hr>
-        <div className="flex justify-between w-5/6 py-6">
+        <div className="flex justify-between w-5/6 py-6 *:text-[18px]">
           <button
             className="button_dossier text-red border-red hover:bg-red/25 min-w-fit"
             onClick={(e) => {
@@ -720,7 +719,7 @@ function AjouterRapport() {
               }, 2000)
             }}
           >
-            {step > 2 ? 'terminer' : 'continue'}
+            {step > 2 ? 'terminer' : 'continuer'}
           </button>
         </div>
       </form>

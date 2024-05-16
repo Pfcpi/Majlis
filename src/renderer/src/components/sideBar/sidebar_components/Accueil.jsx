@@ -749,7 +749,7 @@ function Archive() {
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="prenomE">
-                      Prenom
+                      Prénom
                     </label>
                     {errorsStep1.prenomError && (
                       <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -995,10 +995,9 @@ function Archive() {
                 </div>
               </div>
             )}
-            <hr className="w-full dark:text-gray"></hr>
-            <div className="flex justify-between w-5/6 py-6">
+            <div className="flex justify-between w-5/6 py-6 *:text-[18px]">
               <button
-                className="button_dossier text-red min-w-fit hover:bg-0.36-red"
+                className="button_dossier text-red min-w-fit  hover:bg-0.36-red"
                 onClick={(e) => {
                   e.preventDefault()
                   if (step == 1) {
