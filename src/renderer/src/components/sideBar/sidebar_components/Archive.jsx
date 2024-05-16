@@ -156,15 +156,26 @@ function Archive() {
     </svg>
   )
 
-  function handlePreview(numR) {
+  function handlePreview(num, rapport_ou_pv) {
     return new Promise(async () => {
       let path = await window.electronAPI.getPath()
-      const pdfToPreview = await axios
-        .post(api + '/archive/printrapport', { numR: numR, path: path })
-        .then((res) => {
-          const result = window.electronAPI.getUrl()
-        })
-        .catch((err) => console.log(err))
+      if ((rapport_ou_pv == win[0])) {
+        console.log("in rapport")
+        const pdfToPreview = await axios
+          .post(api + '/archive/printrapport', { numR: num, path: path })
+          .then((res) => {
+            const result = window.electronAPI.getUrl()
+          })
+          .catch((err) => console.log(err))
+      } else {
+        console.log("in pv")
+        const pdfToPreview = await axios
+          .post(api + '/archive/printpv', { numPV: num, path: path })
+          .then((res) => {
+            const result = window.electronAPI.getUrl()
+          })
+          .catch((err) => console.log(err))
+      }
     })
   }
 
@@ -375,7 +386,10 @@ function Archive() {
           {currentWindow == win[1] && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
-                <button onClick={() => handlePreview()} className="text-blue">
+                <button
+                  onClick={() => handlePreview(selectedPVs[0].num_pv, win[1])}
+                  className="text-blue"
+                >
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
@@ -604,7 +618,7 @@ function Archive() {
           <div className="flex flex-col w-1/2 justify-center items-center [&>button]:w-1/3 [&>button]:min-w-fit gap-4">
             <button
               onClick={() => {
-                handlePreview(currentViewedRapport.num_r)
+                handlePreview(currentViewedRapport.num_r, win[0])
               }}
               className="modify_rapport_button"
             >
