@@ -19,8 +19,9 @@ const transporter = nodemailer.createTransport({
 // list of commission members (commission page)
 router.get('/get', (req, res) => {
   let sqlquery = `SELECT nom_m, prenom_m, role_m, email_m, date_debut_m, id_m
-  FROM Membre
-  WHERE est_actif = TRUE`
+  FROM Membre m
+  INNER JOIN Commission c ON c.num_c = m.num_c
+  WHERE m.est_actif = TRUE AND c.actif_c = TRUE`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.send(err)
@@ -48,7 +49,14 @@ router.post('/add', (req, res) => {
     req.body.emailM,
     req.body.dateDebutM
   ]
-  let sqlquery = `INSERT INTO Membre (nom_m, prenom_m, role_m, email_m, date_debut_m, num_c, est_actif) VALUES (?, ?, ?, ?, ?, (SELECT num_c FROM Commission WHERE actif_c = TRUE), TRUE)`
+  if (values[2]=="Président") {
+    db.query("UPDATE Utilisateur SET email_u = ?, nomU = ?, prenomU = ? WHERE id_u = 2",  [values[3], values[0], values[1]], (err, result) => {
+    if(err) {
+      res.send("Error while changing président")
+    }
+  })
+  }
+  let sqlquery = `INSERT INTO Membre (nom_m, prenom_m, role_m, email_m, date_debut_m, num_c, est_actif) VALUES (?, ?,   ?, ?, ?, (SELECT num_c FROM Commission WHERE actif_c = TRUE), TRUE)`
   db.query(sqlquery, values, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -77,6 +85,13 @@ router.patch('/edit', (req, res) => {
     req.body.dateDebutM,
     req.body.idM
   ]
+  if (values[0]=="Président") {
+    db.query("UPDATE Utilisateur SET email_u = ?, nomU = ?, prenomU = ? WHERE id_u = 2",  [values[3], values[1], values[2]], (err, result) => {
+    if(err) {
+      res.send("Error while changing président")
+    }
+  })
+  }
   let sqlquery = `UPDATE Membre SET role_m = ?, nom_m = ?, prenom_m = ?, email_m = ?, date_debut_m = ? WHERE id_m = ?`
   db.query(sqlquery, values, (err, result) => {
     if (err) {
