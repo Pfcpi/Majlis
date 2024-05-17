@@ -23,6 +23,58 @@ function maj(chaine) {
   return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
 }
 
+function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
+    // Ensure the strings are not null or undefined, and split them into arrays
+    let nomsArray = noms_temoins ? noms_temoins.split(',') : [];
+    let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : [];
+    let rolesArray = roles_temoins ? roles_temoins.split(',') : [];
+
+    // Initialize an empty array to hold the temoins objects
+    let temoins = [];
+
+    // Determine the length of the arrays (they should all be the same length)
+    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length);
+
+    // Loop through the arrays and create objects
+    for (let i = 0; i < length; i++) {
+        let temoin = {
+            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
+            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
+            role: rolesArray[i] || ""  // Use empty string if value is undefined
+        };
+        temoins.push(temoin);
+    }
+
+    // Return the result
+    return temoins;
+}
+
+function createMembers(noms_members, prenoms_members, roles_members) {
+    // Ensure the strings are not null or undefined, and split them into arrays
+    let nomsArray = noms_members ? noms_members.split(',') : [];
+    let prenomsArray = prenoms_members ? prenoms_members.split(',') : [];
+    let rolesArray = roles_members ? roles_members.split(',') : [];
+
+    // Initialize an empty array to hold the members objects
+    let members = [];
+
+    // Determine the length of the arrays (they should all be the same length)
+    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length);
+
+    // Loop through the arrays and create objects
+    for (let i = 0; i < length; i++) {
+        let member = {
+            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
+            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
+            role: rolesArray[i] || ""  // Use empty string if value is undefined
+        };
+        members.push(member);
+    }
+
+    // Return the result
+    return members;
+}
+
 function formatDate(inputDate) {
   const months = [
     'Jan',
@@ -189,7 +241,7 @@ router.patch('/editrapport', (req, res) => {
 //VALID
 // Get inactive commissions and it's members
 router.get('/getcommission', (req, res) => {
-  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE ORDER BY c.num_c`
+  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE GROUP BY c.num_c`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -538,8 +590,29 @@ GROUP BY
       console.log('err executing /archive/getspv:', err)
       res.status(400).send(err)
     } else {
-      console.log('result /archive/getspv: ', result)
-      res.send(result)
+      
+      const data = {
+        numR: result[0].num_r,
+        matriculeE: result[0].matricule_e,
+        nomE: result[0].nom_e,
+        prenomE: result[0].prenom_e,
+        niveauE: result[0].niveau_e,
+        sectionE: result[0].section_e,
+        groupeE: result[0].groupe_e,
+        nomP: result[0].nom_p,
+        prenomP: result[0].prenom_p,
+        dateCd: result[0].date_cd,
+        dateI: result[0].date_i,
+        lieuI: result[0].lieu_i,
+        motifI: result[0].motif_i,
+        descriptionI: result[0].description_i,
+        numPV: result[0].num_pv,
+        datePV: result[0].date_pv,
+        libeleS: result[0].libele_s,
+        temoins: createTemoins(result[0].noms_temoins, result[0].prenoms_temoins, result[0].roles_temoins),
+        membres: createMembers(result[0].noms_membres, result[0].prenoms_membres, result[0].roles_membres)
+      }
+      res.send(data)
     }
   })
 })
