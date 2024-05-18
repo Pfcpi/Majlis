@@ -55,17 +55,6 @@ function Archive() {
 
   const commissionPage = useRef(null)
 
-  // edit a member information
-  /* Body being in the format of :
-  {
-	  "roleM": string value,
-    "nomM": string value,
-    "prenomM": string value,
-    "emailM": string value in the format of 'name@mail.x',
-    "dateDebutM": date value in the format of 'YYYY-MM-DD',
-    "idM": int value
-  }
-*/
 
   const [currentAddedMember, setCurrentAddedMember] = useState({
     roleM: '',
@@ -312,8 +301,10 @@ function Archive() {
     if (Object.keys(newErrors).length === 0) {
       if (addMember) {
         setAddMemberMessage(true)
+        setAddMember(false)
       } else {
         setModifyMemberMessage(true)
+        setModifyMember(false)
       }
     }
     setTimeout(
@@ -385,7 +376,7 @@ function Archive() {
     } else {
       setErrors((prev) => ({ ...prev, nomError: '' }))
       membres.forEach((m) => {
-        if (m.nom_m == data.nomM) {
+        if (m.nom_m == data.nomM && addMember) {
           setMembreExiste(true)
         }
       })
@@ -405,7 +396,7 @@ function Archive() {
     } else {
       setErrors((prev) => ({ ...prev, prenomError: '' }))
       membres.forEach((m) => {
-        if (m.prenom_m == data.prenomM) {
+        if (m.prenom_m == data.prenomM && addMember) {
           if (membreExiste) {
             setErrors((prev) => ({ ...prev, prenomError: 'ce membre existe déjà' }))
             return errors
@@ -445,7 +436,7 @@ function Archive() {
 
   const validateEmail = (data) => {
     let errors = {}
-    let current_date = (new Date().toISOString().slice(0, 10))
+    let current_date = new Date().toISOString().slice(0, 10)
     if (data.dateE.length == 0) {
       errors.date = 'Date est vide!'
       setErrorInfoEmail((prev) => ({ ...prev, dateError: errors.date }))
@@ -678,7 +669,7 @@ function Archive() {
                   handleAjouter(e)
                 }}
               >
-                Ajouter
+                {addMember ? 'Ajouter' : 'Modifier'}
               </button>
             </div>
           </form>

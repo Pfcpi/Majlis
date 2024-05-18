@@ -121,6 +121,22 @@ function Archive() {
   const [step, setStep] = useState(1)
   const [currentViewedEtudiant, setCurrentViewedEtudiant] = useState({})
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   async function fetchData() {
     addLoadingBar()
     const tache1 = await axios
@@ -993,6 +1009,7 @@ function Archive() {
                   Annuler
                 </button>
                 <button
+                  ref={buttonRef}
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
@@ -1002,9 +1019,9 @@ function Archive() {
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
                       .catch((err) => console.log(err))
                     const tache2 = await axios
-                      .get(api + '/rapport/get')
+                      .get(api + '/archive/getrapport')
                       .then((res) => {
-                        setEtudiants(res.data)
+                        setRapports(res.data)
                       })
                       .catch((err) => console.log(err))
                     RemoveLoadingBar()
@@ -1362,6 +1379,7 @@ function Archive() {
                 {step >= 2 ? 'retourner' : 'annuler'}
               </button>
               <button
+                ref={buttonRef}
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
                 onClick={(e) => {
                   e.preventDefault()

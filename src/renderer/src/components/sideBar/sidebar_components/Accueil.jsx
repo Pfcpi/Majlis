@@ -111,6 +111,21 @@ function Archive() {
     numR: 0
   })
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache1 = await axios
@@ -494,6 +509,7 @@ function Archive() {
                 Annuler
               </button>
               <button
+                ref={buttonRef}
                 onClick={async () => {
                   const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
@@ -617,7 +633,7 @@ function Archive() {
 
             <div className="w-full grow h-[50vh]">
               <div className="w-full h-full overflow-y-auto">
-                <table  className="w-full">
+                <table className="w-full">
                   <tr className="border-t">
                     <th className="w-1/4 border-x">
                       <div>Rapport</div>
@@ -671,6 +687,7 @@ function Archive() {
                   Annuler
                 </button>
                 <button
+                  ref={buttonRef}
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
@@ -1040,6 +1057,7 @@ function Archive() {
                 {step >= 2 ? 'retourner' : 'annuler'}
               </button>
               <button
+                ref={buttonRef}
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
                 onClick={(e) => {
                   e.preventDefault()

@@ -160,7 +160,7 @@ router.patch('/archivecom', (req, res) => {
         if (err) {
           res.status(200).send(err)
         } else {
-          let sqlquery = `INSERT INTO Commission (date_debut_c, actif_c) VALUES (NOW(), TRUE)`
+          let sqlquery = `INSERT INTO Commission (date_debut_c, date_fin_c,actif_c) VALUES (NOW(), '9999-12-30', TRUE)`
           db.query(sqlquery, (err, result) => {
             if (err) {
               res.status(200).send(err)

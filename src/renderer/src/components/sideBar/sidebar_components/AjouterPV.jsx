@@ -27,6 +27,21 @@ function AjouterPV() {
 
   const AjouterPVPage = useRef(null)
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache = await axios
@@ -254,7 +269,7 @@ function AjouterPV() {
               </div>
               <div className="container_input_rapport">
                 <h2>Membres présents au conseil</h2>
-                <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                <div className="w-full h-[20vh] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                   {members.map((p) => (
                     <div className="flex border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                       <div className="w-5/12">{p.role_m}</div>
@@ -288,6 +303,7 @@ function AjouterPV() {
                 Annuler
               </button>
               <button
+                ref={buttonRef}
                 className="button_dossier text-blue border-blue hover:bg-blue/25"
                 type="submit"
                 onClick={async (e) => {

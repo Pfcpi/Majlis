@@ -95,6 +95,21 @@ function AjouterRapport() {
 
   const { api } = useApi()
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   useEffect(() => {
     axios
       .get(api + '/rapport/get')
@@ -566,10 +581,7 @@ function AjouterRapport() {
                   value={rapport.dateI}
                   required
                 ></input>
-                <label
-                  className="label_rapport_fix"
-                  htmlFor="dateI"
-                >
+                <label className="label_rapport_fix" htmlFor="dateI">
                   Date
                 </label>
               </div>
@@ -680,6 +692,7 @@ function AjouterRapport() {
             {step > 1 ? 'Retourner' : 'Annuler'}
           </button>
           <button
+            ref={buttonRef}
             className="button_dossier text-blue border-blue hover:bg-blue/25 min-w-fit"
             type="submit"
             onClick={(e) => {

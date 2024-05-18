@@ -25,7 +25,21 @@ function App() {
   const [authState, setAuthState] = useState(false)
   const [Msg, setMsg] = useState('')
 
-  //const api = 'http://localhost:3000'
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   useEffect(() => {
     if (!auth) {
@@ -219,6 +233,7 @@ function App() {
                   type="password"
                 ></input>
                 <button
+                  ref={buttonRef}
                   className="relative w-3/5 py-3 px-5 border rounded-[10px] outline-none bg-blue text-white hover:opacity-80 overflow-hidden"
                   onClick={(e) => {
                     handleClick(e, '#fff')
