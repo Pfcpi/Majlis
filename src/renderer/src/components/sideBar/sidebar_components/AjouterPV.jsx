@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import axios from 'axios'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
+import WarningSVG from './../../../assets/warning.svg'
 
 import './sidebar_com_css/archives.css'
 
@@ -22,8 +23,8 @@ function AjouterPV() {
   const [temoinBuffer, setTemoinBuffer] = useState({ nomT: '', prenomT: '', roleT: '' })
   const [temoinArray, setTemoinArray] = useState([])
 
-  const [pathMainProcess, setPathMainProcess] = useState('')
-  const [pathBackend, setPathBackend] = useState('')
+  const [error, setError] = useState({ dateCdError: '' })
+  const [pvError, setPvError] = useState({ sanctionError: '' })
 
   const AjouterPVPage = useRef(null)
 
@@ -170,36 +171,43 @@ function AjouterPV() {
 
   const handleAjouter = async (e) => {
     e.preventDefault()
-    addLoadingBar()
-    const tache = await axios
-      .post(api + '/pv/addPV', {
-        numR: pv.numR,
-        libeleS: pv.libeleS,
-        numCD: pv.numCD,
-        temoin: temoinArray
-      })
-      .then((res) => {
-        RemoveLoadingBar()
-        console.log(res)
-      })
-      .catch((err) => {
-        RemoveLoadingBar()
-        console.log(err)
-      })
+    const newErrors = validateFormPV(pv)
+    if (Object.keys(newErrors).length === 0) {
+      e.preventDefault()
+      addLoadingBar()
+      const tache = await axios
+        .post(api + '/pv/addPV', {
+          numR: pv.numR,
+          libeleS: pv.libeleS,
+          numCD: pv.numCD,
+          temoin: temoinArray
+        })
+        .then((res) => {
+          RemoveLoadingBar()
+          console.log(res)
+        })
+        .catch((err) => {
+          RemoveLoadingBar()
+          console.log(err)
+        })
 
-    if (currentSelectedRapports.length > 1) {
-      setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
+      if (currentSelectedRapports.length > 1) {
+        setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
+      }
+      if (currentSelectedRapports.length == 1) {
+        setMembers([])
+      }
+      setCurrentSelectedRapports(currentSelectedRapports.slice(1))
+      const tache1 = await axios
+        .get(api + '/rapport/get')
+        .then((res) => {
+          setRapports(res.data)
+        })
+        .catch((err) => console.log(err))
     }
-    if (currentSelectedRapports.length == 1) {
-      setMembers([])
-    }
-    setCurrentSelectedRapports(currentSelectedRapports.slice(1))
-    const tache1 = await axios
-      .get(api + '/rapport/get')
-      .then((res) => {
-        setRapports(res.data)
-      })
-      .catch((err) => console.log(err))
+    setTimeout(() => {
+      setPvError({ sanctionError: '' })
+    }, 2000)
   }
 
   async function handleSupprimer() {
@@ -236,6 +244,38 @@ function AjouterPV() {
     }))
   }
 
+  const validateFormCd = (data) => {
+    let errors = {}
+    const currentDate = new Date().toISOString().slice(0, 10)
+
+    console.log('data: ', data)
+    if (data.dateCd.length == 0) {
+      errors.dateCd = 'date est vide!'
+      setError((prev) => ({ ...prev, dateCdError: errors.dateCd }))
+      return errors
+    } else if (data.dateCd > currentDate) {
+      errors.dateCd = "date doit etre inferieure a la date d'aujourd'hui!"
+      setError((prev) => ({ ...prev, dateCdError: errors.dateCd }))
+      return errors
+    } else {
+      setError((prev) => ({ ...prev, dateCdError: '' }))
+    }
+    return errors
+  }
+
+  const validateFormPV = (data) => {
+    let errors = {}
+
+    console.log('data: ', data)
+    if (data.libeleS.length == 0) {
+      errors.sanction = 'sanction est vide!'
+      setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
+      return errors
+    } else {
+      setPvError((prev) => ({ ...prev, sanctionError: '' }))
+    }
+    return errors
+  }
   return (
     <div ref={AjouterPVPage} className="flex w-full h-full">
       {creerConseilState && (
@@ -266,6 +306,12 @@ function AjouterPV() {
                   type="date"
                   required
                 ></input>
+                {error.dateCdError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {error.dateCdError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <h2>Membres présents au conseil</h2>
@@ -308,24 +354,30 @@ function AjouterPV() {
                 type="submit"
                 onClick={async (e) => {
                   e.preventDefault()
-                  addLoadingBar()
-                  const tache = await axios
-                    .post(api + '/pv/addCD', {
-                      dateCd: cd.dateCd,
-                      idM: members.map((obj) => obj.id_m)
-                    })
-                    .then((res) => {
-                      console.log(res)
-                      setCd((prev) => ({ ...prev, id: res.data.id }))
-                      setPv((prev) => ({
-                        ...prev,
-                        numCD: res.data.id,
-                        numR: currentSelectedRapports[0].num_r
-                      }))
-                    })
-                    .catch((err) => console.log(err))
-                  RemoveLoadingBar()
-                  setCreerConseildState(false)
+                  const newErrors = validateFormCd(cd)
+                  if (Object.keys(newErrors).length === 0) {
+                    addLoadingBar()
+                    const tache = await axios
+                      .post(api + '/pv/addCD', {
+                        dateCd: cd.dateCd,
+                        idM: members.map((obj) => obj.id_m)
+                      })
+                      .then((res) => {
+                        console.log(res)
+                        setCd((prev) => ({ ...prev, id: res.data.id }))
+                        setPv((prev) => ({
+                          ...prev,
+                          numCD: res.data.id,
+                          numR: currentSelectedRapports[0].num_r
+                        }))
+                      })
+                      .catch((err) => console.log(err))
+                    RemoveLoadingBar()
+                    setCreerConseildState(false)
+                  }
+                  setTimeout(() => {
+                    setError({ dateCdError: '' })
+                  }, 2000)
                 }}
               >
                 Ajouter
@@ -354,8 +406,14 @@ function AjouterPV() {
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="libeleS">
-                  libele
+                  Sanction
                 </label>
+                {pvError.sanctionError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {pvError.sanctionError}
+                  </p>
+                )}
               </div>
               {!isAddingTemoin && temoinArray.length < 3 && (
                 <div className="flex w-full justify-between items-center">
