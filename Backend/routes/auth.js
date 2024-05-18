@@ -144,7 +144,7 @@ router.patch('/cedit', (req, res) => {
 })
 
 // Sends a mail to chef departement containing the password
-router.post('/cmail', (req, res) => {
+router.get('/cmail', (req, res) => {
   let sqlquery = `SELECT * FROM Utilisateur WHERE id_u = 1`
   db.query(sqlquery, (err, result) => {
     if (err) {
@@ -157,21 +157,110 @@ router.post('/cmail', (req, res) => {
       db.query(sqlquery2, hashedNewPassword, (err, result) => {
         if (err) {
           res.status(400).send(err)
+        }
+          
+        
+      })
+      const mailOptions = {
+        from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
+        to: result[0].email_u,
+        subject: 'Votre mot de passe oublie.',
+        html : `<!DOCTYPE html>
+        <html lang="fr-FR">
+        <head>
+            <meta charset="UTF-8">
+            <title>new password</title>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+            <style>
+                body {
+                    font-family: "PT Serif", serif;
+                    margin: 0;
+                    min-height: 100vh;
+                    text-align: center;
+                    background-color: white;
+                }
+        
+                .container {
+                    text-align: center;
+                    padding: 20px;
+                    background-color: #18253b;
+                    gap: 0;
+                    margin: auto;
+                }
+        
+                .box1 {
+                    margin: 30px auto;
+                    padding: 0;
+                    text-align: center;
+                }
+        
+                .box2 {
+                    background-color: #212f4b;
+                    margin: 30px 5%;
+                    padding: 35px;
+                    text-align: center;
+                }
+        
+                #logo {
+                    width: 10em;
+                    height: 10em;
+                    margin: 0;
+                }
+        
+                #title {
+                    font-size: 2.3em;
+                    font-weight: 500;
+                    color: white;
+                    margin: 15px auto 0;
+                }
+        
+                #parg {
+                    font-size: 1.25em;
+                    font-weight: 400;
+                    color: white;
+                    margin: 0 auto 15px;
+                }
+        
+                #mdp {
+                    font-size: 1.9em;
+                    font-weight: 700;
+                    color: white;
+                    margin: 15px auto 0;
+                }
+        
+                #msg {
+                    font-size: 1em;
+                    font-weight: 500;
+                    color: white;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="box1">
+                    <img src="https://i.goopics.net/drpcqh.png" id="logo">
+                    <h1 id="title">
+                        Mot de passe<br>
+                        réinitialiser
+                    </h1>
+                    <div class="box2">
+                        <p id="parg">Votre nouveau mot de passe de connexion:</p>
+                        <p id="mdp">${newPass}</p>
+                    </div>
+                    <p id="msg">Veuillez changer votre mot de passe a l'aide de ce code de connexion.</p>
+                </div>
+            </div>
+        </body>
+        </html>`
+      }
+      transporter.sendMail(mailOptions, function (err, info) {
+        if (err) {
+          console.log(err)
         } else {
-          const mailOptions = {
-            from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
-            to: result[0].email_u,
-            subject: 'Votre mot de passe oublie.',
-            html : ``
-          }
-          transporter.sendMail(mailOptions, function (err, info) {
-            if (err) {
-              console.log(err)
-            } else {
-              console.log('Email sent')
-              res.sendStatus(204)
-            }
-          })
+          console.log('Email sent')
+          res.sendStatus(204)
         }
       })
     }
@@ -179,7 +268,7 @@ router.post('/cmail', (req, res) => {
 })
 
 // Sends a mail to president containing the password
-router.post('/pmail', (req, res) => {
+router.get('/pmail', (req, res) => {
   let sqlquery = `SELECT m.email_m FROM Membre m
   INNER JOIN Commission c ON c.num_c = m.num_c
   WHERE c.actif_c = TRUE AND m.role_m = "Président"`
@@ -194,26 +283,113 @@ router.post('/pmail', (req, res) => {
       db.query(sqlquery2, hashedNewPassword, (err, result) => {
         if (err) {
           res.status(400).send(err)
-        } else {
-          const mailOptions = {
-            from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
-            to: result[0].email_u,
-            subject: 'Votre mot de passe oublie.',
-            html : ``
-          }
-          transporter.sendMail(mailOptions, function (err, info) {
-            if (err) {
-              console.log(err)
-            } else {
-              console.log('Email sent')
-              res.sendStatus(204)
-            }
-          })
+        }})
+        const mailOptions = {
+          from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
+          to: result[0].email_u,
+          subject: 'Votre mot de passe oublie.',
+          html : `<!DOCTYPE html>
+          <html lang="fr-FR">
+          <head>
+              <meta charset="UTF-8">
+              <title>new password</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+              <style>
+                  body {
+                      font-family: "PT Serif", serif;
+                      margin: 0;
+                      min-height: 100vh;
+                      text-align: center;
+                      background-color: white;
+                  }
+          
+                  .container {
+                      text-align: center;
+                      padding: 20px;
+                      background-color: #18253b;
+                      gap: 0;
+                      margin: auto;
+                  }
+          
+                  .box1 {
+                      margin: 30px auto;
+                      padding: 0;
+                      text-align: center;
+                  }
+          
+                  .box2 {
+                      background-color: #212f4b;
+                      margin: 30px 5%;
+                      padding: 35px;
+                      text-align: center;
+                  }
+          
+                  #logo {
+                      width: 10em;
+                      height: 10em;
+                      margin: 0;
+                  }
+          
+                  #title {
+                      font-size: 2.3em;
+                      font-weight: 500;
+                      color: white;
+                      margin: 15px auto 0;
+                  }
+          
+                  #parg {
+                      font-size: 1.25em;
+                      font-weight: 400;
+                      color: white;
+                      margin: 0 auto 15px;
+                  }
+          
+                  #mdp {
+                      font-size: 1.9em;
+                      font-weight: 700;
+                      color: white;
+                      margin: 15px auto 0;
+                  }
+          
+                  #msg {
+                      font-size: 1em;
+                      font-weight: 500;
+                      color: white;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="box1">
+                      <img src="https://i.goopics.net/drpcqh.png" id="logo">
+                      <h1 id="title">
+                          Mot de passe<br>
+                          réinitialiser
+                      </h1>
+                      <div class="box2">
+                          <p id="parg">Votre nouveau mot de passe de connexion:</p>
+                          <p id="mdp">${newPass}</p>
+                      </div>
+                      <p id="msg">Veuillez changer votre mot de passe a l'aide de ce code de connexion.</p>
+                  </div>
+              </div>
+          </body>
+          </html>`
         }
-      })
+        transporter.sendMail(mailOptions, function (err, info) {
+          if (err) {
+            console.log(err)
+          } else {
+            console.log('Email sent')
+            res.sendStatus(204)
+          }
+        })
+      }
+    })
     }
-})
-})
+)
 
 /* Change nom, prenom and email of chef departement (in case it happens which is very unlikely)
 {

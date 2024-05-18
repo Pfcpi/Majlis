@@ -6,6 +6,7 @@ const router = express.Router()
 const { db } = require('../config/db')
 const { generatePDFpv } = require('../services/pdf')
 const { generatePDFrapport } = require('../services/pdf')
+const { generatePDFcd } = require('../services/pdf')
 const nodemailer = require('nodemailer')
 
 // Automatic mailling setup
@@ -23,56 +24,99 @@ function maj(chaine) {
   return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
 }
 
+function numRapport(num_rapport) {
+  return num_rapport.split(',').map(Number)
+}
+function dateSplit(dates) {
+  return dates.split(',')
+}
 function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
-  // Ensure the strings are not null or undefined, and split them into arrays
-  let nomsArray = noms_temoins ? noms_temoins.split(',') : []
-  let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : []
-  let rolesArray = roles_temoins ? roles_temoins.split(',') : []
+    // Ensure the strings are not null or undefined, and split them into arrays
+    let nomsArray = noms_temoins ? noms_temoins.split(',') : []
+    let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : []
+    let rolesArray = roles_temoins ? roles_temoins.split(',') : []
 
-  // Initialize an empty array to hold the temoins objects
-  let temoins = []
+    // Initialize an empty array to hold the temoins objects
+    let temoins = []
 
-  // Determine the length of the arrays (they should all be the same length)
-  let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
+    // Determine the length of the arrays (they should all be the same length)
+    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
-  // Loop through the arrays and create objects
-  for (let i = 0; i < length; i++) {
-    let temoin = {
-      nom: nomsArray[i].toUpperCase() || '', // Use empty string if value is undefined
-      prenom: maj(prenomsArray[i]) || '', // Use empty string if value is undefined
-      role: rolesArray[i] || '' // Use empty string if value is undefined
+    // Loop through the arrays and create objects
+    for (let i = 0; i < length; i++) {
+        let temoin = {
+            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
+            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
+            role: rolesArray[i] || ""  // Use empty string if value is undefined
+        }
+        temoins.push(temoin)
     }
-    temoins.push(temoin)
-  }
 
-  // Return the result
-  return temoins
+    // Return the result
+    return temoins
+}
+
+function transformNomsMembers(noms_members) {
+  // Split the input string by commas to get individual name pairs
+  const pairs = noms_members.split(',')
+
+  // Map over the pairs to apply the transformations
+  return pairs.map(pair => {
+      // Trim any leading/trailing whitespace and split by space to separate name and firstname
+      const [name, firstname] = pair.trim().split(' ')
+
+      // Transform name to uppercase and apply maj to firstname
+      return `${name.toUpperCase()} ${maj(firstname)}`
+  })
+}
+
+function formatNames(etudiants) {
+  // Split the string by commas to get individual names
+  return etudiants.split(',').map(fullName => {
+      // Trim any leading/trailing whitespace
+      fullName = fullName.trim()
+      
+      // Find the index of the first space
+      let firstSpaceIndex = fullName.indexOf(' ')
+      
+      // Separate the family name and the rest of the name(s)
+      let familyName = fullName.substring(0, firstSpaceIndex).toUpperCase()
+      let firstNames = fullName.substring(firstSpaceIndex + 1)
+      
+      // Capitalize the first letter of each first name
+      firstNames = firstNames.split(' ').map(name => {
+          return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+      }).join(' ')
+      
+      // Combine the formatted family name and first names
+      return `${familyName} ${firstNames}`
+  })
 }
 
 function createMembers(noms_members, prenoms_members, roles_members) {
-  // Ensure the strings are not null or undefined, and split them into arrays
-  let nomsArray = noms_members ? noms_members.split(',') : []
-  let prenomsArray = prenoms_members ? prenoms_members.split(',') : []
-  let rolesArray = roles_members ? roles_members.split(',') : []
+    // Ensure the strings are not null or undefined, and split them into arrays
+    let nomsArray = noms_members ? noms_members.split(',') : []
+    let prenomsArray = prenoms_members ? prenoms_members.split(',') : []
+    let rolesArray = roles_members ? roles_members.split(',') : []
 
-  // Initialize an empty array to hold the members objects
-  let members = []
+    // Initialize an empty array to hold the members objects
+    let members = []
 
-  // Determine the length of the arrays (they should all be the same length)
-  let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
+    // Determine the length of the arrays (they should all be the same length)
+    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
-  // Loop through the arrays and create objects
-  for (let i = 0; i < length; i++) {
-    let member = {
-      nom: nomsArray[i].toUpperCase() || '', // Use empty string if value is undefined
-      prenom: maj(prenomsArray[i]) || '', // Use empty string if value is undefined
-      role: rolesArray[i] || '' // Use empty string if value is undefined
+    // Loop through the arrays and create objects
+    for (let i = 0; i < length; i++) {
+        let member = {
+            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
+            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
+            role: rolesArray[i] || ""  // Use empty string if value is undefined
+        }
+        members.push(member)
     }
-    members.push(member)
-  }
 
-  // Return the result
-  return members
+    // Return the result
+    return members
 }
 
 function formatDate(inputDate) {
@@ -97,6 +141,40 @@ function formatDate(inputDate) {
   const year = date.getFullYear()
 
   return `${day}/${month}/${year}`
+}
+
+function formatTuples(nomE, prenomE, niveauE, sectionE, groupeE, nomP, prenomP, motifI, libeleS) {
+  // Split each input string into an array of values
+  const nomEArray = nomE.split(',')
+  const prenomEArray = prenomE.split(',')
+  const niveauEArray = niveauE.split(',')
+  const sectionEArray = sectionE.split(',')
+  const groupeEArray = groupeE.split(',')
+  const nomPArray = nomP.split(',')
+  const prenomPArray = prenomP.split(',')
+  const motifIArray = motifI.split(',')
+  const libeleSArray = libeleS.split(',')
+
+  // Map over the arrays to create the tuples
+  return nomEArray.map((_, index) => {
+      // Check for null or undefined values and handle them
+      const nomEValue = nomEArray[index] ? nomEArray[index].toUpperCase() : null
+      const prenomEValue = prenomEArray[index] ? maj(prenomEArray[index]) : null
+      const nomPValue = nomPArray[index] ? nomPArray[index].toUpperCase() : null
+      const prenomPValue = prenomPArray[index] ? maj(prenomPArray[index]) : null
+
+      return {
+          nomE: nomEValue,
+          prenomE: prenomEValue,
+          niveauE: niveauEArray[index],
+          sectionE: sectionEArray[index],
+          groupeE: groupeEArray[index],
+          nomP: nomPValue,
+          prenomP: prenomPValue,
+          motifI: motifIArray[index],
+          libeleS: libeleSArray[index]
+      }
+  })
 }
 
 //VALID
@@ -241,7 +319,21 @@ router.patch('/editrapport', (req, res) => {
 //VALID
 // Get inactive commissions and it's members
 router.get('/getcommission', (req, res) => {
-  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE GROUP BY c.num_c`
+  let sqlquery = `SELECT
+  c.num_c, c.date_debut_c, c.date_fin_c,
+  GROUP_CONCAT(DISTINCT m.nom_m) AS nomM,
+  GROUP_CONCAT(DISTINCT m.prenom_m) AS roleM,
+  GROUP_CONCAT(DISTINCT m.role_m) AS roleM
+FROM
+Commission c
+
+INNER JOIN Membre m ON m.num_c = c.num_c
+
+WHERE c.actif_c = FALSE
+
+GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
+
+`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -259,40 +351,16 @@ router.get('/getcommission', (req, res) => {
 */
 router.get('/getscommission', (req, res) => {
   let numC = req.body.numC
-  let sqlquery = `SELECT
-  c.num_c,
+  let sqlquery = `SELECT DISTINCT
   CD.num_cd,
-  c.date_fin_c,
-  c.date_fin_c,
-  GROUP_CONCAT(CONCAT_WS(' ', m.nom_m, m.prenom_m, m.role_m) SEPARATOR ', ') AS membres,
-  pv.num_pv,
-  pv.date_pv,
-  nom_e,
-  prenom_e
-FROM
-  Commission c
+  CD.date_cd
+FROM Conseil_Discipline CD
 INNER JOIN
-  Membre m ON m.num_c = c.num_c
-INNER JOIN
-  PV pv ON pv.num_c = c.num_c
+  PV pv ON pv.num_cd = CD.num_cd
 LEFT JOIN
-  Commission_Presente CP ON m.id_m = CP.id_m
-LEFT JOIN
-  Conseil_Discipline CD ON pv.num_cd = CD.num_cd
-LEFT JOIN
-  Rapport R ON pv.num_r = R.num_r
-LEFT JOIN
-  Etudiant E ON R.matricule_e = E.matricule_e
+  Commission c ON pv.num_c = c.num_c
 WHERE
-  c.num_c = ?
-GROUP BY
-  c.num_c,
-  CD.num_cd,
-  c.date_fin_c,
-  pv.num_pv,
-  pv.date_pv,
-  nom_e,
-  prenom_e`
+  c.num_c = ?`
   db.query(sqlquery, numC, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -334,28 +402,6 @@ router.delete('/deletecommission', (req, res) => {
       "datePV": date format 'YYYY-MM-DD',
       "libeleS": String,
       "numPV": int,
-      "newIdM": [
-        {
-          "nomM": String,
-          "prenomM": String
-        },
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null,
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null,
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null,
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null
-      ],
       "temoinNew": [
         {
         "nomT": string value,
@@ -372,41 +418,18 @@ router.delete('/deletecommission', (req, res) => {
         "prenomT": string value,
         "roleT": string value
         } or null
-      ],
-      "dateCD": Date value
+      ]
     }
   */
 router.patch('/editpv', (req, res) => {
-  let { datePV, libeleS, numPV, newIdM, temoinNew, dateCD } = req.body
-  let newIdMArray = Object.values(newIdM).filter((member) => member !== null)
+  let { datePV, libeleS, numPV, temoinNew } = req.body
   let temoinNewArray = Object.values(temoinNew).filter((temoin) => temoin !== null)
   let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`
   db.query(sqlqueryP, [datePV, numPV])
-  let sqlquerydelM = `DELETE cp FROM Commission_Presente cp LEFT JOIN PV ON PV.num_cd = cp.num_cd WHERE PV.num_pv = ?`
-  db.query(sqlquerydelM, numPV, (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-  })
-  let sqlquerygetM = `SELECT id_m FROM Membre WHERE nom_m = ? and prenom_m = ?`
-  let idM = []
-  for (let member of newIdMArray) {
-    db.query(sqlquerygetM, [member.nomM, member.prenomM], (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      }
-      idM = result[0]
-      let sqlqueryaddM = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES
-                                  ((SELECT PV.num_cd FROM PV
-                                  INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?), ?)`
-      db.query(sqlqueryaddM, [numPV, result[0].id_m], (err, result) => {
-        if (err) {
-          res.status(400).send(err)
-        }
-      })
-    })
-  }
-  let sqlquerydelT = `DELETE te FROM Temoigne te LEFT JOIN PV ON PV.num_cd = te.num_cd WHERE PV.num_pv = ?`
+ 
+  let sqlquerydelT = `DELETE te FROM Temoigne te
+  INNER JOIN PV ON PV.num_pv = te.num_pv
+  WHERE PV.num_pv = ?`
   db.query(sqlquerydelT, numPV, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -426,18 +449,18 @@ router.patch('/editpv', (req, res) => {
             res.status(400).send(err)
           }
           numT = result[0].num_t
-          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (${numT}, (SELECT PV.num_cd FROM PV
+          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (${numT}, ?,(SELECT PV.num_cd FROM PV
                     INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
-          db.query(sqlquerylinkT, numPV, (err, result) => {
+          db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
             if (err) {
               res.status(400).send(err)
             }
           })
         })
       } else {
-        sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (LAST_INSERT_ID(), (SELECT PV.num_cd FROM PV
+        sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (LAST_INSERT_ID(), ?, (SELECT PV.num_cd FROM PV
                 INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
-        db.query(sqlquerylinkT, numPV, (err, result) => {
+        db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
           if (err) {
             res.status(400).send(err)
           }
@@ -452,14 +475,7 @@ router.patch('/editpv', (req, res) => {
       res.status(400).send(err)
     }
   })
-  let sqlqueryC = `UPDATE Conseil_Discipline cd INNER JOIN PV ON PV.num_cd = cd.num_cd SET cd.date_cd = ? WHERE PV.num_pv = ?`
-  db.query(sqlqueryC, [dateCD, numPV], (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    } else {
-      res.sendStatus(204)
-    }
-  })
+  res.sendStatus(204)
 })
 
 // VALID
@@ -926,7 +942,7 @@ GROUP BY
       res.send(pdfBuffer)
     } catch (err) {
       console.error(err)
-      res.status(200).send('An error occurred while generating the PDF')
+      res.status(400).send('An error occurred while generating the PDF')
     }
   })
 })
@@ -975,9 +991,90 @@ router.post('/getscd', (req, res) => {
   db.query(sqlquery, numcd, (err, result) => {
     if (err) {
       res.status(400).send(err)
-    } else {
-      res.send(result[0])
     }
+    const data = {
+      numCD: result[0].num_cd,
+      dateCD: result[0].date_cd,
+      numRapport: numRapport(result[0].num_rapport),
+      dateRapport: result[0].date_rapport,
+      etudiants: formatNames(result[0].etudiants),
+      membres: formatNames(result[0].membres)
+    }
+    res.send(data)
+  })
+})
+
+//Print all informations of a cd
+/*
+{
+  "numCD": int value
+}
+*/
+router.get('/printcd', (req, res) => {
+  let numCD = req.body.numCD
+  const sqlquery = `SELECT
+  cd.date_cd,
+
+  GROUP_CONCAT(DISTINCT pv.num_pv) AS numPV,
+  GROUP_CONCAT(DISTINCT pv.date_pv) AS datePV,
+
+
+  GROUP_CONCAT(DISTINCT e.nom_e) AS nomE,
+  GROUP_CONCAT(DISTINCT e.prenom_e) AS prenomE,
+  GROUP_CONCAT(DISTINCT e.niveau_e) AS niveauE,
+  GROUP_CONCAT(DISTINCT e.section_e) AS sectionE,
+  GROUP_CONCAT(DISTINCT e.groupe_e) AS groupeE,
+  GROUP_CONCAT(DISTINCT p.nom_p) AS nomP,
+  GROUP_CONCAT(DISTINCT p.prenom_p) AS prenomP,
+  GROUP_CONCAT(DISTINCT i.motif_i) AS motifI,
+  GROUP_CONCAT(DISTINCT s.libele_s) AS libeleS,
+
+  (SELECT CONCAT(m.nom_m, ' ', m.prenom_m) FROM Membre m
+    LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+    LEFT JOIN Commission c ON c.num_c = m.num_c
+
+    WHERE c.actif_c = 1 AND m.role_m = 'Président') as nom_president,
+  GROUP_CONCAT(DISTINCT m.nom_m, ' ', m.prenom_m) AS noms_membres
+FROM
+    Conseil_Discipline cd
+INNER JOIN
+    PV pv ON pv.num_cd = cd.num_cd
+LEFT JOIN
+    Rapport r ON r.num_r = pv.num_r
+LEFT JOIN
+    Sanction s ON pv.num_s = s.num_s
+LEFT JOIN
+    Etudiant e ON r.matricule_e = e.matricule_e
+LEFT JOIN
+    Plaignant p ON r.id_p = p.id_p
+LEFT JOIN
+    Commission_Presente cp ON pv.num_cd = cp.num_cd
+LEFT JOIN
+    Infraction i ON i.num_i = r.num_i
+LEFT JOIN
+    Membre m ON cp.id_m = m.id_m
+
+WHERE cd.num_cd = ?
+  `
+  db.query(sqlquery, numCD, async (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+      }
+      const data = {
+        dateCD: result[0].date_cd,
+        numPV: numRapport(result[0].numPV),
+        datePV: dateSplit(result[0].datePV),
+        tuples: formatTuples(result[0].nomE, result[0].prenomE, result[0].niveauE, result[0].sectionE, result[0].groupeE, result[0].nomP, result[0].prenomP, result[0].motifI, result[0].libeleS),
+        president: `${result[0].nom_president.split(' ')[0].toUpperCase()} ${maj(result[0].nom_president.split(' ')[1])}`,
+        membres: transformNomsMembers(result[0].noms_membres)
+      }
+      try {
+        const pdfBuffer = await generatePDFcd(data, req.body.path)
+        res.send(pdfBuffer)
+      } catch (err) {
+        console.error(err)
+        res.status(400).send('An error occurred while generating the PDF')
+      }
   })
 })
 
