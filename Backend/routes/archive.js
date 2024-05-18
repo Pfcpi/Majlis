@@ -728,18 +728,18 @@ WHERE
 
     const data = {
       matriculeE: result[0].matricule_e,
-      nomE: result[0].nom_e.toUpperCase(),
+      nomE: (result[0].nom_e).toUpperCase(),
       prenomE: maj(result[0].prenom_e),
       niveauE: result[0].niveau_e,
       groupeE: result[0].groupe_e,
       sectionE: result[0].section_e,
-      nomP: result[0].nom_p.toUpperCase(),
+      nomP: (result[0].nom_p).toUpperCase(),
       prenomP: maj(result[0].prenom_p),
       dateCD: formatDate(result[0].date_cd),
       motifI: result[0].motif_i,
       datePV: formatDate(result[0].date_pv),
       libeleS: result[0].libele_s,
-      nomPR: result[0].nom_pres.toUpperCase(),
+      nomPR: (result[0].nom_pres).toUpperCase(),
       prenomPR: maj(result[0].prenom_pres),
       nomT: result[0].noms_temoins,
       prenomT: result[0].prenoms_temoins,
@@ -803,12 +803,12 @@ WHERE r.num_r = ?`
     if (result) {
       const data = {
         matriculeE: result[0].matricule_e,
-        nomE: result[0].nom_e.toUpperCase(),
+        nomE: (result[0].nom_e).toUpperCase(),
         prenomE: maj(result[0].prenom_e),
         niveauE: result[0].niveau_e,
         groupeE: result[0].groupe_e,
         sectionE: result[0].section_e,
-        nomP: result[0].nom_p.toUpperCase(),
+        nomP: (result[0].nom_p).toUpperCase(),
         prenomP: maj(result[0].prenom_p),
         dateI: formatDate(result[0].date_i),
         lieuI: result[0].lieu_i,
@@ -931,13 +931,13 @@ GROUP BY
 
     const data = {
       matriculeE: result[0].matricule_e,
-      nomE: result[0].nom_e,
-      prenomE: result[0].prenom_e,
+      nomE: result[0].nom_e.toUpperCase(),
+      prenomE: maj(result[0].prenom_e),
       niveauE: result[0].niveau_e,
       groupeE: result[0].groupe_e,
       sectionE: result[0].section_e,
-      nomP: result[0].nom_p,
-      prenomP: result[0].prenom_p,
+      nomP: result[0].nom_p.toUpperCase(),
+      prenomP: maj(result[0].prenom_p),
       dateCD: formatDate(result[0].date_cd),
       motifI: result[0].motif_i,
       datePV: formatDate(result[0].date_pv),
@@ -1051,7 +1051,7 @@ router.get('/printcd', (req, res) => {
 FROM
     Conseil_Discipline cd
 INNER JOIN
-    PV pv ON pv.num_cd = cd.num_cd
+    PV pv ON pv.nu  m_cd = cd.num_cd
 LEFT JOIN
     Rapport r ON r.num_r = pv.num_r
 LEFT JOIN
