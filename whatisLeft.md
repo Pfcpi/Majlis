@@ -2,12 +2,7 @@
 
 ## Overall
 
-- pv generale(waiting for html (ouss)).
-- use manual animated.
 - forgot password.
-
-- full blocking bg:
-  - archive
 
 ## Ajouter rapport
 
@@ -23,9 +18,15 @@
 
   - modify(problem in route)
 
+- commission:
+
+  - display
+  - view
+  - search
+
 - conseils:
 
-  - view. (router problem)
+  - view. (route problem)
   - search
 
 ## Bugs
@@ -33,5 +34,11 @@
 - all forms should be able to press the enter key and it works
   - modifier pv
 - before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
+- use manual (change text)
 - nom et prenom de president de conseil manque dans le pv pdf el le format html doit etre changé(ouss and mouh).
 - date always removes one day.
+- full blocking bg:
+
+  - archive
+
+- pv generale(waiting for html (ouss)).

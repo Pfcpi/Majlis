@@ -12,6 +12,7 @@ import useApi from './zustand/api.js'
 import authAni from './assets/animations/authentication.json'
 import useHelp from './zustand/help.js'
 import arrowSVG from './assets/arrow.svg'
+import useCliped from './zustand/cliped.js'
 
 import './index.css'
 import axios from 'axios'
@@ -21,6 +22,7 @@ function App() {
   const { auth, authentificate } = useAuth()
   const { account, setChef, setPresident, emptyAccount } = useAccount()
   const { api } = useApi()
+  const { cliped } = useCliped()
   const { help, setHelp, ExitHelp } = useHelp()
   const [ChangePassword, setChangePassword] = useState(false)
   const [password, setPassword] = useState('')
@@ -30,12 +32,12 @@ function App() {
   const [Msg, setMsg] = useState('')
 
   const dynamicHeight = [
-    'top-[206px]',
-    'top-[266px]',
-    'top-[326px]',
-    'top-[386px]',
-    'top-[486px]',
-    'top-[546px]'
+    'top-[200px]',
+    'top-[260px]',
+    'top-[320px]',
+    'top-[380px]',
+    'top-[480px]',
+    'top-[540px]'
   ]
   const guide = [
     'View the list of untreated reports',
@@ -280,8 +282,13 @@ function App() {
         <div className="flex flex-col h-screen w-screen relative text-primary-white-theme-text-color dark:text-white">
           {help && (
             <div className="fullBgBlock">
-              <img className={`w-10 h-10 absolute left-32 duration-100 ${dynamicHeight[step]}`} src={arrowSVG}></img>
-              <div className="absolute flex flex-col top-48 left-64 w-96 h-fit bg-white text-dark-gray shadow-md rounded-lg">
+              <img
+                className={`w-10 h-10 absolute  ${cliped ? 'left-11' : 'left-32'} duration-100 ${dynamicHeight[step]}`}
+                src={arrowSVG}
+              ></img>
+              <div
+                className={`absolute flex flex-col top-48 ${cliped ? 'left-28' : 'left-64'} w-96 h-fit bg-white text-dark-gray shadow-md rounded-lg`}
+              >
                 <div className="w-full h-20 p-4 text-pretty">{guide[step]}</div>
                 <div className="flex w-full justify-between p-4">
                   <button
