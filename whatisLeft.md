@@ -19,24 +19,14 @@
 
 ## Archive page
 
-- rapport:
-
-  - modify(zustand/Rapport/Rapport.js, forms/InputField.jsx, forms/ModifyRapport.jsx).
-
 - pv:
 
-  - modify
-
-- commissions.
-
-  - modify.
+  - modify(problem in route)
 
 - conseils:
 
   - view. (router problem)
   - search
-
-- (to expand)
 
 ## Bugs
 

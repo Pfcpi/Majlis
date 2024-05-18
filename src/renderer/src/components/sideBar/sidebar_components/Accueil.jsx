@@ -27,7 +27,19 @@ import WarningSVG from './../../../assets/warning.svg'
 import axios from 'axios'
 
 function Archive() {
-  const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const niveaux = [
+    'ING 1',
+    'ING 2',
+    'ING 3',
+    'ING 4',
+    'ING 5',
+    'L1',
+    'L2',
+    'L3',
+    'M1',
+    'M2',
+    'Doctorat'
+  ]
   const accueilPage = useRef(null)
   const motif1 = [
     'Demande non fondée de double correction',
