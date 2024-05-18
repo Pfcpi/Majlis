@@ -23,17 +23,21 @@ function maj(chaine) {
   return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
 }
 
+function numRapport(num_rapport) {
+  return num_rapport.split(',').map(Number)
+}
+
 function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
     // Ensure the strings are not null or undefined, and split them into arrays
-    let nomsArray = noms_temoins ? noms_temoins.split(',') : [];
-    let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : [];
-    let rolesArray = roles_temoins ? roles_temoins.split(',') : [];
+    let nomsArray = noms_temoins ? noms_temoins.split(',') : []
+    let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : []
+    let rolesArray = roles_temoins ? roles_temoins.split(',') : []
 
     // Initialize an empty array to hold the temoins objects
-    let temoins = [];
+    let temoins = []
 
     // Determine the length of the arrays (they should all be the same length)
-    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length);
+    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
     // Loop through the arrays and create objects
     for (let i = 0; i < length; i++) {
@@ -41,25 +45,48 @@ function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
             nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
             prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
             role: rolesArray[i] || ""  // Use empty string if value is undefined
-        };
-        temoins.push(temoin);
+        }
+        temoins.push(temoin)
     }
 
     // Return the result
-    return temoins;
+    return temoins
+}
+
+function formatNames(etudiants) {
+  // Split the string by commas to get individual names
+  return etudiants.split(',').map(fullName => {
+      // Trim any leading/trailing whitespace
+      fullName = fullName.trim()
+      
+      // Find the index of the first space
+      let firstSpaceIndex = fullName.indexOf(' ')
+      
+      // Separate the family name and the rest of the name(s)
+      let familyName = fullName.substring(0, firstSpaceIndex).toUpperCase()
+      let firstNames = fullName.substring(firstSpaceIndex + 1)
+      
+      // Capitalize the first letter of each first name
+      firstNames = firstNames.split(' ').map(name => {
+          return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+      }).join(' ')
+      
+      // Combine the formatted family name and first names
+      return `${familyName} ${firstNames}`
+  })
 }
 
 function createMembers(noms_members, prenoms_members, roles_members) {
     // Ensure the strings are not null or undefined, and split them into arrays
-    let nomsArray = noms_members ? noms_members.split(',') : [];
-    let prenomsArray = prenoms_members ? prenoms_members.split(',') : [];
-    let rolesArray = roles_members ? roles_members.split(',') : [];
+    let nomsArray = noms_members ? noms_members.split(',') : []
+    let prenomsArray = prenoms_members ? prenoms_members.split(',') : []
+    let rolesArray = roles_members ? roles_members.split(',') : []
 
     // Initialize an empty array to hold the members objects
-    let members = [];
+    let members = []
 
     // Determine the length of the arrays (they should all be the same length)
-    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length);
+    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
     // Loop through the arrays and create objects
     for (let i = 0; i < length; i++) {
@@ -67,12 +94,12 @@ function createMembers(noms_members, prenoms_members, roles_members) {
             nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
             prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
             role: rolesArray[i] || ""  // Use empty string if value is undefined
-        };
-        members.push(member);
+        }
+        members.push(member)
     }
 
     // Return the result
-    return members;
+    return members
 }
 
 function formatDate(inputDate) {
@@ -241,7 +268,7 @@ router.patch('/editrapport', (req, res) => {
 //VALID
 // Get inactive commissions and it's members
 router.get('/getcommission', (req, res) => {
-  let sqlquery = `SELECT c.*, m.* FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE GROUP BY c.num_c`
+  let sqlquery = `SELECT * FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE GROUP BY c.num_c`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -259,40 +286,16 @@ router.get('/getcommission', (req, res) => {
 */
 router.get('/getscommission', (req, res) => {
   let numC = req.body.numC
-  let sqlquery = `SELECT
-  c.num_c,
+  let sqlquery = `SELECT DISTINCT
   CD.num_cd,
-  c.date_fin_c,
-  c.date_fin_c,
-  GROUP_CONCAT(CONCAT_WS(' ', m.nom_m, m.prenom_m, m.role_m) SEPARATOR ', ') AS membres,
-  pv.num_pv,
-  pv.date_pv,
-  nom_e,
-  prenom_e
-FROM
-  Commission c
+  CD.date_cd
+FROM Conseil_Discipline CD
 INNER JOIN
-  Membre m ON m.num_c = c.num_c
-INNER JOIN
-  PV pv ON pv.num_c = c.num_c
+  PV pv ON pv.num_cd = CD.num_cd
 LEFT JOIN
-  Commission_Presente CP ON m.id_m = CP.id_m
-LEFT JOIN
-  Conseil_Discipline CD ON pv.num_cd = CD.num_cd
-LEFT JOIN
-  Rapport R ON pv.num_r = R.num_r
-LEFT JOIN
-  Etudiant E ON R.matricule_e = E.matricule_e
+  Commission c ON pv.num_c = c.num_c
 WHERE
-  c.num_c = ?
-GROUP BY
-  c.num_c,
-  CD.num_cd,
-  c.date_fin_c,
-  pv.num_pv,
-  pv.date_pv,
-  nom_e,
-  prenom_e`
+  c.num_c = ?`
   db.query(sqlquery, numC, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -334,28 +337,6 @@ router.delete('/deletecommission', (req, res) => {
       "datePV": date format 'YYYY-MM-DD',
       "libeleS": String,
       "numPV": int,
-      "newIdM": [
-        {
-          "nomM": String,
-          "prenomM": String
-        },
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null,
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null,
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null,
-        {
-          "nomM": String,
-          "prenomM": String
-        } or null
-      ],
       "temoinNew": [
         {
         "nomT": string value,
@@ -372,41 +353,18 @@ router.delete('/deletecommission', (req, res) => {
         "prenomT": string value,
         "roleT": string value
         } or null
-      ],
-      "dateCD": Date value
+      ]
     }
   */
 router.patch('/editpv', (req, res) => {
-  let { datePV, libeleS, numPV, newIdM, temoinNew, dateCD } = req.body
-  let newIdMArray = Object.values(newIdM).filter((member) => member !== null)
+  let { datePV, libeleS, numPV, temoinNew } = req.body
   let temoinNewArray = Object.values(temoinNew).filter((temoin) => temoin !== null)
   let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`
   db.query(sqlqueryP, [datePV, numPV])
-  let sqlquerydelM = `DELETE cp FROM Commission_Presente cp LEFT JOIN PV ON PV.num_cd = cp.num_cd WHERE PV.num_pv = ?`
-  db.query(sqlquerydelM, numPV, (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-  })
-  let sqlquerygetM = `SELECT id_m FROM Membre WHERE nom_m = ? and prenom_m = ?`
-  let idM = []
-  for (let member of newIdMArray) {
-    db.query(sqlquerygetM, [member.nomM, member.prenomM], (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      }
-      idM = result[0]
-      let sqlqueryaddM = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES
-                                  ((SELECT PV.num_cd FROM PV
-                                  INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?), ?)`
-      db.query(sqlqueryaddM, [numPV, result[0].id_m], (err, result) => {
-        if (err) {
-          res.status(400).send(err)
-        }
-      })
-    })
-  }
-  let sqlquerydelT = `DELETE te FROM Temoigne te LEFT JOIN PV ON PV.num_cd = te.num_cd WHERE PV.num_pv = ?`
+ 
+  let sqlquerydelT = `DELETE te FROM Temoigne te
+  INNER JOIN PV ON PV.num_pv = te.num_pv
+  WHERE PV.num_pv = ?`
   db.query(sqlquerydelT, numPV, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -426,18 +384,18 @@ router.patch('/editpv', (req, res) => {
             res.status(400).send(err)
           }
           numT = result[0].num_t
-          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (${numT}, (SELECT PV.num_cd FROM PV
+          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (${numT}, ?,(SELECT PV.num_cd FROM PV
                     INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
-          db.query(sqlquerylinkT, numPV, (err, result) => {
+          db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
             if (err) {
               res.status(400).send(err)
             }
           })
         })
       } else {
-        sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_cd ) VALUES (LAST_INSERT_ID(), (SELECT PV.num_cd FROM PV
+        sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (LAST_INSERT_ID(), ?, (SELECT PV.num_cd FROM PV
                 INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
-        db.query(sqlquerylinkT, numPV, (err, result) => {
+        db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
           if (err) {
             res.status(400).send(err)
           }
@@ -452,14 +410,7 @@ router.patch('/editpv', (req, res) => {
       res.status(400).send(err)
     }
   })
-  let sqlqueryC = `UPDATE Conseil_Discipline cd INNER JOIN PV ON PV.num_cd = cd.num_cd SET cd.date_cd = ? WHERE PV.num_pv = ?`
-  db.query(sqlqueryC, [dateCD, numPV], (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    } else {
-      res.sendStatus(204)
-    }
-  })
+  res.sendStatus(204)
 })
 
 // VALID
@@ -944,7 +895,15 @@ router.get('/getscd', (req, res) => {
     if (err) {
       res.status(400).send(err)
     }
-    res.send(result[0])
+    const data = {
+      numCD: result[0].num_cd,
+      dateCD: result[0].date_cd,
+      numRapport: numRapport(result[0].num_rapport),
+      dateRapport: result[0].date_rapport,
+      etudiants: formatNames(result[0].etudiants),
+      membres: formatNames(result[0].membres)
+    }
+    res.send(data)
   })
 })
 
