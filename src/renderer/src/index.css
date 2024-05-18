@@ -14,7 +14,13 @@
   }
 
   .loadingBar {
-    @apply absolute block visible top-0 left-0 w-full h-2 bg-blue;
+    @apply absolute block visible top-0 left-0 w-full h-[6px] bg-blue;
+  }
+  .helpContainer {
+    @apply absolute block visible top-0 left-0 w-96 h-40 bg-white rounded-lg;
+  }
+  .buttonHelp {
+    @apply text-white w-24 h-8 bg-blue rounded-md shadow-md;
   }
 }
 

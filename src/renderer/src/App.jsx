@@ -10,6 +10,8 @@ import useAccount from './zustand/account.js'
 import { useEffect, useState, useRef } from 'react'
 import useApi from './zustand/api.js'
 import authAni from './assets/animations/authentication.json'
+import useHelp from './zustand/help.js'
+import arrowSVG from './assets/arrow.svg'
 
 import './index.css'
 import axios from 'axios'
@@ -19,12 +21,30 @@ function App() {
   const { auth, authentificate } = useAuth()
   const { account, setChef, setPresident, emptyAccount } = useAccount()
   const { api } = useApi()
+  const { help, setHelp, ExitHelp } = useHelp()
   const [ChangePassword, setChangePassword] = useState(false)
   const [password, setPassword] = useState('')
   const [blurBg, setBlurBg] = useState(false)
+  const [step, setStep] = useState(0)
   const [authState, setAuthState] = useState(false)
   const [Msg, setMsg] = useState('')
 
+  const dynamicHeight = [
+    'top-[206px]',
+    'top-[266px]',
+    'top-[326px]',
+    'top-[386px]',
+    'top-[486px]',
+    'top-[546px]'
+  ]
+  const guide = [
+    'View the list of untreated reports',
+    'view members of commission',
+    'add a report',
+    'To view the archive',
+    'View documentation about the reglamentation',
+    'After finishing work, you can log out'
+  ]
   const buttonRef = useRef(null)
 
   useEffect(() => {
@@ -117,7 +137,7 @@ function App() {
               setTimeout(() => {
                 setAuthState(false)
                 authentificate()
-              }, 5000)
+              }, 4000)
             } else {
               setMsg('Mot de passe incorrect')
             }
@@ -258,6 +278,39 @@ function App() {
       )}
       {auth && (
         <div className="flex flex-col h-screen w-screen relative text-primary-white-theme-text-color dark:text-white">
+          {help && (
+            <div className="fullBgBlock">
+              <img className={`w-10 h-10 absolute left-32 duration-100 ${dynamicHeight[step]}`} src={arrowSVG}></img>
+              <div className="absolute flex flex-col top-48 left-64 w-96 h-fit bg-white text-dark-gray shadow-md rounded-lg">
+                <div className="w-full h-20 p-4 text-pretty">{guide[step]}</div>
+                <div className="flex w-full justify-between p-4">
+                  <button
+                    onClick={() => {
+                      ExitHelp()
+                      setStep(0)
+                    }}
+                    className="buttonHelp"
+                  >
+                    Ok
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (step >= 5) {
+                        ExitHelp()
+                        setStep(0)
+                      } else {
+                        setStep((prev) => prev + 1)
+                        setDynamicHeight((prev) => prev + 10)
+                      }
+                    }}
+                    className="buttonHelp"
+                  >
+                    {step == 5 ? 'Terminer' : 'Suivant'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <NavBar></NavBar>
           <SideBar></SideBar>
         </div>
