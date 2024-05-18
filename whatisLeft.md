@@ -32,7 +32,6 @@
 
 - all forms should be able to press the enter key and it works
   - modifier pv
-- nom et prenom de president de conseil manque dans le pv pdf el le format html doit etre changé.
-- in modifying the member, the warning the member exists should not be there.
-- matricule for plaignant in form and database and request.
+- before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
+- nom et prenom de president de conseil manque dans le pv pdf el le format html doit etre changé(ouss and mouh).
 - date always removes one day.

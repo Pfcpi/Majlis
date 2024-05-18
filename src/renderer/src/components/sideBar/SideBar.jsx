@@ -83,8 +83,8 @@ function SideBar() {
         <div
           className={
             cliped
-              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[10%] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
-              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[10%] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
+              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[60px] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
+              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[60px] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
           }
         >
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
