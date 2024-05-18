@@ -22,7 +22,7 @@ function Archive() {
 
   const [query, setQuery] = useState('')
   const [membres, setMembres] = useState([])
-  const [currentModifiedMembres, setCurrentModifiedMembres] = useState([])
+  const [currentSelectedMembres, setCurrentSelectedMembres] = useState([])
 
   const [renouvelerComMessage, setRenouvelerComMessage] = useState(false)
   const [deleteMembersMessage, setDeleteMembersMessage] = useState(false)
@@ -34,6 +34,10 @@ function Archive() {
   const [dropRole, setDropRole] = useState(false)
   const [dropRoleValue, setDropRoleValue] = useState('')
 
+  const [isSendingMail, setIsSendingMail] = useState(false)
+
+  const [rapports, setRapports] = useState([])
+
   const [membreExiste, setMembreExiste] = useState(false)
 
   const [errors, setErrors] = useState({
@@ -41,6 +45,10 @@ function Archive() {
     prenomError: '',
     emailError: '',
     roleError: ''
+  })
+
+  const [errorInfoEmail, setErrorInfoEmail] = useState({
+    dateError: ''
   })
 
   const dataFin = new Date().toISOString().slice(0, 10)
@@ -67,6 +75,8 @@ function Archive() {
     emailM: '',
     idM: 0
   })
+
+  const [emailInfo, setEmailInfo] = useState({ dateE: '' })
 
   async function fetchData() {
     addLoadingBar()
@@ -167,7 +177,7 @@ function Archive() {
       viewBox="0 0 18 24"
       fill="none"
       className={
-        currentModifiedMembres.length != 0
+        currentSelectedMembres.length != 0
           ? '[&>path]:fill-red duration-100'
           : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
       }
@@ -185,7 +195,7 @@ function Archive() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={
-        currentModifiedMembres.length == 1
+        currentSelectedMembres.length == 1
           ? '[&>path]:stroke-blue duration-100'
           : '[&>path]:stroke-dark-gray/25 dark:[&>path]:stroke-white/25 duration-100'
       }
@@ -206,11 +216,11 @@ function Archive() {
   )
 
   async function handleRemoveMembers() {
-    console.log('currentModifiedMembres: ', currentModifiedMembres)
-    if (currentModifiedMembres.length > 0) {
+    console.log('currentSelectedMembres: ', currentSelectedMembres)
+    if (currentSelectedMembres.length > 0) {
       addLoadingBar()
       const result = await Promise.all(
-        currentModifiedMembres.map(async (m) => {
+        currentSelectedMembres.map(async (m) => {
           const tache1 = await axios
             .patch(api + '/commission/remove', {
               dataFin: dataFin,
@@ -227,7 +237,7 @@ function Archive() {
             .catch((err) => console.log(err))
         })
       )
-      setCurrentModifiedMembres([])
+      setCurrentSelectedMembres([])
       RemoveLoadingBar()
     }
   }
@@ -257,7 +267,7 @@ function Archive() {
     setAddMember(false)
     RemoveLoadingBar()
 
-    setCurrentModifiedMembres([])
+    setCurrentSelectedMembres([])
     const tache2 = await axios
       .get(api + '/commission/get')
       .then((res) => setMembres(res.data))
@@ -280,7 +290,7 @@ function Archive() {
       .catch((err) => console.log(err))
     setModifyMember(false)
 
-    setCurrentModifiedMembres([])
+    setCurrentSelectedMembres([])
     const tache2 = await axios
       .get(api + '/commission/get')
       .then((res) => setMembres(res.data))
@@ -313,9 +323,9 @@ function Archive() {
   }
 
   async function handleModify() {
-    if (currentModifiedMembres.length == 1) {
+    if (currentSelectedMembres.length == 1) {
       setModifyMember(true)
-      const mem = currentModifiedMembres[0]
+      const mem = currentSelectedMembres[0]
       console.log(mem)
       setCurrentAddedMember({
         nomM: mem.nom_m,
@@ -328,15 +338,25 @@ function Archive() {
     }
   }
 
-  const handleSendEmail = () => {
-    if (currentModifiedMembres != 0) {
-      currentModifiedMembres.map(async (m) => {
-        const tache = await axios
-          .post(api + '/commission/mail', { email: m.email_m })
-          .then((res) => console.log(res))
-          .catch((err) => console.log(err))
-      })
-      setCurrentModifiedMembres([])
+  async function handleSendEmail() {
+    if (currentSelectedMembres != 0) {
+      addLoadingBar()
+      const tache = await Promise.all(
+        currentSelectedMembres.map(async (m) => {
+          const tache = await axios
+            .post(api + '/commission/mail', {
+              mail: m.email_m,
+              date: emailInfo.dateE,
+              text: rapports
+            })
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err))
+        })
+      )
+      console.log('handle send email finished!!')
+      RemoveLoadingBar()
+      setIsSendingMail(false)
+      setCurrentSelectedMembres([])
     }
   }
 
@@ -414,6 +434,30 @@ function Archive() {
     return errors
   }
 
+  const hanldeEmailInfoChange = (e) => {
+    const { name, value } = e.target
+    console.log(name, value)
+    setEmailInfo((prevState) => ({
+      ...prevState,
+      [name]: value
+    }))
+  }
+
+  const validateEmail = (data) => {
+    let errors = {}
+    let current_date = (new Date().toISOString().slice(0, 10))
+    if (data.dateE.length == 0) {
+      errors.date = 'Date est vide!'
+      setErrorInfoEmail((prev) => ({ ...prev, dateError: errors.date }))
+      return errors
+    } else if (data.dateE < current_date) {
+      errors.date = "Date est inferieure a la date d'aujour'dui!"
+      setErrorInfoEmail((prev) => ({ ...prev, dateError: errors.date }))
+      return errors
+    }
+    return errors
+  }
+
   const filteredMembres = useMemo(() => {
     return Array.isArray(membres)
       ? membres.filter((membres) => {
@@ -430,15 +474,15 @@ function Archive() {
     ? filteredMembres.map((m) => (
         <tr
           className={
-            currentModifiedMembres.findIndex((el) => el == m) == -1
+            currentSelectedMembres.findIndex((el) => el == m) == -1
               ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
               : 'border-y duration-150 ease-linear bg-blue/25'
           }
           onClick={(e) => {
-            const found = currentModifiedMembres.findIndex((el) => el == m)
-            if (found == -1) setCurrentModifiedMembres((prev) => [...prev, m])
+            const found = currentSelectedMembres.findIndex((el) => el == m)
+            if (found == -1) setCurrentSelectedMembres((prev) => [...prev, m])
             else {
-              setCurrentModifiedMembres((prev) =>
+              setCurrentSelectedMembres((prev) =>
                 prev.slice(0, found).concat(prev.slice(found + 1))
               )
             }
@@ -493,7 +537,7 @@ function Archive() {
                       .then((res) => console.log(res))
                       .then((err) => console.log(err))
 
-                    setCurrentModifiedMembres([])
+                    setCurrentSelectedMembres([])
                     const tache2 = await axios
                       .get(api + '/commission/get')
                       .then((res) => setMembres(res.data))
@@ -522,7 +566,7 @@ function Archive() {
         </div>
       )}
       {(addMember || modifyMember) && (
-        <div className="absolute top-0 left-0 flex items-center justify-center w-full h-full bg-blue/25 z-10">
+        <div className="fullBgBlock">
           <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
             <h1 className="text-[36px] py-4">
               {addMember ? 'Ajouter un membre' : 'Modifier ce membre'}
@@ -640,6 +684,82 @@ function Archive() {
           </form>
         </div>
       )}
+      {isSendingMail && (
+        <div className="fullBgBlock">
+          <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
+            <h1 className="text-[36px] py-4">Envoyer un Email</h1>
+            <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
+            <div className="flex w-5/6 flex-col gap-6 my-4">
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="dateE"
+                  id="dateE"
+                  type="date"
+                  onChange={hanldeEmailInfoChange}
+                  value={emailInfo.dateE}
+                  required
+                ></input>
+                <label className="label_rapport_fix" htmlFor="dateE">
+                  Date
+                </label>
+                {errorInfoEmail.dateError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorInfoEmail.dateError}
+                  </p>
+                )}
+              </div>
+              <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                {Array.isArray(rapports) &&
+                  rapports.length != 0 &&
+                  rapports.map((t) => (
+                    <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                      <div>{t.nom_e}</div>
+                      <div>{t.prenom_e}</div>
+                      {rapports.length != 1 && (
+                        <button
+                          className="flex justify-end"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setRapports(rapports.filter((item) => item !== t))
+                          }}
+                        >
+                          {supprimerImage}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div className="flex justify-between py-4 w-5/6">
+              <button
+                className="button_dossier text-red border-red hover:bg-red/25"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setIsSendingMail(false)
+                }}
+              >
+                Annuler
+              </button>
+              <button
+                className="button_dossier text-blue border-blue hover:bg-blue/25"
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault()
+                  const newErrors = validateEmail(emailInfo)
+                  if (Object.keys(newErrors).length === 0) {
+                    handleSendEmail()
+                  }
+                  setTimeout(() => setErrorInfoEmail({ dateError: '' }), 2000)
+                }}
+              >
+                Envoyer
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
       <div className="flex flex-col w-full">
         <div className="flex px-[3vw] justify-between h-16 items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
           {account == 'chef' && (
@@ -671,7 +791,7 @@ function Archive() {
                 </button>
                 <button
                   className={
-                    currentModifiedMembres.length == 1
+                    currentSelectedMembres.length == 1
                       ? 'button_active_blue rounded-none'
                       : 'button_inactive rounded-none'
                   }
@@ -681,7 +801,7 @@ function Archive() {
                 </button>
                 <button
                   className={
-                    currentModifiedMembres.length != 0
+                    currentSelectedMembres.length != 0
                       ? 'button_active_red rounded-l-none'
                       : 'button_inactive rounded-l-none'
                   }
@@ -694,9 +814,20 @@ function Archive() {
           )}
           {account == 'president' && (
             <button
-              onClick={handleSendEmail}
+              onClick={async () => {
+                setIsSendingMail(true)
+                addLoadingBar()
+                const tache = await axios
+                  .get(api + '/rapport/get')
+                  .then((res) => {
+                    console.log(res)
+                    setRapports(res.data)
+                  })
+                  .catch((err) => console.log(err))
+                RemoveLoadingBar()
+              }}
               className={
-                currentModifiedMembres.length != 0
+                currentSelectedMembres.length != 0
                   ? 'flex border py-2 px-4 rounded-xl gap-2 text-blue bg-blue/15 duration-100'
                   : 'flex border py-2 px-4 rounded-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
               }

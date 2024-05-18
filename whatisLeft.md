@@ -2,15 +2,12 @@
 
 ## Overall
 
-- pv generale.
+- pv generale(waiting for html (ouss)).
 - use manual animated.
+- forgot password.
 
 - full blocking bg:
   - archive
-
-## Commission
-
-- form email (date, rapports a traiter)
 
 ## Ajouter rapport
 
@@ -36,8 +33,7 @@
 
 - conseils:
 
-  - display.
-  - view. (all related details)
+  - view. (router problem)
   - search
 
 - (to expand)
@@ -59,4 +55,3 @@
 - in modifying the member, the warning the member exists should not be there.
 - matricule for plaignant in form and database and request.
 - date always removes one day.
-- viewing the membres and temoins for pv is disgusting.

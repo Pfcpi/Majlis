@@ -536,8 +536,8 @@ function AjouterPV() {
                   </th>
                 </tr>
                 {tableRapport}
-                {pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
-                {pathBackend && <div>Main process Path: {pathBackend}</div>}
+                {/*{pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
+                {pathBackend && <div>Main process Path: {pathBackend}</div>}*/}
               </table>
             </div>
           </div>

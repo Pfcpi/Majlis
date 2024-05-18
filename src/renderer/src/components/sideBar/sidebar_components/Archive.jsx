@@ -36,7 +36,11 @@ function Archive() {
   const [currentViewedPV, setCurrentViewedPV] = useState({})
   const [selectedPVs, setSelectedPVs] = useState([])
   const [queryPV, setQueryPV] = useState('')
-  const [membresPV, setMembresPV] = useState([])
+
+  const [conseils, setConseils] = useState([])
+  const [currentViewedCD, setCurrentViewedCD] = useState({})
+  const [selectedCon, setSelectedCon] = useState([])
+  const [queryCon, setQueryCon] = useState('')
 
   const [view, setView] = useState(false)
 
@@ -68,12 +72,26 @@ function Archive() {
         setCommissions(res.data)
       })
       .catch((err) => console.log(err))
+
+    const tache4 = await axios
+      .get(api + '/archive/getcd')
+      .then((res) => {
+        setConseils(res.data)
+        console.log('/archive/getcd:', res.data)
+      })
+      .catch((err) => console.log(err))
     RemoveLoadingBar()
   }
 
   useEffect(() => {
     fetchData()
   }, [])
+
+  useEffect(() => {
+    setSelectedCon([])
+    setSelectedMem([])
+    setSelectedPVs([])
+  }, [currentWindow])
 
   let loadingBar = document.createElement('div')
   loadingBar.classList.add('loadingBar')
@@ -110,7 +128,7 @@ function Archive() {
       height="25"
       viewBox="0 0 24 25"
       className={
-        selectedPVs.length == 1
+        selectedPVs.length == 1 || selectedCon.length == 1 || selectedMem.length == 1
           ? '[&>path]:fill-blue duration-100'
           : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
       }
@@ -130,7 +148,7 @@ function Archive() {
       height="25"
       viewBox="0 0 24 25"
       className={
-        selectedPVs.length == 1
+        selectedPVs.length == 1 || selectedCon.length == 1 || selectedMem.length == 1
           ? '[&>path]:fill-blue duration-100'
           : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
       }
@@ -147,7 +165,7 @@ function Archive() {
       height="24"
       viewBox="0 0 23 24"
       className={
-        selectedPVs.length == 1
+        selectedPVs.length == 1 || selectedCon.length == 1 || selectedMem.length == 1
           ? '[&>path]:fill-blue duration-100'
           : '[&>path]:fill-dark-gray/25 dark:[&>path]:fill-white/25 duration-100'
       }
@@ -196,20 +214,25 @@ function Archive() {
   async function handleViewPV() {
     addLoadingBar()
     setView(true)
+    console.log('selected pv: ', selectedPVs)
     const tache1 = await axios
       .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
       .then((res) => {
         console.log(res.data)
-        if (res.data[0].noms_membres && res.data[0].prenoms_membres && res.data[0].roles_membres) {
-          const array1 = res.data[0].noms_membres.split(',')
-          const array2 = res.data[0].prenoms_membres.split(',')
-          const array3 = res.data[0].roles_membres.split(',')
+        setCurrentViewedPV({ ...res.data, numPV: selectedPVs[0].num_pv })
+        console.log('the object', { ...res.data, numPV: selectedPVs[0].num_pv })
+      })
+      .catch((err) => console.log(err))
+    RemoveLoadingBar()
+  }
 
-          for (let i = 0; i < array1.length; i++) {
-            setMembresPV((prev) => [prev, [array1[i], array2[i], array3[i]]])
-          }
-        }
-        setCurrentViewedPV({ ...res.data[0], num_pv: selectedPVs[0].num_pv })
+  async function handleViewCD() {
+    addLoadingBar()
+    const tache = await axios
+      .post(api + '/archive/getscd', { numCD: selectedCon[0].num_cd })
+      .then((res) => {
+        console.log(res)
+        setCurrentViewedCD(res.data)
       })
       .catch((err) => console.log(err))
     RemoveLoadingBar()
@@ -314,7 +337,7 @@ function Archive() {
     filteredMembers.map((m) => (
       <tr
         className={
-          selectedPVs.findIndex((el) => el == m) == -1
+          selectedMem.findIndex((el) => el == m) == -1
             ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
             : 'border-y duration-150 ease-linear bg-blue/25'
         }
@@ -322,7 +345,7 @@ function Archive() {
           const found = selectedMem.findIndex((el) => el == m)
           if (found == -1) setSelectedMem((prev) => [...prev, m])
           else {
-            selectedMem((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
+            setSelectedMem((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
           }
         }}
       >
@@ -333,6 +356,32 @@ function Archive() {
         <td>{m.date_debut_c.slice(0, m.date_debut_c.indexOf('T'))}</td>
         <td>{m.date_fin_c.slice(0, m.date_fin_c.indexOf('T'))}</td>
         <td>{m.role_m}</td>
+      </tr>
+    ))
+  ) : (
+    <></>
+  )
+
+  const tabCons = Array.isArray(conseils) ? (
+    conseils.map((m) => (
+      <tr
+        className={
+          selectedCon.findIndex((el) => el == m) == -1
+            ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
+            : 'border-y duration-150 ease-linear bg-blue/25'
+        }
+        onClick={() => {
+          const found = selectedCon.findIndex((el) => el == m)
+          if (found == -1) setSelectedCon((prev) => [...prev, m])
+          else {
+            setSelectedCon((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
+          }
+        }}
+      >
+        <td>
+          <span>{m.num_cd}</span>
+        </td>
+        <td>{m.date_cd.slice(0, m.date_cd.indexOf('T'))}</td>
       </tr>
     ))
   ) : (
@@ -391,7 +440,11 @@ function Archive() {
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color text-[18px] dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
                 <button
-                  onClick={() => handlePreview(selectedPVs[0].num_pv, win[1])}
+                  onClick={() => {
+                    if (selectedPVs.length == 1) {
+                      handlePreview(selectedPVs[0].num_pv, win[1])
+                    }
+                  }}
                   className="text-blue"
                 >
                   <div
@@ -400,7 +453,7 @@ function Archive() {
                     {PdfImage}PDF
                   </div>
                 </button>
-                {account == 'president'  && (
+                {account == 'president' && (
                   <button>
                     <div
                       className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
@@ -412,7 +465,11 @@ function Archive() {
                 <button className="text-blue">
                   <div
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                    onClick={() => handleViewPV()}
+                    onClick={() => {
+                      if (selectedPVs.length == 1) {
+                        handleViewPV()
+                      }
+                    }}
                   >
                     {voirDossierImage}Voir
                   </div>
@@ -436,7 +493,7 @@ function Archive() {
               <div className="w-fit flex gap-4">
                 <button>
                   <div
-                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    className={selectedMem.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
                     {modifierImage}Modifier
                   </div>
@@ -458,24 +515,35 @@ function Archive() {
           {currentWindow == win[3] && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color text-[18px] dark:bg-dark-gray">
               <div className="w-fit flex gap-4">
-                <button onClick={() => handlePreview()} className="text-blue">
+                <button
+                  onClick={() => {
+                    if (selectedCon.length == 1) {
+                      handlePreview()
+                    }
+                  }}
+                  className="text-blue"
+                >
                   <div
-                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    className={selectedCon.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
                     {PdfImage}PDF
                   </div>
                 </button>
                 <button>
                   <div
-                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    className={selectedCon.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
                     {modifierImage}Modifier
                   </div>
                 </button>
                 <button className="text-blue">
                   <div
-                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                    onClick={() => handleViewPV()}
+                    className={selectedCon.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    onClick={() => {
+                      if (selectedCon.length == 1) {
+                        handleViewCD()
+                      }
+                    }}
                   >
                     {voirDossierImage}Voir
                   </div>
@@ -486,10 +554,10 @@ function Archive() {
                 <input
                   className="searchInput"
                   aria-label="search input"
-                  value={queryPV}
-                  onChange={(e) => setQueryPV(e.target.value)}
+                  value={queryCon}
+                  onChange={(e) => setQueryCon(e.target.value)}
                   type="search"
-                  placeholder="Dossier"
+                  placeholder="Conseil"
                 ></input>
               </div>
             </div>
@@ -552,10 +620,21 @@ function Archive() {
                       </th>
                     </>
                   )}
+                  {currentWindow == win[3] && (
+                    <>
+                      <th className="w-1/5">
+                        <div>Conseild Discipline</div>
+                      </th>
+                      <th className="w-1/5 ">
+                        <div>Date</div>
+                      </th>
+                    </>
+                  )}
                 </tr>
                 {currentWindow == win[0] && tabRapports}
                 {currentWindow == win[1] && tabPVs}
                 {currentWindow == win[2] && tabComs}
+                {currentWindow == win[3] && tabCons}
               </table>
             </div>
           </div>
@@ -644,6 +723,7 @@ function Archive() {
               className="w-10 aspect-square"
               onClick={() => {
                 setView(false)
+                setSelectedPVs([])
               }}
             >
               <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
@@ -653,27 +733,27 @@ function Archive() {
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
                 <div className="flex flex-col gap-3">
-                  <p>matricule: {currentViewedPV.matricule_e}</p>
-                  <p>Nom: {[currentViewedPV.nom_e, ' ', currentViewedPV.prenom_e]}</p>
-                  <p>Niveau: {currentViewedPV.niveau_e}</p>
-                  <p>Section: {currentViewedPV.section_e}</p>
-                  <p>Groupe: {currentViewedPV.groupe_e}</p>
+                  <p>matricule: {currentViewedPV.matriculeE}</p>
+                  <p>Nom: {[currentViewedPV.nomE, ' ', currentViewedPV.prenomE]}</p>
+                  <p>Niveau: {currentViewedPV.niveauE}</p>
+                  <p>Section: {currentViewedPV.sectionE}</p>
+                  <p>Groupe: {currentViewedPV.groupeE}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Nom: {[currentViewedPV.nom_p, ' ', currentViewedPV.prenom_e]}</p>
+                  <p>Nom: {[currentViewedPV.nomP, ' ', currentViewedPV.prenomP]}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations du l'infraction</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Date: {currentViewedPV.date_i ? currentViewedPV.date_i.slice(0, 10) : ''}</p>
-                  <p>Lieu: {currentViewedPV.lieu_i}</p>
-                  <p>Motif: {currentViewedPV.motif_i}</p>
+                  <p>Date: {currentViewedPV.dateI ? currentViewedPV.dateI.slice(0, 10) : ''}</p>
+                  <p>Lieu: {currentViewedPV.lieuI}</p>
+                  <p>Motif: {currentViewedPV.motifI}</p>
                   {/* <p>Degre: {currentViewedPV.degre_i}</p> */}
-                  <p>Description: {currentViewedPV.description_i}</p>
+                  <p>Description: {currentViewedPV.descriptionI}</p>
                 </div>
               </div>
             </div>
@@ -684,22 +764,19 @@ function Archive() {
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations du Conseil discipline</h3>
                   <div className="flex flex-col gap-3">
-                    <p>
-                      matricule:{' '}
-                      {currentViewedPV.date_cd ? currentViewedPV.date_cd.slice(0, 10) : ''}
-                    </p>
+                    <p>Date: {currentViewedPV.dateCd ? currentViewedPV.dateCd.slice(0, 10) : ''}</p>
                     <div>
                       membres:{' '}
                       <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          {currentViewedPV.noms_membres}
-                        </div>
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          {currentViewedPV.prenoms_membres}
-                        </div>
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          {currentViewedPV.roles_membres}
-                        </div>
+                        {Array.isArray(currentViewedPV.membres) &&
+                          currentViewedPV.membres.length != 0 &&
+                          currentViewedPV.membres.map((t) => (
+                            <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                              <div>{t.role}</div>
+                              <div>{t.nom}</div>
+                              <div>{t.prenom}</div>
+                            </div>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -707,23 +784,21 @@ function Archive() {
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations du PV</h3>
                   <div className="flex flex-col gap-3">
-                    <p>Sanction: {currentViewedPV.libele_s}</p>
-                    <p>
-                      Date: {currentViewedPV.date_pv ? currentViewedPV.date_pv.slice(0, 10) : ''}
-                    </p>
+                    <p>Sanction: {currentViewedPV.libeleS}</p>
+                    <p>Date: {currentViewedPV.datePV ? currentViewedPV.datePV.slice(0, 10) : ''}</p>
 
                     <p>
                       temoins:{' '}
                       <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          {currentViewedPV.noms_temoins}
-                        </div>
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          {currentViewedPV.prenoms_temoins}
-                        </div>
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          {currentViewedPV.roles_temoins}
-                        </div>
+                        {Array.isArray(currentViewedPV.temoins) &&
+                          currentViewedPV.temoins.length != 0 &&
+                          currentViewedPV.temoins.map((t) => (
+                            <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                              <div>{t.role}</div>
+                              <div>{t.nom}</div>
+                              <div>{t.prenom}</div>
+                            </div>
+                          ))}
                       </div>
                     </p>
                   </div>

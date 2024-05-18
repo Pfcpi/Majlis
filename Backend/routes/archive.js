@@ -24,55 +24,55 @@ function maj(chaine) {
 }
 
 function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
-    // Ensure the strings are not null or undefined, and split them into arrays
-    let nomsArray = noms_temoins ? noms_temoins.split(',') : [];
-    let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : [];
-    let rolesArray = roles_temoins ? roles_temoins.split(',') : [];
+  // Ensure the strings are not null or undefined, and split them into arrays
+  let nomsArray = noms_temoins ? noms_temoins.split(',') : []
+  let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : []
+  let rolesArray = roles_temoins ? roles_temoins.split(',') : []
 
-    // Initialize an empty array to hold the temoins objects
-    let temoins = [];
+  // Initialize an empty array to hold the temoins objects
+  let temoins = []
 
-    // Determine the length of the arrays (they should all be the same length)
-    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length);
+  // Determine the length of the arrays (they should all be the same length)
+  let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
-    // Loop through the arrays and create objects
-    for (let i = 0; i < length; i++) {
-        let temoin = {
-            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
-            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
-            role: rolesArray[i] || ""  // Use empty string if value is undefined
-        };
-        temoins.push(temoin);
+  // Loop through the arrays and create objects
+  for (let i = 0; i < length; i++) {
+    let temoin = {
+      nom: nomsArray[i].toUpperCase() || '', // Use empty string if value is undefined
+      prenom: maj(prenomsArray[i]) || '', // Use empty string if value is undefined
+      role: rolesArray[i] || '' // Use empty string if value is undefined
     }
+    temoins.push(temoin)
+  }
 
-    // Return the result
-    return temoins;
+  // Return the result
+  return temoins
 }
 
 function createMembers(noms_members, prenoms_members, roles_members) {
-    // Ensure the strings are not null or undefined, and split them into arrays
-    let nomsArray = noms_members ? noms_members.split(',') : [];
-    let prenomsArray = prenoms_members ? prenoms_members.split(',') : [];
-    let rolesArray = roles_members ? roles_members.split(',') : [];
+  // Ensure the strings are not null or undefined, and split them into arrays
+  let nomsArray = noms_members ? noms_members.split(',') : []
+  let prenomsArray = prenoms_members ? prenoms_members.split(',') : []
+  let rolesArray = roles_members ? roles_members.split(',') : []
 
-    // Initialize an empty array to hold the members objects
-    let members = [];
+  // Initialize an empty array to hold the members objects
+  let members = []
 
-    // Determine the length of the arrays (they should all be the same length)
-    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length);
+  // Determine the length of the arrays (they should all be the same length)
+  let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
-    // Loop through the arrays and create objects
-    for (let i = 0; i < length; i++) {
-        let member = {
-            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
-            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
-            role: rolesArray[i] || ""  // Use empty string if value is undefined
-        };
-        members.push(member);
+  // Loop through the arrays and create objects
+  for (let i = 0; i < length; i++) {
+    let member = {
+      nom: nomsArray[i].toUpperCase() || '', // Use empty string if value is undefined
+      prenom: maj(prenomsArray[i]) || '', // Use empty string if value is undefined
+      role: rolesArray[i] || '' // Use empty string if value is undefined
     }
+    members.push(member)
+  }
 
-    // Return the result
-    return members;
+  // Return the result
+  return members
 }
 
 function formatDate(inputDate) {
@@ -590,7 +590,6 @@ GROUP BY
       console.log('err executing /archive/getspv:', err)
       res.status(400).send(err)
     } else {
-      
       const data = {
         numR: result[0].num_r,
         matriculeE: result[0].matricule_e,
@@ -609,8 +608,16 @@ GROUP BY
         numPV: result[0].num_pv,
         datePV: result[0].date_pv,
         libeleS: result[0].libele_s,
-        temoins: createTemoins(result[0].noms_temoins, result[0].prenoms_temoins, result[0].roles_temoins),
-        membres: createMembers(result[0].noms_membres, result[0].prenoms_membres, result[0].roles_membres)
+        temoins: createTemoins(
+          result[0].noms_temoins,
+          result[0].prenoms_temoins,
+          result[0].roles_temoins
+        ),
+        membres: createMembers(
+          result[0].noms_membres,
+          result[0].prenoms_membres,
+          result[0].roles_membres
+        )
       }
       res.send(data)
     }
@@ -941,7 +948,7 @@ router.get('/getcd', (req, res) => {
   "numCD": int value,
 }
 */
-router.get('/getscd', (req, res) => {
+router.post('/getscd', (req, res) => {
   let numcd = req.body.numCD
   const sqlquery = `SELECT
     cd.num_cd, cd.date_cd,
@@ -968,8 +975,9 @@ router.get('/getscd', (req, res) => {
   db.query(sqlquery, numcd, (err, result) => {
     if (err) {
       res.status(400).send(err)
+    } else {
+      res.send(result[0])
     }
-    res.send(result[0])
   })
 })
 

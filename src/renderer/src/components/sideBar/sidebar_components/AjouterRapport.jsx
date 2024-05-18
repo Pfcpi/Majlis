@@ -324,7 +324,10 @@ function AjouterRapport() {
   }
 
   return (
-    <div ref={ajouterRapportPage} className="h-full w-full flex flex-col justify-center items-center gap-6">
+    <div
+      ref={ajouterRapportPage}
+      className="h-full w-full flex flex-col justify-center items-center gap-6"
+    >
       <div className="w-full flex flex-col items-center justify-center">
         <div className="flex w-5/6 h-2 stretch-0 bg-[#D9D9D9] justify-evenly items-center [&>div]: [&>div]:h-8 [&>div]:aspect-square [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:rounded-full [&>div]:z-10">
           <div className={step >= 2 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>1</div>
@@ -355,9 +358,9 @@ function AjouterRapport() {
               Annuler
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
                 addLoadingBar()
-                axios
+                const tache = await axios
                   .post(api + '/rapport/add', rapport)
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err))
@@ -564,7 +567,7 @@ function AjouterRapport() {
                   required
                 ></input>
                 <label
-                  className="absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent"
+                  className="label_rapport_fix"
                   htmlFor="dateI"
                 >
                   Date
