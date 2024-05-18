@@ -66,6 +66,7 @@ router.post('/gets', (req, res) => {
    "motifI": string value,
    "descI": string value,
    "degreI": int value (1 or 2),
+   "email": string value
 	 "numR": int value
   }
 */
@@ -82,6 +83,7 @@ router.patch('/edit', (req, res) => {
       e.niveau_e = ?,
       e.groupe_e = ?,
       e.section_e = ?,
+      e.email_e = ?,
       p.nom_p = ?,
       p.prenom_p = ?,
       i.date_i = ?,
@@ -98,6 +100,7 @@ router.patch('/edit', (req, res) => {
     object.niveauE,
     object.groupeE,
     object.sectionE,
+    object.email,
     object.nomP,
     object.prenomP,
     object.dateI,
@@ -155,14 +158,15 @@ router.delete('/delete', (req, res) => {
    "lieuI": string value,
    "motifI": string value,
    "descI": string value,
-   "degreI": int value (1 or 2)
+   "degreI": int value (1 or 2),
+   "email": string value
   }
 */
 router.post('/add', (req, res) => {
   let object = req.body
   // SQL queries
   let sqlqueryE =
-    'INSERT INTO Etudiant (matricule_e, nom_e, prenom_e, niveau_e, groupe_e, section_e, antecedant_e) VALUES (?, ?, ?, ?, ?, ?, true)'
+    'INSERT INTO Etudiant (matricule_e, nom_e, prenom_e, niveau_e, groupe_e, section_e, antecedant_e, email_e) VALUES (?, ?, ?, ?, ?, ?, true, ?)'
   let sqlqueryP = 'SELECT * FROM Plaignant WHERE nom_p = ? AND prenom_p = ?'
   let sqlqueryP2 = 'INSERT INTO Plaignant (nom_p, prenom_p) VALUES (?, ?)'
   let sqlqueryI =
@@ -178,7 +182,8 @@ router.post('/add', (req, res) => {
       object.prenomE,
       object.niveauE,
       object.groupeE,
-      object.sectionE
+      object.sectionE,
+      object.email
     ],
     (err, result) => {
       if (err && err.errno != 1062) {
