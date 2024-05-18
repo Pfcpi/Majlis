@@ -227,11 +227,80 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    //to: result[0].email_m,
-                                    to: 'amirmadjour133@gmail.com',
-                                    //to: "dounia.yedjour@univ-usto.dz",
+                                    to: result[0].email_m,
                                     subject: 'Nouveau rapport déposé.',
-                                    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
+                                    html: `<!DOCTYPE html>
+                                    <html lang="fr-FR">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>new rapport</title>
+                                        <link rel="preconnect" href="https://fonts.googleapis.com">
+                                        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+                                        <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+                                        <style>
+                                            body {
+                                                font-family: "PT Serif", serif;
+                                                margin: 0;
+                                                min-height: 100vh;
+                                                text-align: center;
+                                            }
+                                    
+                                            .container {
+                                                text-align: center;
+                                                padding: 20px;
+                                                margin: auto;
+                                            }
+                                    
+                                            .box1 {
+                                                margin: 30px auto 60px;
+                                                padding: 0;
+                                                text-align: center;
+                                            }
+                                    
+                                            .box2 {
+                                                text-align: center;
+                                            }
+                                    
+                                            #logo {
+                                                width: 10em;
+                                                height: 10em;
+                                                margin: 0;
+                                            }
+                                    
+                                            #title {
+                                                font-size: 2.3em;
+                                                font-weight: 500;
+                                                margin: 15px auto 0;
+                                            }
+                                    
+                                            #parg1 {
+                                                font-size: 1.4em;
+                                                font-weight: 400;
+                                                margin: 0 auto 15px;
+                                            }
+                                    
+                                            #parg2 {
+                                                font-size: 1.2em;
+                                                font-weight: 500;
+                                                margin: 15px auto 0;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class="container">
+                                            <div class="box1">
+                                                <img src="https://i.goopics.net/drpcqh.png" id="logo">
+                                                <h1 id="title">
+                                                    Nouveau Rapport
+                                                </h1>
+                                            </div>
+                                            <div class="box2">
+                                                <p id="parg1">Le chef de département a rédigé un nouveau rapport.</p>
+                                                <p id="parg2">Vous pouvez le consulter à l'accueil du logiciel.</p>
+                                            </div>
+                                        </div>
+                                    </body>
+                                    </html> `
                                   }
                                   transporter.sendMail(mailOptions, function (err, info) {
                                     if (err) {
@@ -291,7 +360,78 @@ router.post('/add', (req, res) => {
                                     to: 'amirmadjour133@gmail.com',
                                     //to: "dounia.yedjour@univ-usto.dz",
                                     subject: 'Nouveau rapport déposé.',
-                                    html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>'
+                                    html: `<!DOCTYPE html>
+                                    <html lang="fr-FR">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>new rapport</title>
+                                        <link rel="preconnect" href="https://fonts.googleapis.com">
+                                        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+                                        <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+                                        <style>
+                                            body {
+                                                font-family: "PT Serif", serif;
+                                                margin: 0;
+                                                min-height: 100vh;
+                                                text-align: center;
+                                            }
+                                    
+                                            .container {
+                                                text-align: center;
+                                                padding: 20px;
+                                                margin: auto;
+                                            }
+                                    
+                                            .box1 {
+                                                margin: 30px auto 60px;
+                                                padding: 0;
+                                                text-align: center;
+                                            }
+                                    
+                                            .box2 {
+                                                text-align: center;
+                                            }
+                                    
+                                            #logo {
+                                                width: 10em;
+                                                height: 10em;
+                                                margin: 0;
+                                            }
+                                    
+                                            #title {
+                                                font-size: 2.3em;
+                                                font-weight: 500;
+                                                margin: 15px auto 0;
+                                            }
+                                    
+                                            #parg1 {
+                                                font-size: 1.4em;
+                                                font-weight: 400;
+                                                margin: 0 auto 15px;
+                                            }
+                                    
+                                            #parg2 {
+                                                font-size: 1.2em;
+                                                font-weight: 500;
+                                                margin: 15px auto 0;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class="container">
+                                            <div class="box1">
+                                                <img src="https://i.goopics.net/drpcqh.png" id="logo">
+                                                <h1 id="title">
+                                                    Nouveau Rapport
+                                                </h1>
+                                            </div>
+                                            <div class="box2">
+                                                <p id="parg1">Le chef de département a rédigé un nouveau rapport.</p>
+                                                <p id="parg2">Vous pouvez le consulter à l'accueil du logiciel.</p>
+                                            </div>
+                                        </div>
+                                    </body>
+                                    </html> `
                                   }
                                   transporter.sendMail(mailOptions, function (err, info) {
                                     if (err) {
