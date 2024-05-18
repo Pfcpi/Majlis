@@ -3,6 +3,8 @@ import axios from 'axios'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import WarningSVG from './../../../assets/warning.svg'
+import successmarkSVG from './../../../assets/success_mark.svg'
+import addPlusSVg from './../../../assets/add_plus.svg'
 
 import './sidebar_com_css/archives.css'
 
@@ -25,6 +27,7 @@ function AjouterPV() {
 
   const [error, setError] = useState({ dateCdError: '' })
   const [pvError, setPvError] = useState({ sanctionError: '' })
+  const [temoinsError, setTemoinsError] = useState({ nomError: '', prenomError: '', roleError: '' })
 
   const AjouterPVPage = useRef(null)
 
@@ -276,6 +279,34 @@ function AjouterPV() {
     }
     return errors
   }
+
+  const validateFormTemoin = (data) => {
+    let errors = {}
+    //nomT: '', prenomT: '', roleT: '
+    console.log('data: ', data)
+    if (data.nomT.length == 0) {
+      errors.nom = 'nom est vide!'
+      setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, nomError: '' }))
+    }
+    if (data.prenomT.length == 0) {
+      errors.prenom = 'prenom est vide!'
+      setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, prenomError: '' }))
+    }
+    if (data.roleT.length == 0) {
+      errors.role = 'role est vide!'
+      setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+    }
+    return errors
+  }
   return (
     <div ref={AjouterPVPage} className="flex w-full h-full">
       {creerConseilState && (
@@ -418,62 +449,88 @@ function AjouterPV() {
               {!isAddingTemoin && temoinArray.length < 3 && (
                 <div className="flex w-full justify-between items-center">
                   <div>Ajouter un temoin</div>
-                  <button className="bg-blue" onClick={() => setIsAddingTemoin(true)}>
-                    A
+                  <button className="bg-blue rounded-md" onClick={() => setIsAddingTemoin(true)}>
+                    <img className="h-6 aspect-square" src={addPlusSVg}></img>
                   </button>
                 </div>
               )}
               {isAddingTemoin && (
-                <div className="flex">
-                  <div className="container_input_rapport ">
-                    <input
-                      className="input_dossier rounded-r-none"
-                      name="roleT"
-                      id="roleT"
-                      onChange={handleInputTemoinChange}
-                      value={temoinBuffer.roleT}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="roleT">
-                      Role
-                    </label>
-                  </div>
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier rounded-none"
-                      name="nomT"
-                      id="nomT"
-                      onChange={handleInputTemoinChange}
-                      value={temoinBuffer.nomT}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="nomT">
-                      nom
-                    </label>
-                  </div>
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier rounded-l-none"
-                      name="prenomT"
-                      id="prenomT"
-                      onChange={handleInputTemoinChange}
-                      value={temoinBuffer.prenomT}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="prenomT">
-                      Prenom
-                    </label>
+                <div className="flex w-full items-center gap-2">
+                  <div className="flex">
+                    <div className="container_input_rapport">
+                      <input
+                        className="input_dossier rounded-r-none"
+                        name="nomT"
+                        id="nomT"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.nomT}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="nomT">
+                        nom
+                      </label>
+                      {temoinsError.nomError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.nomError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="container_input_rapport">
+                      <input
+                        className="input_dossier rounded-none"
+                        name="prenomT"
+                        id="prenomT"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.prenomT}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="prenomT">
+                        Prenom
+                      </label>
+                      {temoinsError.prenomError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.prenomError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="container_input_rapport ">
+                      <input
+                        className="input_dossier rounded-l-none"
+                        name="roleT"
+                        id="roleT"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.roleT}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="roleT">
+                        Role
+                      </label>
+                      {temoinsError.roleError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.roleError}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <button
-                    className="bg-green-400"
+                    className="bg-white h-8 w-8 flex rounded-md items-center justify-center"
                     onClick={(e) => {
                       e.preventDefault()
-                      setTemoinArray((prev) => [...prev, temoinBuffer])
-                      setIsAddingTemoin(false)
-                      setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+                      const newErrors = validateFormTemoin(temoinBuffer)
+                      if (Object.keys(newErrors).length === 0) {
+                        setTemoinArray((prev) => [...prev, temoinBuffer])
+                        setIsAddingTemoin(false)
+                        setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+                      }
+                      setTimeout(() => {
+                        setTemoinsError({ nomError: '', prenomError: '', roleError: '' })
+                      }, 2000)
                     }}
                   >
-                    Aj
+                    <img className="h-6 w-6" src={successmarkSVG}></img>
                   </button>
                 </div>
               )}
