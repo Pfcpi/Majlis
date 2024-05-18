@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const { app } = require('electron')
 
-async function generatePDFpv(data) {
+async function generatePDFpv(data, pathReq) {
   let html = null
   if (data.sectionE != null) {
     html = `
@@ -476,12 +476,40 @@ async function generatePDFpv(data) {
   </html>
   `
   }
+  /*
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
   await page.pdf({ path: './out/s.pdf', format: 'A4' })
-
   return page.pdf({ format: 'A4' })
+  */
+  // Create a temporary HTML file
+  const tempHtmlPath = path.join(pathReq, 'temp.html')
+  fs.writeFileSync(tempHtmlPath, html, 'utf-8')
+
+  const browser = await puppeteer.launch({ headless: true })
+  const page = await browser.newPage()
+  //await page.setContent(html)
+  await page.goto(tempHtmlPath)
+
+  // Generate PDF
+  const pdfBuffer = await page.pdf({ format: 'A4' })
+
+  // Define file path
+  const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
+
+  let pathPDF = path.join(pathReq, 'sortie.pdf')
+
+  // Write PDF to file system
+  fs.writeFile(pathPDF, pdfBuffer, (err) => {
+    if (err) {
+      console.error('Error writing PDF:', err)
+    } else {
+      console.log('PDF saved successfully!')
+    }
+  })
+
+  return pathPDF
 }
 
 async function generatePDFrapport(data, pathReq) {

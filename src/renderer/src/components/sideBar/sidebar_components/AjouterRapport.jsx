@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import WarningSVG from './../../../assets/warning.svg'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
@@ -7,7 +7,19 @@ import axios from 'axios'
 import useApi from '../../../zustand/api'
 
 function AjouterRapport() {
-  const niveaux = ['ING 1', 'ING 2', 'ING 3', 'ING 4', 'ING 5', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const niveaux = [
+    'ING 1',
+    'ING 2',
+    'ING 3',
+    'ING 4',
+    'ING 5',
+    'L1',
+    'L2',
+    'L3',
+    'M1',
+    'M2',
+    'Doctorat'
+  ]
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
@@ -83,6 +95,21 @@ function AjouterRapport() {
 
   const { api } = useApi()
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   useEffect(() => {
     axios
       .get(api + '/rapport/get')
@@ -101,6 +128,20 @@ function AjouterRapport() {
       setRapport((prev) => ({ ...prev, motifI: '' }))
     }
   }, [dropMotifValue])
+
+  const ajouterRapportPage = useRef(null)
+
+  let loadingBar = document.createElement('div')
+  loadingBar.classList.add('loadingBar')
+  loadingBar.classList.add('loadingBarAni')
+
+  function addLoadingBar() {
+    ajouterRapportPage.current.appendChild(loadingBar)
+  }
+
+  function RemoveLoadingBar() {
+    loadingBar.remove()
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -298,7 +339,10 @@ function AjouterRapport() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6">
+    <div
+      ref={ajouterRapportPage}
+      className="h-full w-full flex flex-col justify-center items-center gap-6"
+    >
       <div className="w-full flex flex-col items-center justify-center">
         <div className="flex w-5/6 h-2 stretch-0 bg-[#D9D9D9] justify-evenly items-center [&>div]: [&>div]:h-8 [&>div]:aspect-square [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:rounded-full [&>div]:z-10">
           <div className={step >= 2 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>1</div>
@@ -312,9 +356,7 @@ function AjouterRapport() {
           <div className={step >= 4 ? 'w-1/4 bg-blue h-2' : ''}></div>
         </div>
       </div>
-      {step === 4 && (
-        <div className="fullBgBlock"></div>
-      )}
+      {step === 4 && <div className="fullBgBlock"></div>}
       {step === 4 && (
         <div className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
           Confirmer la création du rapport
@@ -331,15 +373,17 @@ function AjouterRapport() {
               Annuler
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
+                addLoadingBar()
+                const tache = await axios
+                  .post(api + '/rapport/add', rapport)
+                  .then((res) => console.log(res))
+                  .catch((err) => console.log(err))
                 setStep(1)
                 setdropNiveauValue('')
                 setDropMotifValue('')
                 setRapport({})
-                axios
-                  .post(api + '/rapport/add', rapport)
-                  .then((res) => console.log(res))
-                  .catch((err) => console.log(err))
+                RemoveLoadingBar()
               }}
               className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
             >
@@ -349,7 +393,7 @@ function AjouterRapport() {
         </div>
       )}
       <form className="overflow-y-auto flex flex-col justify-center items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray w-1/2 max-h-[84vh] min-w-[500px] ">
-        <h1 className="text-[36px] py-4">Detail du rapport</h1>
+        <h1 className="text-[36px] py-4">Détail du rapport</h1>
         <hr className="w-full dark:text-gray"></hr>
         {step == 1 && (
           <div className="flex flex-col w-5/6 my-2">
@@ -403,7 +447,7 @@ function AjouterRapport() {
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="prenomE">
-                  Prenom
+                  Prénom
                 </label>
                 {errorsStep1.prenomError && (
                   <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -537,10 +581,7 @@ function AjouterRapport() {
                   value={rapport.dateI}
                   required
                 ></input>
-                <label
-                  className="absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent"
-                  htmlFor="dateI"
-                >
+                <label className="label_rapport_fix" htmlFor="dateI">
                   Date
                 </label>
               </div>
@@ -595,11 +636,6 @@ function AjouterRapport() {
               <div className="container_input_rapport">
                 <input
                   className="input_dossier"
-                  onClick={() => {
-                    if (!dropDegre) {
-                      setDropDegre(true)
-                    }
-                  }}
                   name="degreI"
                   id="degreI"
                   onChange={handleInputChange}
@@ -626,8 +662,7 @@ function AjouterRapport() {
             </div>
           </div>
         )}
-        <hr className="w-full dark:text-gray"></hr>
-        <div className="flex justify-between w-5/6 py-6">
+        <div className="flex justify-between w-5/6 py-6 *:text-[18px]">
           <button
             className="button_dossier text-red border-red hover:bg-red/25 min-w-fit"
             onClick={(e) => {
@@ -657,6 +692,7 @@ function AjouterRapport() {
             {step > 1 ? 'Retourner' : 'Annuler'}
           </button>
           <button
+            ref={buttonRef}
             className="button_dossier text-blue border-blue hover:bg-blue/25 min-w-fit"
             type="submit"
             onClick={(e) => {
@@ -699,7 +735,7 @@ function AjouterRapport() {
               }, 2000)
             }}
           >
-            {step > 2 ? 'terminer' : 'continue'}
+            {step > 2 ? 'terminer' : 'continuer'}
           </button>
         </div>
       </form>

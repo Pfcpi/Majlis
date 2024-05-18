@@ -200,44 +200,40 @@ router.post('/addCD', (req, res) => {
     if (err) {
       res.send(err)
       return
-    }
-    // Add multiple members to comission
-    let id = result.insertId
-    let sqlqueryC = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES (?, ?)`
-    var i = 0
-    do {
-      if (idM[i] != null)
-        db.query(sqlqueryC, [id, idM[i]], (err, result) => {
+    } else {
+      // Add multiple members to comission
+      let sqlqueryC = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES (?, ?)`
+      idM.forEach((m) => {
+        db.query(sqlqueryC, [result.insertId, m], (err, result) => {
           if (err) {
             res.send(err)
-            return
           }
         })
-      i++
-    } while (i < 5)
-    db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
-      if (err) {
-        res.send(err)
-        return
-      } else {
-        console.log('after executing a query after looping in else')
-        const mail = result[0].email_u
-        const mailOptions = {
-          from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
-          to: mail,
-          subject: 'Nouveau PV déposé.',
-          html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
+      })
+      db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
+        if (err) {
+          res.send(err)
+          return
+        } else {
+          const mail = result[0].email_u
+          const mailOptions = {
+            from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
+            //to: mail,
+            to: 'amirmadjour133@gmail.com',
+            subject: 'Nouveau PV déposé.',
+            html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
+          }
+          transporter.sendMail(mailOptions, function (err, info) {
+            if (err) {
+              console.log(err)
+            } else {
+              console.log('Email sent!')
+            }
+          })
         }
-        transporter.sendMail(mailOptions, function (err, info) {
-          if (err) {
-            console.log(err)
-          } else {
-            console.log('Email sent!')
-          }
-        })
-      }
-    })
-    res.send({ id: id })
+      })
+      res.send({ id: result.insertId })
+    }
   })
 })
 
@@ -268,70 +264,57 @@ router.post('/addCD', (req, res) => {
 */
 router.post('/addPV', (req, res) => {
   let { numCD, libeleS, temoin, numR } = req.body
+  let pvId,
+    sent = false
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
   db.query(sqlqueryS, libeleS, (err, result) => {
     if (err) {
       res.status(400).send(err)
-    }
-  })
-
-  // Add a temoin to the database if it is in the body
-  let sqlqueryT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
-  var i
-  var num = [null, null, null]
-  i = 0
-  do {
-    if (temoin[i] != null) {
-      console.log(temoin[i])
-      db.query(sqlqueryT, [temoin[i].nomT, temoin[i].prenomT, temoin[i].roleT], (err, result) => {
-        if (err && err.errno != 1062) {
-          res.status(400).send(err)
-        }
-        db.query(
-          'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?',
-          [temoin[i].nomT, temoin[i].prenomT],
-          (err, result) => {
-            if (err) {
-              res.status(400).send(err)
-            }
-            num[i] = result[0].num_t
-            console.log(num[i])
-          }
-        )
-      })
-    }
-    i++
-  } while (i < 3)
-  console.log(num[i])
-  // Counter to track number of temoin
-  i = 0
-  while (num[i] != null && i < 3) {
-    i++
-  }
-
-  // Connect temoins to cd
-  let sqlquerytem = 'INSERT INTO Temoigne (num_cd, num_t) VALUES (?, ?)'
-  var k = 0
-  while (k < i) {
-    db.query(sqlquerytem, [numCD, num[k]], (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      }
-    })
-  }
-
-  // Add the pv
-  let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r) VALUES (NOW(), ?, LAST_INSERT_ID(), ?)`
-  db.query(sqlqueryPv, [numCD, numR], (err, result) => {
-    if (err) {
-      res.status(400).send(err)
     } else {
-      let setReportTraited = `UPDATE Rapport r SET r.est_traite = TRUE WHERE r.num_r = ?`
-      db.query(setReportTraited, numR, (err, result) => {
+      let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r) VALUES (NOW(), ?, ?, ?)`
+      db.query(sqlqueryPv, [numCD, result.insertId, numR], (err, result) => {
         if (err) {
           res.status(400).send(err)
+        } else {
+          pvId = result.insertId
+          console.log('pvId:', pvId)
+          let setReportTraited = `UPDATE Rapport r SET r.est_traite = TRUE WHERE r.num_r = ?`
+          db.query(setReportTraited, numR, (err, result) => {
+            if (err) {
+              res.status(400).send(err)
+            } else {
+              let sqlqueryT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
+              temoin.forEach((t) => {
+                console.log(t)
+                db.query(sqlqueryT, [t.nomT, t.prenomT, t.roleT], (err, result) => {
+                  if (err && err.errno != 1062) {
+                    if (!sent) {
+                      res.status(400).send(err)
+                      sent = true
+                    }
+                  } else {
+                    // Connect temoins to cd and pv
+                    let sqlquerytem =
+                      'INSERT INTO Temoigne (num_cd, num_t, num_pv) VALUES (?, ?, ?)'
+                    console.log('pvId:', pvId)
+                    db.query(sqlquerytem, [numCD, result.insertId, pvId], (err, result) => {
+                      if (err) {
+                        if (!sent) {
+                          res.status(400).send(err)
+                          sent = true
+                        }
+                      }
+                    })
+                  }
+                })
+              })
+              if (!sent) {
+                console.log('arrivedHere')
+                res.send('added')
+              }
+            }
+          })
         }
-        res.sendStatus(204)
       })
     }
   })

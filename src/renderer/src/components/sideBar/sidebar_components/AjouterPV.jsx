@@ -1,7 +1,10 @@
-import { useState, useEffect, useMemo, useRef} from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import axios from 'axios'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
+import WarningSVG from './../../../assets/warning.svg'
+import successmarkSVG from './../../../assets/success_mark.svg'
+import addPlusSVg from './../../../assets/add_plus.svg'
 
 import './sidebar_com_css/archives.css'
 
@@ -22,11 +25,27 @@ function AjouterPV() {
   const [temoinBuffer, setTemoinBuffer] = useState({ nomT: '', prenomT: '', roleT: '' })
   const [temoinArray, setTemoinArray] = useState([])
 
-  const [pathMainProcess, setPathMainProcess] = useState('')
-  const [pathBackend, setPathBackend] = useState('')
+  const [error, setError] = useState({ dateCdError: '' })
+  const [pvError, setPvError] = useState({ sanctionError: '' })
+  const [temoinsError, setTemoinsError] = useState({ nomError: '', prenomError: '', roleError: '' })
 
   const AjouterPVPage = useRef(null)
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache = await axios
@@ -47,10 +66,12 @@ function AjouterPV() {
   loadingBar.classList.add('loadingBarAni')
 
   function addLoadingBar() {
+    console.log('loading bar added')
     AjouterPVPage.current.appendChild(loadingBar)
   }
 
   function RemoveLoadingBar() {
+    console.log('loading bar removed')
     loadingBar.remove()
   }
 
@@ -153,40 +174,56 @@ function AjouterPV() {
 
   const handleAjouter = async (e) => {
     e.preventDefault()
-    const tache = await axios
-      .post(api + '/pv/addPV', {
-        numR: pv.numR,
-        libeleS: pv.libeleS,
-        numCD: pv.numCD,
-        temoin: temoinArray
-      })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err))
+    const newErrors = validateFormPV(pv)
+    if (Object.keys(newErrors).length === 0) {
+      e.preventDefault()
+      addLoadingBar()
+      const tache = await axios
+        .post(api + '/pv/addPV', {
+          numR: pv.numR,
+          libeleS: pv.libeleS,
+          numCD: pv.numCD,
+          temoin: temoinArray
+        })
+        .then((res) => {
+          RemoveLoadingBar()
+          console.log(res)
+        })
+        .catch((err) => {
+          RemoveLoadingBar()
+          console.log(err)
+        })
 
-    if (currentSelectedRapports.length > 1) {
-      setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
+      if (currentSelectedRapports.length > 1) {
+        setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
+      }
+      if (currentSelectedRapports.length == 1) {
+        setMembers([])
+      }
+      setCurrentSelectedRapports(currentSelectedRapports.slice(1))
+      const tache1 = await axios
+        .get(api + '/rapport/get')
+        .then((res) => {
+          setRapports(res.data)
+        })
+        .catch((err) => console.log(err))
     }
-    if (currentSelectedRapports.length == 1) {
-      setMembers([])
-    }
-    setCurrentSelectedRapports(currentSelectedRapports.slice(1))
-    const tache1 = await axios
-      .get(api + '/rapport/get')
-      .then((res) => {
-        setRapports(res.data)
-      })
-      .catch((err) => console.log(err))
+    setTimeout(() => {
+      setPvError({ sanctionError: '' })
+    }, 2000)
   }
 
   async function handleSupprimer() {
     if (currentSelectedRapports.length != 0) {
-      currentSelectedRapports.map(async (sr) => {
-        const tache = await axios
-          .delete(api + '/rapport/delete', { data: { numR: sr.num_r } })
-          .then((res) => console.log(res))
-          .catch((err) => console.log(err))
-      })
-
+      addLoadingBar()
+      const result = await Promise.all(
+        currentSelectedRapports.map(async (sr) => {
+          const tache = await axios
+            .delete(api + '/rapport/delete', { data: { numR: sr.num_r } })
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err))
+        })
+      )
       const tache1 = await axios
         .get(api + '/rapport/get')
         .then((res) => {
@@ -194,6 +231,9 @@ function AjouterPV() {
           console.log(res.data)
         })
         .catch((err) => console.log(err))
+
+      setCurrentSelectedRapports([])
+      RemoveLoadingBar()
 
       setSupprimer(false)
     }
@@ -207,6 +247,66 @@ function AjouterPV() {
     }))
   }
 
+  const validateFormCd = (data) => {
+    let errors = {}
+    const currentDate = new Date().toISOString().slice(0, 10)
+
+    console.log('data: ', data)
+    if (data.dateCd.length == 0) {
+      errors.dateCd = 'date est vide!'
+      setError((prev) => ({ ...prev, dateCdError: errors.dateCd }))
+      return errors
+    } else if (data.dateCd > currentDate) {
+      errors.dateCd = "date doit etre inferieure a la date d'aujourd'hui!"
+      setError((prev) => ({ ...prev, dateCdError: errors.dateCd }))
+      return errors
+    } else {
+      setError((prev) => ({ ...prev, dateCdError: '' }))
+    }
+    return errors
+  }
+
+  const validateFormPV = (data) => {
+    let errors = {}
+
+    console.log('data: ', data)
+    if (data.libeleS.length == 0) {
+      errors.sanction = 'sanction est vide!'
+      setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
+      return errors
+    } else {
+      setPvError((prev) => ({ ...prev, sanctionError: '' }))
+    }
+    return errors
+  }
+
+  const validateFormTemoin = (data) => {
+    let errors = {}
+    //nomT: '', prenomT: '', roleT: '
+    console.log('data: ', data)
+    if (data.nomT.length == 0) {
+      errors.nom = 'nom est vide!'
+      setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, nomError: '' }))
+    }
+    if (data.prenomT.length == 0) {
+      errors.prenom = 'prenom est vide!'
+      setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, prenomError: '' }))
+    }
+    if (data.roleT.length == 0) {
+      errors.role = 'role est vide!'
+      setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+    }
+    return errors
+  }
   return (
     <div ref={AjouterPVPage} className="flex w-full h-full">
       {creerConseilState && (
@@ -221,6 +321,7 @@ function AjouterPV() {
                   name="dateCd"
                   onChange={async (e) => {
                     setCd((prev) => ({ ...prev, dateCd: e.target.value }))
+                    addLoadingBar()
                     const tache = await axios
                       .post(api + '/pv/getActiveCommissionAndMembersByData', {
                         date: e.target.value
@@ -230,15 +331,22 @@ function AjouterPV() {
                         console.log(res.data)
                       })
                       .catch((err) => console.log(err))
+                    RemoveLoadingBar()
                   }}
                   value={cd.dateCd}
                   type="date"
                   required
                 ></input>
+                {error.dateCdError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {error.dateCdError}
+                  </p>
+                )}
               </div>
               <div className="container_input_rapport">
                 <h2>Membres présents au conseil</h2>
-                <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                <div className="w-full h-[20vh] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                   {members.map((p) => (
                     <div className="flex border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                       <div className="w-5/12">{p.role_m}</div>
@@ -272,26 +380,35 @@ function AjouterPV() {
                 Annuler
               </button>
               <button
+                ref={buttonRef}
                 className="button_dossier text-blue border-blue hover:bg-blue/25"
                 type="submit"
                 onClick={async (e) => {
                   e.preventDefault()
-                  const tache = await axios
-                    .post(api + '/pv/addCD', {
-                      dateCd: cd.dateCd,
-                      idM: members.map((obj) => obj.id_m)
-                    })
-                    .then((res) => {
-                      console.log(res)
-                      setCd((prev) => ({ ...prev, id: res.data.id }))
-                      setPv((prev) => ({
-                        ...prev,
-                        numCD: res.data.id,
-                        numR: currentSelectedRapports[0].num_r
-                      }))
-                    })
-                    .catch((err) => console.log(err))
-                  setCreerConseildState(false)
+                  const newErrors = validateFormCd(cd)
+                  if (Object.keys(newErrors).length === 0) {
+                    addLoadingBar()
+                    const tache = await axios
+                      .post(api + '/pv/addCD', {
+                        dateCd: cd.dateCd,
+                        idM: members.map((obj) => obj.id_m)
+                      })
+                      .then((res) => {
+                        console.log(res)
+                        setCd((prev) => ({ ...prev, id: res.data.id }))
+                        setPv((prev) => ({
+                          ...prev,
+                          numCD: res.data.id,
+                          numR: currentSelectedRapports[0].num_r
+                        }))
+                      })
+                      .catch((err) => console.log(err))
+                    RemoveLoadingBar()
+                    setCreerConseildState(false)
+                  }
+                  setTimeout(() => {
+                    setError({ dateCdError: '' })
+                  }, 2000)
                 }}
               >
                 Ajouter
@@ -320,68 +437,100 @@ function AjouterPV() {
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="libeleS">
-                  libele
+                  Sanction
                 </label>
+                {pvError.sanctionError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {pvError.sanctionError}
+                  </p>
+                )}
               </div>
               {!isAddingTemoin && temoinArray.length < 3 && (
                 <div className="flex w-full justify-between items-center">
                   <div>Ajouter un temoin</div>
-                  <button className="bg-blue" onClick={() => setIsAddingTemoin(true)}>
-                    A
+                  <button className="bg-blue rounded-md" onClick={() => setIsAddingTemoin(true)}>
+                    <img className="h-6 aspect-square" src={addPlusSVg}></img>
                   </button>
                 </div>
               )}
               {isAddingTemoin && (
-                <div className="flex">
-                  <div className="container_input_rapport ">
-                    <input
-                      className="input_dossier rounded-r-none"
-                      name="roleT"
-                      id="roleT"
-                      onChange={handleInputTemoinChange}
-                      value={temoinBuffer.roleT}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="roleT">
-                      Role
-                    </label>
-                  </div>
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier rounded-none"
-                      name="nomT"
-                      id="nomT"
-                      onChange={handleInputTemoinChange}
-                      value={temoinBuffer.nomT}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="nomT">
-                      nom
-                    </label>
-                  </div>
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier rounded-l-none"
-                      name="prenomT"
-                      id="prenomT"
-                      onChange={handleInputTemoinChange}
-                      value={temoinBuffer.prenomT}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="prenomT">
-                      Prenom
-                    </label>
+                <div className="flex w-full items-center gap-2">
+                  <div className="flex">
+                    <div className="container_input_rapport">
+                      <input
+                        className="input_dossier rounded-r-none"
+                        name="nomT"
+                        id="nomT"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.nomT}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="nomT">
+                        nom
+                      </label>
+                      {temoinsError.nomError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.nomError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="container_input_rapport">
+                      <input
+                        className="input_dossier rounded-none"
+                        name="prenomT"
+                        id="prenomT"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.prenomT}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="prenomT">
+                        Prenom
+                      </label>
+                      {temoinsError.prenomError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.prenomError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="container_input_rapport ">
+                      <input
+                        className="input_dossier rounded-l-none"
+                        name="roleT"
+                        id="roleT"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.roleT}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="roleT">
+                        Role
+                      </label>
+                      {temoinsError.roleError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.roleError}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <button
-                    className="bg-green-400"
+                    className="bg-white h-8 w-8 flex rounded-md items-center justify-center"
                     onClick={(e) => {
                       e.preventDefault()
-                      setTemoinArray((prev) => [...prev, temoinBuffer])
-                      setIsAddingTemoin(false)
-                      setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+                      const newErrors = validateFormTemoin(temoinBuffer)
+                      if (Object.keys(newErrors).length === 0) {
+                        setTemoinArray((prev) => [...prev, temoinBuffer])
+                        setIsAddingTemoin(false)
+                        setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+                      }
+                      setTimeout(() => {
+                        setTemoinsError({ nomError: '', prenomError: '', roleError: '' })
+                      }, 2000)
                     }}
                   >
-                    Aj
+                    <img className="h-6 w-6" src={successmarkSVG}></img>
                   </button>
                 </div>
               )}
@@ -463,7 +612,7 @@ function AjouterPV() {
                   setCreerConseildState(true)
                 }}
               >
-                Creer Conseil
+                Créer un conseil
               </button>
               <button
                 className={
@@ -503,22 +652,26 @@ function AjouterPV() {
               ></input>
             </div>
           </div>
-          <table className="w-full">
-            <tr className="border-t">
-              <th className="w-1/3 border-x">
-                <div>Rapport</div>
-              </th>
-              <th className="w-1/3 border-x">
-                <div>Nom Etudiant</div>
-              </th>
-              <th className="w-1/3 border-x">
-                <div>Date de l'infraction</div>
-              </th>
-            </tr>
-            {tableRapport}
-            {pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
-            {pathBackend && <div>Main process Path: {pathBackend}</div>}
-          </table>
+          <div className="w-full grow h-[50vh]">
+            <div className="w-full h-full overflow-y-auto">
+              <table className="w-full">
+                <tr className="border-t">
+                  <th className="w-1/3 border-x">
+                    <div>Rapport</div>
+                  </th>
+                  <th className="w-1/3 border-x">
+                    <div>Nom Etudiant</div>
+                  </th>
+                  <th className="w-1/3 border-x">
+                    <div>Date de l'infraction</div>
+                  </th>
+                </tr>
+                {tableRapport}
+                {/*{pathMainProcess && <div>Main Process Path: {pathMainProcess}</div>}
+                {pathBackend && <div>Main process Path: {pathBackend}</div>}*/}
+              </table>
+            </div>
+          </div>
         </div>
       )}
     </div>

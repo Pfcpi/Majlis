@@ -27,7 +27,19 @@ import WarningSVG from './../../../assets/warning.svg'
 import axios from 'axios'
 
 function Archive() {
-  const niveaux = ['1 ING', '2 ING', 'L1', 'L2', 'L3', 'M1', 'M2', 'Doctorat']
+  const niveaux = [
+    'ING 1',
+    'ING 2',
+    'ING 3',
+    'ING 4',
+    'ING 5',
+    'L1',
+    'L2',
+    'L3',
+    'M1',
+    'M2',
+    'Doctorat'
+  ]
   const accueilPage = useRef(null)
   const motif1 = [
     'Demande non fondée de double correction',
@@ -99,6 +111,21 @@ function Archive() {
     numR: 0
   })
 
+  const buttonRef = useRef(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        buttonRef.current.click()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache1 = await axios
@@ -114,7 +141,6 @@ function Archive() {
       .get(api + '/commission/get')
       .then((res) => {
         setCommission(res.data)
-        console.log(res)
       })
       .catch((err) => console.log(err))
     RemoveLoadingBar()
@@ -314,7 +340,7 @@ function Archive() {
   const ListCom = Array.isArray(commission) ? (
     commission.map((mem) => (
       <div className="flex flex-col snap-start h-fit py-2 px-4 w-full">
-        <p className="text-xl text-active-com-acceil font-semibold">
+        <p className="text-xl text-active-com-acceil dark:text-white font-semibold">
           {[mem.nom_m, ' ', mem.prenom_m]}
         </p>
         <p className="text-blue font-semibold">{mem.role_m}</p>
@@ -483,6 +509,7 @@ function Archive() {
                 Annuler
               </button>
               <button
+                ref={buttonRef}
                 onClick={async () => {
                   const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
@@ -603,26 +630,29 @@ function Archive() {
                 ></input>
               </div>
             </div>
-            <div className="max-h-[56vh] overflow-y-auto w-full">
-              <table className="w-full">
-                <tr className="border-t">
-                  <th className="w-1/4 border-x">
-                    <div>Rapport</div>
-                  </th>
-                  <th className="w-1/4 border-x">
-                    <div>Nom Etudiant</div>
-                  </th>
-                  <th className="w-1/4 border-x">
-                    <div>Date de l'infraction</div>
-                  </th>
-                  {!view && (
+
+            <div className="w-full grow h-[50vh]">
+              <div className="w-full h-full overflow-y-auto">
+                <table className="w-full">
+                  <tr className="border-t">
                     <th className="w-1/4 border-x">
-                      <div>Action</div>
+                      <div>Rapport</div>
                     </th>
-                  )}
-                </tr>
-                {tableEtu}
-              </table>
+                    <th className="w-1/4 border-x">
+                      <div>Nom Etudiant</div>
+                    </th>
+                    <th className="w-1/4 border-x">
+                      <div>Date de l'infraction</div>
+                    </th>
+                    {!view && (
+                      <th className="w-1/4 border-x">
+                        <div>Action</div>
+                      </th>
+                    )}
+                  </tr>
+                  {tableEtu}
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -657,9 +687,11 @@ function Archive() {
                   Annuler
                 </button>
                 <button
+                  ref={buttonRef}
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
+                    addLoadingBar()
                     const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
@@ -670,6 +702,7 @@ function Archive() {
                         setEtudiants(res.data)
                       })
                       .catch((err) => console.log(err))
+                    RemoveLoadingBar()
                   }}
                   className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
                 >
@@ -745,7 +778,7 @@ function Archive() {
                       required
                     ></input>
                     <label className="label_rapport" htmlFor="prenomE">
-                      Prenom
+                      Prénom
                     </label>
                     {errorsStep1.prenomError && (
                       <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -991,10 +1024,9 @@ function Archive() {
                 </div>
               </div>
             )}
-            <hr className="w-full dark:text-gray"></hr>
-            <div className="flex justify-between w-5/6 py-6">
+            <div className="flex justify-between w-5/6 py-6 *:text-[18px]">
               <button
-                className="button_dossier text-red min-w-fit hover:bg-0.36-red"
+                className="button_dossier text-red min-w-fit  hover:bg-0.36-red"
                 onClick={(e) => {
                   e.preventDefault()
                   if (step == 1) {
@@ -1025,6 +1057,7 @@ function Archive() {
                 {step >= 2 ? 'retourner' : 'annuler'}
               </button>
               <button
+                ref={buttonRef}
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
                 onClick={(e) => {
                   e.preventDefault()

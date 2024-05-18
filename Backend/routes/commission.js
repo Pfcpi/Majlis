@@ -49,12 +49,16 @@ router.post('/add', (req, res) => {
     req.body.emailM,
     req.body.dateDebutM
   ]
-  if (values[2]=="Président") {
-    db.query("UPDATE Utilisateur SET email_u = ?, nomU = ?, prenomU = ? WHERE id_u = 2",  [values[3], values[0], values[1]], (err, result) => {
-    if(err) {
-      res.send("Error while changing président")
-    }
-  })
+  if (values[2] == 'Président') {
+    db.query(
+      'UPDATE Utilisateur SET email_u = ?, nomU = ?, prenomU = ? WHERE id_u = 2',
+      [values[3], values[0], values[1]],
+      (err, result) => {
+        if (err) {
+          res.send('Error while changing président')
+        }
+      }
+    )
   }
   let sqlquery = `INSERT INTO Membre (nom_m, prenom_m, role_m, email_m, date_debut_m, num_c, est_actif) VALUES (?, ?,   ?, ?, ?, (SELECT num_c FROM Commission WHERE actif_c = TRUE), TRUE)`
   db.query(sqlquery, values, (err, result) => {
@@ -85,12 +89,16 @@ router.patch('/edit', (req, res) => {
     req.body.dateDebutM,
     req.body.idM
   ]
-  if (values[0]=="Président") {
-    db.query("UPDATE Utilisateur SET email_u = ?, nomU = ?, prenomU = ? WHERE id_u = 2",  [values[3], values[1], values[2]], (err, result) => {
-    if(err) {
-      res.send("Error while changing président")
-    }
-  })
+  if (values[0] == 'Président') {
+    db.query(
+      'UPDATE Utilisateur SET email_u = ?, nomU = ?, prenomU = ? WHERE id_u = 2',
+      [values[3], values[1], values[2]],
+      (err, result) => {
+        if (err) {
+          res.send('Error while changing président')
+        }
+      }
+    )
   }
   let sqlquery = `UPDATE Membre SET role_m = ?, nom_m = ?, prenom_m = ?, email_m = ?, date_debut_m = ? WHERE id_m = ?`
   db.query(sqlquery, values, (err, result) => {
@@ -152,7 +160,7 @@ router.patch('/archivecom', (req, res) => {
         if (err) {
           res.status(200).send(err)
         } else {
-          let sqlquery = `INSERT INTO Commission (date_debut_c, actif_c) VALUES (NOW(), TRUE)`
+          let sqlquery = `INSERT INTO Commission (date_debut_c, date_fin_c,actif_c) VALUES (NOW(), '9999-12-30', TRUE)`
           db.query(sqlquery, (err, result) => {
             if (err) {
               res.status(200).send(err)
@@ -188,22 +196,25 @@ router.get('/getcom', (req, res) => {
   }
 */
 router.post('/mail', (req, res) => {
-  let mail = req.body.email
-  let html = req.body.html
+  let { mail, text, date } = req.body
+  console.log('{ mail, text, date }:', { mail, text, date })
+  const rapports = text.map((e) => e.nom_e + ' ' + e.prenom_e).toString()
+  console.log(rapports)
   const mailOptions = {
     from: '"Logiciel Conseil de Discipline" <conseil@cd-usto.tech>',
     to: mail,
     subject: 'Nouveau conseil de discipline planifié.',
-    html: html
+    text: 'les rapports a traiter: \n' + rapports + '\n' + 'Date prévue de conseil: ' + date
   }
   transporter.sendMail(mailOptions, function (err, info) {
     if (err) {
       console.log(err)
+      res.status(400).send(err)
     } else {
       console.log('Email sent')
+      res.sendStatus(204)
     }
   })
-  res.sendStatus(204)
 })
 
 module.exports = router

@@ -60,7 +60,7 @@ function SideBar() {
     <div className="flex h-full w-full">
       {isLoggingOut && (
         <div className="fullBgBlock">
-          <div className="flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
+          <div className="flex flex-col justify-evenly px-4 text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
             Êtes-vous sûr de vouloir vous déconnecter ?
             <div className="flex w-full justify-between px-8">
               <button
