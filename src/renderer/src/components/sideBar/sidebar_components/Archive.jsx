@@ -516,6 +516,7 @@ function Archive() {
     <></>
   )
 
+  /*
   const filteredMembers = useMemo(() => {
     return Array.isArray(commissions)
       ? commissions.filter((m) => {
@@ -555,7 +556,7 @@ function Archive() {
     ))
   ) : (
     <></>
-  )
+  )*/
 
   const tabCons = Array.isArray(conseils) ? (
     conseils.map((m) => (
@@ -972,7 +973,7 @@ function Archive() {
                 </tr>
                 {currentWindow == win[0] && tabRapports}
                 {currentWindow == win[1] && tabPVs}
-                {currentWindow == win[2] && tabComs}
+                {/*currentWindow == win[2] && tabComs */}
                 {currentWindow == win[3] && tabCons}
               </table>
             </div>
