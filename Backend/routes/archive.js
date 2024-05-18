@@ -6,6 +6,7 @@ const router = express.Router()
 const { db } = require('../config/db')
 const { generatePDFpv } = require('../services/pdf')
 const { generatePDFrapport } = require('../services/pdf')
+const { generatePDFcd } = require('../services/pdf')
 const nodemailer = require('nodemailer')
 
 // Automatic mailling setup
@@ -26,7 +27,9 @@ function maj(chaine) {
 function numRapport(num_rapport) {
   return num_rapport.split(',').map(Number)
 }
-
+function dateSplit(dates) {
+  return dates.split(',')
+}
 function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
     // Ensure the strings are not null or undefined, and split them into arrays
     let nomsArray = noms_temoins ? noms_temoins.split(',') : []
@@ -51,6 +54,20 @@ function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
 
     // Return the result
     return temoins
+}
+
+function transformNomsMembers(noms_members) {
+  // Split the input string by commas to get individual name pairs
+  const pairs = noms_members.split(',')
+
+  // Map over the pairs to apply the transformations
+  return pairs.map(pair => {
+      // Trim any leading/trailing whitespace and split by space to separate name and firstname
+      const [name, firstname] = pair.trim().split(' ')
+
+      // Transform name to uppercase and apply maj to firstname
+      return `${name.toUpperCase()} ${maj(firstname)}`
+  })
 }
 
 function formatNames(etudiants) {
@@ -124,6 +141,40 @@ function formatDate(inputDate) {
   const year = date.getFullYear()
 
   return `${day}/${month}/${year}`
+}
+
+function formatTuples(nomE, prenomE, niveauE, sectionE, groupeE, nomP, prenomP, motifI, libeleS) {
+  // Split each input string into an array of values
+  const nomEArray = nomE.split(',')
+  const prenomEArray = prenomE.split(',')
+  const niveauEArray = niveauE.split(',')
+  const sectionEArray = sectionE.split(',')
+  const groupeEArray = groupeE.split(',')
+  const nomPArray = nomP.split(',')
+  const prenomPArray = prenomP.split(',')
+  const motifIArray = motifI.split(',')
+  const libeleSArray = libeleS.split(',')
+
+  // Map over the arrays to create the tuples
+  return nomEArray.map((_, index) => {
+      // Check for null or undefined values and handle them
+      const nomEValue = nomEArray[index] ? nomEArray[index].toUpperCase() : null
+      const prenomEValue = prenomEArray[index] ? maj(prenomEArray[index]) : null
+      const nomPValue = nomPArray[index] ? nomPArray[index].toUpperCase() : null
+      const prenomPValue = prenomPArray[index] ? maj(prenomPArray[index]) : null
+
+      return {
+          nomE: nomEValue,
+          prenomE: prenomEValue,
+          niveauE: niveauEArray[index],
+          sectionE: sectionEArray[index],
+          groupeE: groupeEArray[index],
+          nomP: nomPValue,
+          prenomP: prenomPValue,
+          motifI: motifIArray[index],
+          libeleS: libeleSArray[index]
+      }
+  })
 }
 
 //VALID
@@ -268,7 +319,21 @@ router.patch('/editrapport', (req, res) => {
 //VALID
 // Get inactive commissions and it's members
 router.get('/getcommission', (req, res) => {
-  let sqlquery = `SELECT * FROM Commission c INNER JOIN Membre m ON m.num_c = c.num_c WHERE c.actif_c = FALSE GROUP BY c.num_c`
+  let sqlquery = `SELECT
+  c.num_c, c.date_debut_c, c.date_fin_c,
+  GROUP_CONCAT(DISTINCT m.nom_m) AS nomM,
+  GROUP_CONCAT(DISTINCT m.prenom_m) AS roleM,
+  GROUP_CONCAT(DISTINCT m.role_m) AS roleM
+FROM
+Commission c
+
+INNER JOIN Membre m ON m.num_c = c.num_c
+
+WHERE c.actif_c = FALSE
+
+GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
+
+`
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
@@ -877,7 +942,7 @@ GROUP BY
       res.send(pdfBuffer)
     } catch (err) {
       console.error(err)
-      res.status(200).send('An error occurred while generating the PDF')
+      res.status(400).send('An error occurred while generating the PDF')
     }
   })
 })
@@ -936,6 +1001,80 @@ router.post('/getscd', (req, res) => {
       membres: formatNames(result[0].membres)
     }
     res.send(data)
+  })
+})
+
+//Print all informations of a cd
+/*
+{
+  "numCD": int value
+}
+*/
+router.get('/printcd', (req, res) => {
+  let numCD = req.body.numCD
+  const sqlquery = `SELECT
+  cd.date_cd,
+
+  GROUP_CONCAT(DISTINCT pv.num_pv) AS numPV,
+  GROUP_CONCAT(DISTINCT pv.date_pv) AS datePV,
+
+
+  GROUP_CONCAT(DISTINCT e.nom_e) AS nomE,
+  GROUP_CONCAT(DISTINCT e.prenom_e) AS prenomE,
+  GROUP_CONCAT(DISTINCT e.niveau_e) AS niveauE,
+  GROUP_CONCAT(DISTINCT e.section_e) AS sectionE,
+  GROUP_CONCAT(DISTINCT e.groupe_e) AS groupeE,
+  GROUP_CONCAT(DISTINCT p.nom_p) AS nomP,
+  GROUP_CONCAT(DISTINCT p.prenom_p) AS prenomP,
+  GROUP_CONCAT(DISTINCT i.motif_i) AS motifI,
+  GROUP_CONCAT(DISTINCT s.libele_s) AS libeleS,
+
+  (SELECT CONCAT(m.nom_m, ' ', m.prenom_m) FROM Membre m
+    LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+    LEFT JOIN Commission c ON c.num_c = m.num_c
+
+    WHERE c.actif_c = 1 AND m.role_m = 'Président') as nom_president,
+  GROUP_CONCAT(DISTINCT m.nom_m, ' ', m.prenom_m) AS noms_membres
+FROM
+    Conseil_Discipline cd
+INNER JOIN
+    PV pv ON pv.num_cd = cd.num_cd
+LEFT JOIN
+    Rapport r ON r.num_r = pv.num_r
+LEFT JOIN
+    Sanction s ON pv.num_s = s.num_s
+LEFT JOIN
+    Etudiant e ON r.matricule_e = e.matricule_e
+LEFT JOIN
+    Plaignant p ON r.id_p = p.id_p
+LEFT JOIN
+    Commission_Presente cp ON pv.num_cd = cp.num_cd
+LEFT JOIN
+    Infraction i ON i.num_i = r.num_i
+LEFT JOIN
+    Membre m ON cp.id_m = m.id_m
+
+WHERE cd.num_cd = ?
+  `
+  db.query(sqlquery, numCD, async (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+      }
+      const data = {
+        dateCD: result[0].date_cd,
+        numPV: numRapport(result[0].numPV),
+        datePV: dateSplit(result[0].datePV),
+        tuples: formatTuples(result[0].nomE, result[0].prenomE, result[0].niveauE, result[0].sectionE, result[0].groupeE, result[0].nomP, result[0].prenomP, result[0].motifI, result[0].libeleS),
+        president: `${result[0].nom_president.split(' ')[0].toUpperCase()} ${maj(result[0].nom_president.split(' ')[1])}`,
+        membres: transformNomsMembers(result[0].noms_membres)
+      }
+      try {
+        const pdfBuffer = await generatePDFcd(data, req.body.path)
+        res.send(pdfBuffer)
+      } catch (err) {
+        console.error(err)
+        res.status(400).send('An error occurred while generating the PDF')
+      }
   })
 })
 
