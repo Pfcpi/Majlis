@@ -538,6 +538,7 @@ function Archive() {
     const tache = await axios
       .post(api + '/archive/getscd', { numCD: selectedCon[0].num_cd })
       .then((res) => {
+        setView(true)
         console.log(res)
         setCurrentViewedCD(res.data)
       })
@@ -669,9 +670,16 @@ function Archive() {
   ) : (
     <></>
   )*/
+  const filteredCons = useMemo(() => {
+    return Array.isArray(conseils)
+      ? conseils.filter((c) => {
+          return c.date_cd.slice(0, 10).includes(queryCon)
+        })
+      : ''
+  }, [conseils, queryCon])
 
-  const tabCons = Array.isArray(conseils) ? (
-    conseils.map((m) => (
+  const tabCons = Array.isArray(filteredCons) ? (
+    filteredCons.map((m) => (
       <tr
         className={
           selectedCon.findIndex((el) => el == m) == -1
@@ -1021,13 +1029,6 @@ function Archive() {
                     className={selectedCon.length == 1 ? 'button_active_blue' : 'button_inactive'}
                   >
                     {PdfImage}PDF
-                  </div>
-                </button>
-                <button>
-                  <div
-                    className={selectedCon.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                  >
-                    {modifierImage}Modifier
                   </div>
                 </button>
                 <button className="text-blue">
@@ -1922,6 +1923,57 @@ function Archive() {
                           ))}
                       </div>
                     </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {view && currentWindow == win[3] && (
+        <div className="w-full h-full flex">
+          <div className="h-full w-1/2 bg-side-bar-white-theme-color dark:bg-dark-gray flex flex-col">
+            <button
+              className="w-10 aspect-square"
+              onClick={() => {
+                setView(false)
+                setSelectedCon([])
+              }}
+            >
+              <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
+            </button>
+            <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
+              <h2 className="text-4xl">Details du Cd</h2>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-blue text-2xl">Informations de Cd</h3>
+                <div className="flex flex-col gap-3">
+                  <p>
+                    Date de Conseil:{' '}
+                    {currentViewedCD.dateCD ? currentViewedCD.dateCD.slice(0, 10) : ''}
+                  </p>
+                  <div>
+                    membres:{' '}
+                    <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                      {Array.isArray(currentViewedCD.membres) &&
+                        currentViewedCD.membres.length != 0 &&
+                        currentViewedCD.membres.map((t) => (
+                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                            <div>{t}</div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                  <div>
+                    etudiants:{' '}
+                    <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                      {Array.isArray(currentViewedCD.etudiants) &&
+                        currentViewedCD.etudiants.length != 0 &&
+                        currentViewedCD.etudiants.map((t) => (
+                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                            <div>{t}</div>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 </div>
               </div>
