@@ -44,6 +44,7 @@ function AjouterRapport() {
     matriculeError: '',
     nomError: '',
     prenomError: '',
+    emailError: '',
     niveauError: '',
     groupeError: '',
     sectionError: ''
@@ -67,6 +68,7 @@ function AjouterRapport() {
    "niveauE": string value,
    "groupeE": int value,
    "sectionE": int value or null,
+   "email": string value,
    "matriculeP": big int value,
    "nomP": string value,
    "prenomP": string value,
@@ -83,6 +85,7 @@ function AjouterRapport() {
     prenomE: '',
     niveauE: '',
     groupeE: '',
+    email: '',
     sectionE: null,
     nomP: '',
     prenomP: '',
@@ -241,7 +244,17 @@ function AjouterRapport() {
     } else {
       setErrorsStep1((prev) => ({ ...prev, prenomError: '' }))
     }
-
+    if (data.email.length == 0) {
+      errors.email = 'email est vide!'
+      setErrorsStep1((prev) => ({ ...prev, emailError: errors.email }))
+      return errors
+    } else if (data.email.search(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/gm)) {
+      errors.email = 'Format d’e-mail non valide'
+      setErrorsStep1((prev) => ({ ...prev, emailError: errors.email }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, emailError: '' }))
+    }
     if (data.niveauE.length == 0) {
       errors.niveau = 'Niveau est vide!'
       setErrorsStep1((prev) => ({ ...prev, niveauError: errors.niveau }))
@@ -398,7 +411,7 @@ function AjouterRapport() {
         {step == 1 && (
           <div className="flex flex-col w-5/6 my-2">
             <label className="label_dossier">Etudiant</label>
-            <div className="flex flex-col w-full gap-6 mb-4">
+            <div className="flex flex-col w-full gap-6 mb-4 max-h-[38vh] overflow-auto pt-4">
               <div className="container_input_rapport">
                 <input
                   className="input_dossier"
@@ -453,6 +466,25 @@ function AjouterRapport() {
                   <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
                     <img height="16" width="16" src={WarningSVG}></img>
                     {errorsStep1.prenomError}
+                  </p>
+                )}
+              </div>
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="email"
+                  id="email"
+                  onChange={handleInputChange}
+                  value={rapport.email}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="email">
+                  Email
+                </label>
+                {errorsStep1.emailError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {errorsStep1.emailError}
                   </p>
                 )}
               </div>
@@ -673,6 +705,7 @@ function AjouterRapport() {
                   matriculeError: '',
                   nomError: '',
                   prenomError: '',
+                  emailError: '',
                   niveauError: '',
                   groupeError: '',
                   sectionError: ''
@@ -720,6 +753,7 @@ function AjouterRapport() {
                   matriculeError: '',
                   nomError: '',
                   prenomError: '',
+                  emailError: '',
                   niveauError: '',
                   groupeError: '',
                   sectionError: ''

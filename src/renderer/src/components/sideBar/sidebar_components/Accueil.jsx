@@ -64,6 +64,7 @@ function Archive() {
     matriculeError: '',
     nomError: '',
     prenomError: '',
+    emailError: '',
     niveauError: '',
     groupeError: '',
     sectionError: ''
@@ -98,6 +99,7 @@ function Archive() {
     matriculeE: '',
     nomE: '',
     prenomE: '',
+    email: '',
     niveauE: '',
     groupeE: '',
     sectionE: null,
@@ -111,21 +113,6 @@ function Archive() {
     numR: 0
   })
 
-  const buttonRef = useRef(null)
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Enter') {
-        buttonRef.current.click()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache1 = await axios
@@ -273,12 +260,18 @@ function Archive() {
                 onClick={() => {
                   if (!cliped) setCliped()
                   setView(true)
+                  addLoadingBar()
                   axios
                     .post(api + '/rapport/gets', { numR: etudiant.num_r })
                     .then((res) => {
                       setCurrentViewedEtudiant(res.data[0])
+                      RemoveLoadingBar()
                     })
-                    .catch((err) => console.log(err))
+                    .catch((err) => {
+                      console.log(err)
+                      RemoveLoadingBar()
+                      alert('Vérifier la connection internet')
+                    })
                 }}
               >
                 <img src={VoirDossierSVG} alt="voir dossier icon"></img>
@@ -287,16 +280,21 @@ function Archive() {
                 <button
                   onClick={() => {
                     setModify(true)
+                    setCurrentViewedEtudiant({})
                     console.log()
+                    addLoadingBar()
                     axios
                       .post(api + '/rapport/gets', { numR: etudiant.num_r })
                       .then((res) => {
+                        RemoveLoadingBar()
                         setCurrentViewedEtudiant(res.data[0])
+                        console.log(res.data[0])
                         setRapport((prev) => ({
                           degreI: res.data[0].degre_i,
                           matriculeE: res.data[0].matricule_e,
                           nomE: res.data[0].nom_e,
                           prenomE: res.data[0].prenom_e,
+                          email: res.data[0].email_e,
                           niveauE: res.data[0].niveau_e,
                           groupeE: res.data[0].groupe_e,
                           sectionE: res.data[0].section_e,
@@ -309,7 +307,11 @@ function Archive() {
                           numR: etudiant.num_r
                         }))
                       })
-                      .catch((err) => console.log(err))
+                      .catch((err) => {
+                        console.log(err)
+                        RemoveLoadingBar()
+                        alert('Vérifier la connection internet')
+                      })
                   }}
                 >
                   <img
@@ -397,7 +399,19 @@ function Archive() {
     } else {
       setErrorsStep1((prev) => ({ ...prev, prenomError: '' }))
     }
-
+    console.log(data.email, rapport)
+    if (data.email.length == 0) {
+      errors.email = 'email est vide!'
+      console.log(errors.email)
+      setErrorsStep1((prev) => ({ ...prev, emailError: errors.email }))
+      return errors
+    } else if (data.email.search(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/gm)) {
+      errors.email = 'Format d’e-mail non valide'
+      setErrorsStep1((prev) => ({ ...prev, emailError: errors.email }))
+      return errors
+    } else {
+      setErrorsStep1((prev) => ({ ...prev, emailError: '' }))
+    }
     if (data.niveauE.length == 0) {
       errors.niveau = 'Niveau est vide!'
       setErrorsStep1((prev) => ({ ...prev, niveauError: errors.niveau }))
@@ -509,7 +523,6 @@ function Archive() {
                 Annuler
               </button>
               <button
-                ref={buttonRef}
                 onClick={async () => {
                   const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
@@ -556,42 +569,61 @@ function Archive() {
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
                   <div className="flex flex-col gap-3">
-                    <p>Matricule: {currentViewedEtudiant.matricule_e}</p>
-                    <p>Nom: {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}</p>
-                    <p>Niveau: {currentViewedEtudiant.niveau_e}</p>
-                    <p>Groupe: {currentViewedEtudiant.groupe_e}</p>
-                    <p>Section: {currentViewedEtudiant.section_e}</p>
+                    {currentViewedEtudiant.matricule_e && (
+                      <p>Matricule: {currentViewedEtudiant.matricule_e}</p>
+                    )}
+                    {currentViewedEtudiant.nom_e && currentViewedEtudiant.prenom_e && (
+                      <p>
+                        Nom: {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}
+                      </p>
+                    )}
+                    {currentViewedEtudiant.email_e && <p>email: {currentViewedEtudiant.email_e}</p>}
+                    {currentViewedEtudiant.niveau_e && (
+                      <p>Niveau: {currentViewedEtudiant.niveau_e}</p>
+                    )}
+                    {currentViewedEtudiant.groupe_e && (
+                      <p>Groupe: {currentViewedEtudiant.groupe_e}</p>
+                    )}
+                    {currentViewedEtudiant.section_e && (
+                      <p>Section: {currentViewedEtudiant.section_e}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                   <div className="flex flex-col gap-3">
-                    <p>Nom: {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}</p>
+                    {currentViewedEtudiant.nom_p && currentViewedEtudiant.prenom_p && (
+                      <p>
+                        Nom: {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations globales</h3>
                   <div className="flex flex-col gap-3">
-                    <p>
-                      Date de l’infraction:{' '}
-                      {currentViewedEtudiant.date_i
-                        ? currentViewedEtudiant.date_i.slice(
-                            0,
-                            currentViewedEtudiant.date_i.indexOf('T')
-                          )
-                        : 'not found'}
-                    </p>
-                    <p>Lieu: {currentViewedEtudiant.lieu_i}</p>
-                    <p>Degré: {currentViewedEtudiant.degre_i}</p>
-                    <p>Motif: {currentViewedEtudiant.motif_i}</p>
+                    {currentViewedEtudiant.date_i && (
+                      <p>
+                        Date de l’infraction:{' '}
+                        {currentViewedEtudiant.date_i.slice(
+                          0,
+                          currentViewedEtudiant.date_i.indexOf('T')
+                        )}
+                      </p>
+                    )}
+                    {currentViewedEtudiant.lieu_i && <p>Lieu: {currentViewedEtudiant.lieu_i}</p>}
+                    {currentViewedEtudiant.degre_i && <p>Degré: {currentViewedEtudiant.degre_i}</p>}
+                    {currentViewedEtudiant.motif_i && <p>Motif: {currentViewedEtudiant.motif_i}</p>}
                   </div>
                 </div>
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-blue text-2xl">Description:</h3>
-                  <div className="flex flex-col gap-3">
-                    <p>{currentViewedEtudiant.description_i}</p>
+                {currentViewedEtudiant.description_i && (
+                  <div className="flex flex-col gap-4">
+                    <h3 className="text-blue text-2xl">Description:</h3>
+                    <div className="flex flex-col gap-3">
+                      <p>{currentViewedEtudiant.description_i}</p>
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="flex justify-evenly">
                   <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
                     <img src={ImprimerSVG}></img>imprimer
@@ -687,7 +719,6 @@ function Archive() {
                   Annuler
                 </button>
                 <button
-                  ref={buttonRef}
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
@@ -717,7 +748,7 @@ function Archive() {
             {step == 1 && (
               <div className="flex flex-col w-5/6">
                 <label className="label_dossier">Etudiant</label>
-                <div className="flex flex-col w-full gap-6 mb-4">
+                <div className="flex flex-col w-full gap-6 mb-4 max-h-[38vh] overflow-auto pt-4">
                   <div className="container_input_rapport">
                     <input
                       className="input_dossier"
@@ -784,6 +815,28 @@ function Archive() {
                       <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
                         <img height="16" width="16" src={WarningSVG}></img>
                         {errorsStep1.prenomError}
+                      </p>
+                    )}
+                  </div>
+                  <div className="container_input_rapport">
+                    <input
+                      className="input_dossier"
+                      name="email"
+                      id="email"
+                      onChange={(e) => {
+                        handleInputChange(e)
+                        setCurrentViewedEtudiant((prev) => ({ ...prev, email_e: e.target.value }))
+                      }}
+                      value={currentViewedEtudiant.email_e || ''}
+                      required
+                    ></input>
+                    <label className="label_rapport" htmlFor="email">
+                      Email
+                    </label>
+                    {errorsStep1.emailError && (
+                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                        <img height="16" width="16" src={WarningSVG}></img>
+                        {errorsStep1.emailError}
                       </p>
                     )}
                   </div>
@@ -1039,6 +1092,7 @@ function Archive() {
                       matriculeError: '',
                       nomError: '',
                       prenomError: '',
+                      emailError: '',
                       niveauError: '',
                       groupeError: '',
                       sectionError: ''
@@ -1057,7 +1111,6 @@ function Archive() {
                 {step >= 2 ? 'retourner' : 'annuler'}
               </button>
               <button
-                ref={buttonRef}
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
                 onClick={(e) => {
                   e.preventDefault()
@@ -1084,6 +1137,7 @@ function Archive() {
                       matriculeError: '',
                       nomError: '',
                       prenomError: '',
+                      emailError: '',
                       niveauError: '',
                       groupeError: '',
                       sectionError: ''

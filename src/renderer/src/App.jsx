@@ -62,7 +62,7 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && buttonRef.current) {
         buttonRef.current.click()
       }
     }

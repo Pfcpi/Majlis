@@ -31,21 +31,7 @@ function AjouterPV() {
 
   const AjouterPVPage = useRef(null)
 
-  const buttonRef = useRef(null)
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Enter') {
-        buttonRef.current.click()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache = await axios
@@ -378,7 +364,6 @@ function AjouterPV() {
                 Annuler
               </button>
               <button
-                ref={buttonRef}
                 className="button_dossier text-blue border-blue hover:bg-blue/25"
                 type="submit"
                 onClick={async (e) => {
