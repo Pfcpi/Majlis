@@ -31,7 +31,6 @@ function AjouterPV() {
 
   const AjouterPVPage = useRef(null)
 
-
   async function fetchData() {
     addLoadingBar()
     const tache = await axios
@@ -171,6 +170,19 @@ function AjouterPV() {
         })
         .then((res) => {
           RemoveLoadingBar()
+          console.log('result.data:', res.data)
+          members.map((m) => {
+            axios
+              .post(api + '/archive/mail', {
+                numPV: Number(res.data.numpv),
+                email: m.email_m
+              })
+              .then((res) => console.log(res))
+              .catch((err) => {
+                console.log(err)
+                alert('Vérifier la connexion internet')
+              })
+          })
           console.log(res)
         })
         .catch((err) => {
@@ -336,7 +348,7 @@ function AjouterPV() {
                       <div className="w-5/12">{p.role_m}</div>
                       <div className="w-3/12">{p.nom_m}</div>
                       <div className={members.length > 5 ? 'w-3/12' : 'w-1/3'}>{p.prenom_m}</div>
-                      {members.length > 5 && (
+                      {members.length > 0 && (
                         <button
                           className="flex justify-end w-1/12"
                           onClick={(e) => {

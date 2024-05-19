@@ -6,6 +6,7 @@ const router = express.Router()
 const { db } = require('../config/db')
 const { generatePDFpv } = require('../services/pdf')
 const { generatePDFrapport } = require('../services/pdf')
+const { generatePDFpvForEmail } = require('../services/pdf')
 const { generatePDFcd } = require('../services/pdf')
 const nodemailer = require('nodemailer')
 
@@ -31,29 +32,29 @@ function dateSplit(dates) {
   return dates.split(',')
 }
 function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
-    // Ensure the strings are not null or undefined, and split them into arrays
-    let nomsArray = noms_temoins ? noms_temoins.split(',') : []
-    let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : []
-    let rolesArray = roles_temoins ? roles_temoins.split(',') : []
+  // Ensure the strings are not null or undefined, and split them into arrays
+  let nomsArray = noms_temoins ? noms_temoins.split(',') : []
+  let prenomsArray = prenoms_temoins ? prenoms_temoins.split(',') : []
+  let rolesArray = roles_temoins ? roles_temoins.split(',') : []
 
-    // Initialize an empty array to hold the temoins objects
-    let temoins = []
+  // Initialize an empty array to hold the temoins objects
+  let temoins = []
 
-    // Determine the length of the arrays (they should all be the same length)
-    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
+  // Determine the length of the arrays (they should all be the same length)
+  let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
-    // Loop through the arrays and create objects
-    for (let i = 0; i < length; i++) {
-        let temoin = {
-            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
-            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
-            role: rolesArray[i] || ""  // Use empty string if value is undefined
-        }
-        temoins.push(temoin)
+  // Loop through the arrays and create objects
+  for (let i = 0; i < length; i++) {
+    let temoin = {
+      nom: nomsArray[i].toUpperCase() || '', // Use empty string if value is undefined
+      prenom: maj(prenomsArray[i]) || '', // Use empty string if value is undefined
+      role: rolesArray[i] || '' // Use empty string if value is undefined
     }
+    temoins.push(temoin)
+  }
 
-    // Return the result
-    return temoins
+  // Return the result
+  return temoins
 }
 
 function transformNomsMembers(noms_members) {
@@ -61,62 +62,65 @@ function transformNomsMembers(noms_members) {
   const pairs = noms_members.split(',')
 
   // Map over the pairs to apply the transformations
-  return pairs.map(pair => {
-      // Trim any leading/trailing whitespace and split by space to separate name and firstname
-      const [name, firstname] = pair.trim().split(' ')
+  return pairs.map((pair) => {
+    // Trim any leading/trailing whitespace and split by space to separate name and firstname
+    const [name, firstname] = pair.trim().split(' ')
 
-      // Transform name to uppercase and apply maj to firstname
-      return `${name.toUpperCase()} ${maj(firstname)}`
+    // Transform name to uppercase and apply maj to firstname
+    return `${name.toUpperCase()} ${maj(firstname)}`
   })
 }
 
 function formatNames(etudiants) {
   // Split the string by commas to get individual names
-  return etudiants.split(',').map(fullName => {
-      // Trim any leading/trailing whitespace
-      fullName = fullName.trim()
-      
-      // Find the index of the first space
-      let firstSpaceIndex = fullName.indexOf(' ')
-      
-      // Separate the family name and the rest of the name(s)
-      let familyName = fullName.substring(0, firstSpaceIndex).toUpperCase()
-      let firstNames = fullName.substring(firstSpaceIndex + 1)
-      
-      // Capitalize the first letter of each first name
-      firstNames = firstNames.split(' ').map(name => {
-          return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
-      }).join(' ')
-      
-      // Combine the formatted family name and first names
-      return `${familyName} ${firstNames}`
+  return etudiants.split(',').map((fullName) => {
+    // Trim any leading/trailing whitespace
+    fullName = fullName.trim()
+
+    // Find the index of the first space
+    let firstSpaceIndex = fullName.indexOf(' ')
+
+    // Separate the family name and the rest of the name(s)
+    let familyName = fullName.substring(0, firstSpaceIndex).toUpperCase()
+    let firstNames = fullName.substring(firstSpaceIndex + 1)
+
+    // Capitalize the first letter of each first name
+    firstNames = firstNames
+      .split(' ')
+      .map((name) => {
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+      })
+      .join(' ')
+
+    // Combine the formatted family name and first names
+    return `${familyName} ${firstNames}`
   })
 }
 
 function createMembers(noms_members, prenoms_members, roles_members) {
-    // Ensure the strings are not null or undefined, and split them into arrays
-    let nomsArray = noms_members ? noms_members.split(',') : []
-    let prenomsArray = prenoms_members ? prenoms_members.split(',') : []
-    let rolesArray = roles_members ? roles_members.split(',') : []
+  // Ensure the strings are not null or undefined, and split them into arrays
+  let nomsArray = noms_members ? noms_members.split(',') : []
+  let prenomsArray = prenoms_members ? prenoms_members.split(',') : []
+  let rolesArray = roles_members ? roles_members.split(',') : []
 
-    // Initialize an empty array to hold the members objects
-    let members = []
+  // Initialize an empty array to hold the members objects
+  let members = []
 
-    // Determine the length of the arrays (they should all be the same length)
-    let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
+  // Determine the length of the arrays (they should all be the same length)
+  let length = Math.max(nomsArray.length, prenomsArray.length, rolesArray.length)
 
-    // Loop through the arrays and create objects
-    for (let i = 0; i < length; i++) {
-        let member = {
-            nom: nomsArray[i].toUpperCase() || "",  // Use empty string if value is undefined
-            prenom: maj(prenomsArray[i]) || "",  // Use empty string if value is undefined
-            role: rolesArray[i] || ""  // Use empty string if value is undefined
-        }
-        members.push(member)
+  // Loop through the arrays and create objects
+  for (let i = 0; i < length; i++) {
+    let member = {
+      nom: nomsArray[i].toUpperCase() || '', // Use empty string if value is undefined
+      prenom: maj(prenomsArray[i]) || '', // Use empty string if value is undefined
+      role: rolesArray[i] || '' // Use empty string if value is undefined
     }
+    members.push(member)
+  }
 
-    // Return the result
-    return members
+  // Return the result
+  return members
 }
 
 function formatDate(inputDate) {
@@ -157,23 +161,23 @@ function formatTuples(nomE, prenomE, niveauE, sectionE, groupeE, nomP, prenomP, 
 
   // Map over the arrays to create the tuples
   return nomEArray.map((_, index) => {
-      // Check for null or undefined values and handle them
-      const nomEValue = nomEArray[index] ? nomEArray[index].toUpperCase() : null
-      const prenomEValue = prenomEArray[index] ? maj(prenomEArray[index]) : null
-      const nomPValue = nomPArray[index] ? nomPArray[index].toUpperCase() : null
-      const prenomPValue = prenomPArray[index] ? maj(prenomPArray[index]) : null
+    // Check for null or undefined values and handle them
+    const nomEValue = nomEArray[index] ? nomEArray[index].toUpperCase() : null
+    const prenomEValue = prenomEArray[index] ? maj(prenomEArray[index]) : null
+    const nomPValue = nomPArray[index] ? nomPArray[index].toUpperCase() : null
+    const prenomPValue = prenomPArray[index] ? maj(prenomPArray[index]) : null
 
-      return {
-          nomE: nomEValue,
-          prenomE: prenomEValue,
-          niveauE: niveauEArray[index],
-          sectionE: sectionEArray[index],
-          groupeE: groupeEArray[index],
-          nomP: nomPValue,
-          prenomP: prenomPValue,
-          motifI: motifIArray[index],
-          libeleS: libeleSArray[index]
-      }
+    return {
+      nomE: nomEValue,
+      prenomE: prenomEValue,
+      niveauE: niveauEArray[index],
+      sectionE: sectionEArray[index],
+      groupeE: groupeEArray[index],
+      nomP: nomPValue,
+      prenomP: prenomPValue,
+      motifI: motifIArray[index],
+      libeleS: libeleSArray[index]
+    }
   })
 }
 
@@ -426,7 +430,7 @@ router.patch('/editpv', (req, res) => {
   let temoinNewArray = Object.values(temoinNew).filter((temoin) => temoin !== null)
   let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`
   db.query(sqlqueryP, [datePV, numPV])
- 
+
   let sqlquerydelT = `DELETE te FROM Temoigne te
   INNER JOIN PV ON PV.num_pv = te.num_pv
   WHERE PV.num_pv = ?`
@@ -668,6 +672,7 @@ router.delete('/deletepv', (req, res) => {
 */
 router.post('/mail', (req, res) => {
   let values = [req.body.numPV, req.body.email]
+  console.log('values: ', values)
   let sqlquery = `SELECT
   e.matricule_e,
   e.nom_e,
@@ -724,56 +729,57 @@ WHERE
   db.query(sqlquery, req.body.numPV, async (err, result) => {
     if (err && err.errno != 1065) {
       res.status(400).send(err)
-    }
-
-    const data = {
-      matriculeE: result[0].matricule_e,
-      nomE: (result[0].nom_e).toUpperCase(),
-      prenomE: maj(result[0].prenom_e),
-      niveauE: result[0].niveau_e,
-      groupeE: result[0].groupe_e,
-      sectionE: result[0].section_e,
-      nomP: (result[0].nom_p).toUpperCase(),
-      prenomP: maj(result[0].prenom_p),
-      dateCD: formatDate(result[0].date_cd),
-      motifI: result[0].motif_i,
-      datePV: formatDate(result[0].date_pv),
-      libeleS: result[0].libele_s,
-      nomPR: (result[0].nom_pres).toUpperCase(),
-      prenomPR: maj(result[0].prenom_pres),
-      nomT: result[0].noms_temoins,
-      prenomT: result[0].prenoms_temoins,
-      nomM: result[0].noms_membres,
-      prenomM: result[0].prenoms_membres
-    }
-
-    try {
-      const pdfBuffer = await generatePDFpv(data)
-      const mailOptions = {
-        from: '"Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
-        to: values[1],
-        subject: `Procès-Verbal du conseil de discipline du ${data.dateCD}.`,
-        html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
-        attachments: [
-          {
-            filename: 'PV.pdf',
-            content: pdfBuffer,
-            contentType: 'application/pdf'
-          }
-        ]
+    } else {
+      console.log(result[0])
+      const data = {
+        matriculeE: result[0].matricule_e,
+        nomE: result[0].nom_e.toUpperCase(),
+        prenomE: maj(result[0].prenom_e),
+        niveauE: result[0].niveau_e,
+        groupeE: result[0].groupe_e,
+        sectionE: result[0].section_e,
+        nomP: result[0].nom_p.toUpperCase(),
+        prenomP: maj(result[0].prenom_p),
+        dateCD: formatDate(result[0].date_cd),
+        motifI: result[0].motif_i,
+        datePV: formatDate(result[0].date_pv),
+        libeleS: result[0].libele_s,
+        nomPR: result[0].nom_pres.toUpperCase(),
+        prenomPR: maj(result[0].prenom_pres),
+        nomT: result[0].noms_temoins,
+        prenomT: result[0].prenoms_temoins,
+        nomM: result[0].noms_membres,
+        prenomM: result[0].prenoms_membres
       }
-      console.log('AAAAAAAA')
-      transporter.sendMail(mailOptions, function (err, info) {
-        if (err) {
-          console.log('Error while sending email' + err)
-        } else {
-          console.log('Email sent')
-          res.sendStatus(204)
+
+      try {
+        const pdfBuffer = await generatePDFpvForEmail(data)
+        const mailOptions = {
+          from: '"Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
+          to: values[1],
+          subject: `Procès-Verbal du conseil de discipline du ${data.dateCD}.`,
+          html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
+          attachments: [
+            {
+              filename: 'PV.pdf',
+              content: pdfBuffer,
+              contentType: 'application/pdf'
+            }
+          ]
         }
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('An error occurred while generating the PDF')
+        console.log('AAAAAAAA')
+        transporter.sendMail(mailOptions, function (err, info) {
+          if (err) {
+            console.log('Error while sending email' + err)
+          } else {
+            console.log('Email sent')
+            res.sendStatus(204)
+          }
+        })
+      } catch (err) {
+        console.error(err)
+        res.status(400).send('An error occurred while generating the PDF')
+      }
     }
   })
 })
@@ -803,12 +809,12 @@ WHERE r.num_r = ?`
     if (result) {
       const data = {
         matriculeE: result[0].matricule_e,
-        nomE: (result[0].nom_e).toUpperCase(),
+        nomE: result[0].nom_e.toUpperCase(),
         prenomE: maj(result[0].prenom_e),
         niveauE: result[0].niveau_e,
         groupeE: result[0].groupe_e,
         sectionE: result[0].section_e,
-        nomP: (result[0].nom_p).toUpperCase(),
+        nomP: result[0].nom_p.toUpperCase(),
         prenomP: maj(result[0].prenom_p),
         dateI: formatDate(result[0].date_i),
         lieuI: result[0].lieu_i,
@@ -1072,22 +1078,32 @@ WHERE cd.num_cd = ?
   db.query(sqlquery, numCD, async (err, result) => {
     if (err) {
       res.status(400).send(err)
-      }
-      const data = {
-        dateCD: result[0].date_cd,
-        numPV: numRapport(result[0].numPV),
-        datePV: dateSplit(result[0].datePV),
-        tuples: formatTuples(result[0].nomE, result[0].prenomE, result[0].niveauE, result[0].sectionE, result[0].groupeE, result[0].nomP, result[0].prenomP, result[0].motifI, result[0].libeleS),
-        president: `${result[0].nom_president.split(' ')[0].toUpperCase()} ${maj(result[0].nom_president.split(' ')[1])}`,
-        membres: transformNomsMembers(result[0].noms_membres)
-      }
-      try {
-        const pdfBuffer = await generatePDFcd(data, req.body.path)
-        res.send(pdfBuffer)
-      } catch (err) {
-        console.error(err)
-        res.status(400).send('An error occurred while generating the PDF')
-      }
+    }
+    const data = {
+      dateCD: result[0].date_cd,
+      numPV: numRapport(result[0].numPV),
+      datePV: dateSplit(result[0].datePV),
+      tuples: formatTuples(
+        result[0].nomE,
+        result[0].prenomE,
+        result[0].niveauE,
+        result[0].sectionE,
+        result[0].groupeE,
+        result[0].nomP,
+        result[0].prenomP,
+        result[0].motifI,
+        result[0].libeleS
+      ),
+      president: `${result[0].nom_president.split(' ')[0].toUpperCase()} ${maj(result[0].nom_president.split(' ')[1])}`,
+      membres: transformNomsMembers(result[0].noms_membres)
+    }
+    try {
+      const pdfBuffer = await generatePDFcd(data, req.body.path)
+      res.send(pdfBuffer)
+    } catch (err) {
+      console.error(err)
+      res.status(400).send('An error occurred while generating the PDF')
+    }
   })
 })
 

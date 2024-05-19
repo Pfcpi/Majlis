@@ -208,14 +208,39 @@ router.post('/addPV', (req, res) => {
             if (err) {
               res.status(400).send(err)
             } else {
+              console.log('marked rapport as traited: ', numR)
               let sqlqueryT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
-              temoin.forEach((t) => {
+              console.log(sent, 'temoins', temoin, ', if is an array : ', Array.isArray(temoin))
+              temoin.map((t) => {
                 console.log(t)
                 db.query(sqlqueryT, [t.nomT, t.prenomT, t.roleT], (err, result) => {
-                  if (err && err.errno != 1062) {
-                    if (!sent) {
+                  if (err) {
+                    if (err.errno == 1062) {
+                      console.log('tuple duplicated')
+                      let getIndex =
+                        'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ? AND role_t = ?'
+                      db.query(getIndex, [t.nomT, t.prenomT, t.roleT], (err, result) => {
+                        if (err) {
+                          console.log(err)
+                          res.status(400).send(err)
+                          return
+                        } else {
+                          console.log('result[0].num_t', result[0].num_t)
+                          // Connect temoins to cd and pv
+                          let sqlquerytem =
+                            'INSERT INTO Temoigne (num_cd, num_t, num_pv) VALUES (?, ?, ?)'
+                          db.query(sqlquerytem, [numCD, result[0].num_t, pvId], (err, result) => {
+                            if (err) {
+                              console.log('Error inside else', err)
+                              res.status(400).send(err)
+                              return
+                            }
+                          })
+                        }
+                      })
+                    } else {
                       res.status(400).send(err)
-                      sent = true
+                      return
                     }
                   } else {
                     // Connect temoins to cd and pv
@@ -225,8 +250,9 @@ router.post('/addPV', (req, res) => {
                     db.query(sqlquerytem, [numCD, result.insertId, pvId], (err, result) => {
                       if (err) {
                         if (!sent) {
+                          console.log('Error inside else else:', err)
                           res.status(400).send(err)
-                          sent = true
+                          return
                         }
                       }
                     })
@@ -235,7 +261,7 @@ router.post('/addPV', (req, res) => {
               })
               if (!sent) {
                 console.log('arrivedHere')
-                res.send('added')
+                res.send({ numpv: pvId.toString() })
               }
             }
           })
