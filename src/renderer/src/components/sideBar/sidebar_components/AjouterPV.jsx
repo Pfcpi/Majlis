@@ -153,13 +153,11 @@ function AjouterPV() {
       console.log('forwarding print preview request...')
       console.log('numR', numR)
       let path = await window.electronAPI.getPath()
-      setPathMainProcess(path)
       const pdfToPreview = await axios
         .post(api + '/archive/printrapport', { numR: numR, path: path })
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)
-          setPathBackend(res.data)
         })
         .catch((err) => console.log(err))
     })

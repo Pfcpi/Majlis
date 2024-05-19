@@ -1,9 +1,4 @@
 # Tasks:
-
-## Overall
-
-- forgot password.
-
 ## Ajouter rapport
 
 - email for student
