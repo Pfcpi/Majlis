@@ -20,12 +20,12 @@ const transporter = nodemailer.createTransport({
 // Function that generates a password
 function generatePassword() {
   var length = 8,
-      charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-      retVal = "";
+    charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    retVal = ''
   for (var i = 0, n = charset.length; i < length; ++i) {
-      retVal += charset.charAt(Math.floor(Math.random() * n));
+    retVal += charset.charAt(Math.floor(Math.random() * n))
   }
-  return retVal;
+  return retVal
 }
 
 /*
@@ -86,6 +86,7 @@ router.post('/pres', (req, res) => {
 router.patch('/pedit', (req, res) => {
   let oldPass = req.body.oldPass
   let newPass = req.body.newPass
+  console.log('oldPass:', oldPass, ', newPass: ', newPass)
   let sqlquery = `SELECT * FROM Utilisateur WHERE id_u = 2 AND mot_de_passe = ?`
   let sqlquery2 = `UPDATE Utilisateur SET mot_de_passe = ? WHERE id_u = 2`
   const hashedOldPassword = crypto.createHash('sha256').update(oldPass).digest('hex')
@@ -107,7 +108,6 @@ router.patch('/pedit', (req, res) => {
       }
     }
   })
-  
 })
 
 /* Updates the password of the chef
@@ -120,6 +120,7 @@ router.patch('/pedit', (req, res) => {
 router.patch('/cedit', (req, res) => {
   let oldPass = req.body.oldPass
   let newPass = req.body.newPass
+  console.log('oldPass:', oldPass, ', newPass: ', newPass)
   let sqlquery = `SELECT * FROM Utilisateur WHERE id_u = 1 AND mot_de_passe = ?`
   let sqlquery2 = `UPDATE Utilisateur SET mot_de_passe = ? WHERE id_u = 1`
   const hashedOldPassword = crypto.createHash('sha256').update(oldPass).digest('hex')
@@ -151,21 +152,20 @@ router.get('/cmail', (req, res) => {
       res.send(err)
     } else {
       const newPass = generatePassword()
-      console.log(newPass)
+      console.log('newPass:', newPass, ', result:', result)
+      let mail = result[0].email_u
       const hashedNewPassword = crypto.createHash('sha256').update(newPass).digest('hex')
       let sqlquery2 = `UPDATE Utilisateur SET mot_de_passe = ? WHERE id_u = 1`
       db.query(sqlquery2, hashedNewPassword, (err, result) => {
         if (err) {
           res.status(400).send(err)
-        }
-          
-        
-      })
-      const mailOptions = {
-        from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
-        to: result[0].email_u,
-        subject: 'Votre mot de passe oublie.',
-        html : `<!DOCTYPE html>
+        } else {
+          res.send('Changed using email')
+          const mailOptions = {
+            from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
+            to: mail || '',
+            subject: 'Votre mot de passe oublie.',
+            html: `<!DOCTYPE html>
         <html lang="fr-FR">
         <head>
             <meta charset="UTF-8">
@@ -254,17 +254,19 @@ router.get('/cmail', (req, res) => {
             </div>
         </body>
         </html>`
-      }
-      transporter.sendMail(mailOptions, function (err, info) {
-        if (err) {
-          console.log(err)
-        } else {
-          console.log('Email sent')
-          res.sendStatus(204)
+          }
+          transporter.sendMail(mailOptions, function (err, info) {
+            if (err) {
+              console.log(err)
+            } else {
+              console.log('Email sent')
+              res.sendStatus(204)
+            }
+          })
         }
       })
     }
-})
+  })
 })
 
 // Sends a mail to president containing the password
@@ -277,18 +279,20 @@ router.get('/pmail', (req, res) => {
       res.send(err)
     } else {
       const newPass = generatePassword()
-      console.log(newPass)
+      console.log('newPass:', newPass, ', result:', result)
+      let mail = result[0].email_m
       const hashedNewPassword = crypto.createHash('sha256').update(newPass).digest('hex')
-      let sqlquery2 = `UPDATE Utilisateur SET mot_de_passe = ? WHERE id_u = 1`
+      let sqlquery2 = `UPDATE Utilisateur SET mot_de_passe = ? WHERE id_u = 2`
       db.query(sqlquery2, hashedNewPassword, (err, result) => {
         if (err) {
           res.status(400).send(err)
-        }})
-        const mailOptions = {
-          from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
-          to: result[0].email_u,
-          subject: 'Votre mot de passe oublie.',
-          html : `<!DOCTYPE html>
+        } else {
+          res.send('Changed using email')
+          const mailOptions = {
+            from: '"Logiciel Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
+            to: mail || '',
+            subject: 'Votre mot de passe oublie.',
+            html: `<!DOCTYPE html>
           <html lang="fr-FR">
           <head>
               <meta charset="UTF-8">
@@ -377,19 +381,20 @@ router.get('/pmail', (req, res) => {
               </div>
           </body>
           </html>`
-        }
-        transporter.sendMail(mailOptions, function (err, info) {
-          if (err) {
-            console.log(err)
-          } else {
-            console.log('Email sent')
-            res.sendStatus(204)
           }
-        })
-      }
-    })
+          transporter.sendMail(mailOptions, function (err, info) {
+            if (err) {
+              console.log(err)
+            } else {
+              console.log('Email sent')
+              res.sendStatus(204)
+            }
+          })
+        }
+      })
     }
-)
+  })
+})
 
 /* Change nom, prenom and email of chef departement (in case it happens which is very unlikely)
 {
@@ -399,13 +404,10 @@ router.get('/pmail', (req, res) => {
 }
 */
 router.patch('/chefupdate', (req, res) => {
-  let values = [
-    req.body.email,
-    req.body.nom,
-    req.body.prenom
-  ]
+  let values = [req.body.email, req.body.nom, req.body.prenom]
+  console.log('values:', values)
   let sqlquery = `UPDATE Utilisateur SET email_u = ? , nomU = ? , prenomU = ? WHERE id_u = 1`
-  db.query(sqlquery, values , (err, result) => {
+  db.query(sqlquery, values, (err, result) => {
     if (err) {
       res.send(err)
     } else {

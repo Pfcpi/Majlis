@@ -15,7 +15,7 @@ router.get('/get', (req, res) => {
   ORDER BY i.date_i DESC`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status(400).send(err)
     } else {
       res.send(result)
     }
@@ -30,7 +30,7 @@ router.get('/get', (req, res) => {
 */
 router.post('/gets', (req, res) => {
   let numr = req.body.numR
-  let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e,
+  let sqlquery = `SELECT e.matricule_e, e.nom_e, e.prenom_e, e.niveau_e, e.section_e, e.groupe_e, e.email_e,
   p.nom_p, p.prenom_p,
   i.date_i, i.lieu_i, i.motif_i, i.description_i, i.degre_i,
   r.date_r
@@ -42,6 +42,7 @@ router.post('/gets', (req, res) => {
 
   db.query(sqlquery, numr, (err, result) => {
     if (err) {
+      console.log(err)
       res.status(400).send(err)
     } else {
       res.send(result)
@@ -114,7 +115,7 @@ router.patch('/edit', (req, res) => {
 
   db.query(sqlquery, values, (err, result) => {
     if (err) {
-      res.send(err) //if error number is 1062 that means that there is duplicate of either a etudiant or plaignant
+      res.status(400).send(err) //if error number is 1062 that means that there is duplicate of either a etudiant or plaignant
     } else {
       res.send(result)
     }
@@ -136,7 +137,7 @@ router.delete('/delete', (req, res) => {
 
   db.query(sqlquery, numr, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status(400).send(err)
     } else {
       res.sendStatus(204)
     }
@@ -188,18 +189,19 @@ router.post('/add', (req, res) => {
     (err, result) => {
       if (err && err.errno != 1062) {
         // Check for duplicate
-        return res.status(400).send(err)
+        res.status(400).send(err)
       } else {
         db.query(sqlqueryP, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')], (err, result) => {
           if (err) {
             // Check for duplicate
-            return res.status(400).send(err)
+            res.status(400).send(err)
           } else {
             if (result[0] == null) {
               db.query(sqlqueryP2, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')])
               db.query(sqlqueryP, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')], (err, result) => {
                 if (err) {
                   console.log(err)
+                  res.status(400).send(err)
                 } else {
                   let x = result[0].id_p
                   db.query(
@@ -207,11 +209,11 @@ router.post('/add', (req, res) => {
                     [object.lieuI, object.dateI, object.motifI.replace(/,/g, ''), object.descI.replace(/,/g, ''), object.degreI],
                     (err, result) => {
                       if (err) {
-                        return res.status(400).send(err)
+                        res.status(400).send(err)
                       } else {
                         db.query(sqlqueryR, [object.matriculeE, x], (err, result) => {
                           if (err) {
-                            return res.status(400).send(err)
+                            console.log(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
                             db.query(
@@ -329,6 +331,7 @@ router.post('/add', (req, res) => {
               db.query(sqlqueryP, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')], (err, result) => {
                 if (err) {
                   console.log(err)
+                  res.status(400).send(err)
                 } else {
                   let x = result[0].id_p
                   db.query(
@@ -336,11 +339,11 @@ router.post('/add', (req, res) => {
                     [object.lieuI, object.dateI, object.motifI, object.descI, object.degreI],
                     (err, result) => {
                       if (err) {
-                        return res.status(400).send(err)
+                        res.status(400).send(err)
                       } else {
                         db.query(sqlqueryR, [object.matriculeE, x], (err, result) => {
                           if (err) {
-                            return res.status(400).send(err)
+                            res.status(400).send(err)
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
                             db.query(

@@ -31,21 +31,7 @@ function AjouterPV() {
 
   const AjouterPVPage = useRef(null)
 
-  const buttonRef = useRef(null)
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Enter') {
-        buttonRef.current.click()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
   async function fetchData() {
     addLoadingBar()
     const tache = await axios
@@ -153,13 +139,11 @@ function AjouterPV() {
       console.log('forwarding print preview request...')
       console.log('numR', numR)
       let path = await window.electronAPI.getPath()
-      setPathMainProcess(path)
       const pdfToPreview = await axios
         .post(api + '/archive/printrapport', { numR: numR, path: path })
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)
-          setPathBackend(res.data)
         })
         .catch((err) => console.log(err))
     })
@@ -380,7 +364,6 @@ function AjouterPV() {
                 Annuler
               </button>
               <button
-                ref={buttonRef}
                 className="button_dossier text-blue border-blue hover:bg-blue/25"
                 type="submit"
                 onClick={async (e) => {

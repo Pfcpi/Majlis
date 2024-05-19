@@ -89,7 +89,7 @@ function SideBar() {
         >
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
             <div
-              className="flex mb-10 w-full justify-evenly px-6 items-center"
+              className="flex mb-10 w-full justify-evenly px-6 h-14 items-center"
               onClick={() => {
                 setCliped()
               }}
