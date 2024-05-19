@@ -334,10 +334,11 @@ function Archive() {
     }))
   }
 
-  function handlePreview(num, rapport_ou_pv) {
+  function handlePreview(num) {
     return new Promise(async () => {
       let path = await window.electronAPI.getPath()
-      if (rapport_ou_pv == win[0]) {
+      addLoadingBar()
+      if (currentWindow == win[0]) {
         console.log('in rapport')
         const pdfToPreview = await axios
           .post(api + '/archive/printrapport', { numR: num, path: path })
@@ -345,7 +346,9 @@ function Archive() {
             const result = window.electronAPI.getUrl()
           })
           .catch((err) => console.log(err))
-      } else {
+        RemoveLoadingBar()
+      }
+      if (currentWindow == win[1]) {
         console.log('in pv')
         const pdfToPreview = await axios
           .post(api + '/archive/printpv', { numPV: num, path: path })
@@ -353,6 +356,17 @@ function Archive() {
             const result = window.electronAPI.getUrl()
           })
           .catch((err) => console.log(err))
+        RemoveLoadingBar()
+      }
+      if (currentWindow == win[3]) {
+        console.log('in cons')
+        const pdfToPreview = await axios
+          .post(api + '/archive/printcd', { numCD: num, path: path })
+          .then((res) => {
+            const result = window.electronAPI.getUrl()
+          })
+          .catch((err) => console.log(err))
+        RemoveLoadingBar()
       }
     })
   }
@@ -790,7 +804,7 @@ function Archive() {
                 <button
                   onClick={() => {
                     if (selectedPVs.length == 1) {
-                      handlePreview(selectedPVs[0].num_pv, win[1])
+                      handlePreview(selectedPVs[0].num_pv)
                     }
                   }}
                   className="text-blue"
@@ -866,7 +880,7 @@ function Archive() {
                 <button
                   onClick={() => {
                     if (selectedCon.length == 1) {
-                      handlePreview()
+                      handlePreview(selectedCon[0].num_cd)
                     }
                   }}
                   className="text-blue"
@@ -1522,7 +1536,7 @@ function Archive() {
           <div className="flex flex-col w-1/2 justify-center items-center [&>button]:w-1/3 [&>button]:min-w-fit gap-4">
             <button
               onClick={() => {
-                handlePreview(currentViewedRapport.num_r, win[0])
+                handlePreview(currentViewedRapport.num_r)
               }}
               className="modify_rapport_button"
             >

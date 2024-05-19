@@ -137,6 +137,7 @@ function AjouterPV() {
     return new Promise(async () => {
       console.log('forwarding print preview request...')
       console.log('numR', numR)
+      addLoadingBar()
       let path = await window.electronAPI.getPath()
       const pdfToPreview = await axios
         .post(api + '/archive/printrapport', { numR: numR, path: path })
@@ -144,7 +145,11 @@ function AjouterPV() {
           const result = window.electronAPI.getUrl()
           console.log(res)
         })
-        .catch((err) => console.log(err))
+        .catch((err) => {
+          console.log(err)
+          alert('Vérifier la connexion internet')
+        })
+      RemoveLoadingBar()
     })
   }
 

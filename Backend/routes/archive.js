@@ -29,57 +29,70 @@ function maj(chaine) {
 function transformDateString(dateString) {
   // Convert input to string if it's not already a string
   if (typeof dateString !== 'string') {
-      dateString = String(dateString);
+    dateString = String(dateString)
   }
 
   // Ensure dateString has the expected format "YYYY-MM-DDTHH:MM:SS.000Z"
   if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateString)) {
-      return "Invalid date format";
+    return 'Invalid date format'
   }
 
   // Extract the year, month, and day from the ISO 8601 format
-  const [year, month, day] = dateString.slice(0, 10).split('-');
+  const [year, month, day] = dateString.slice(0, 10).split('-')
 
   // Format the date in "DD/MM/YYYY"
-  const formattedDate = `${day}/${month}/${year}`;
+  const formattedDate = `${day}/${month}/${year}`
 
-  return formattedDate;
+  return formattedDate
 }
 
 function transformDateFormat(dateString) {
   // Create a Date object from the input string
-  const date = new Date(dateString);
+  const date = new Date(dateString)
 
   // Extract the day, month, and year components
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so we add 1
-  const year = date.getFullYear();
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-indexed, so we add 1
+  const year = date.getFullYear()
 
   // Format the date as "DD/MM/YYYY"
-  const formattedDate = `${day}/${month}/${year}`;
+  const formattedDate = `${day}/${month}/${year}`
 
-  return formattedDate;
+  return formattedDate
 }
 
 function transformDateToFrench(dateString) {
   // Define the days and months in French with capitalized months
-  const daysOfWeek = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-  const monthsOfYear = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  const daysOfWeek = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+  const monthsOfYear = [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre'
+  ]
 
   // Split the input string to extract day, month, and year
-  const [day, month, year] = dateString.split('/');
+  const [day, month, year] = dateString.split('/')
 
   // Create a Date object from the input string
-  const date = new Date(`${year}-${month}-${day}`);
+  const date = new Date(`${year}-${month}-${day}`)
 
   // Get the day of the week and month in French
-  const dayOfWeek = daysOfWeek[date.getDay()];
-  const monthOfYear = monthsOfYear[date.getMonth()];
+  const dayOfWeek = daysOfWeek[date.getDay()]
+  const monthOfYear = monthsOfYear[date.getMonth()]
 
   // Format the date as "day DD month YYYY"
-  const formattedDate = `${dayOfWeek} ${day} ${monthOfYear} ${year}`;
+  const formattedDate = `${dayOfWeek} ${day} ${monthOfYear} ${year}`
 
-  return formattedDate;
+  return formattedDate
 }
 
 function numRapport(num_rapport) {
@@ -499,35 +512,43 @@ router.patch('/editpv', (req, res) => {
   let sqlquerylinkT = null
   let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
   for (let temoin of temoinNewArray) {
-    db.query(sqlqueryaddT, [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0'), temoin.roleT], (err, result) => {
-      if (err && err.errno != 1062) {
-        res.status(400).send(err)
-      } else if (err && err.errno == 1062) {
-        let numT = null
-        let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
-        db.query(sqlquerygetT, [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0')], (err, result) => {
-          if (err) {
-            res.status(400).send(err)
-          }
-          numT = result[0].num_t
-          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (${numT}, ?,(SELECT PV.num_cd FROM PV
+    db.query(
+      sqlqueryaddT,
+      [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0'), temoin.roleT],
+      (err, result) => {
+        if (err && err.errno != 1062) {
+          res.status(400).send(err)
+        } else if (err && err.errno == 1062) {
+          let numT = null
+          let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
+          db.query(
+            sqlquerygetT,
+            [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0')],
+            (err, result) => {
+              if (err) {
+                res.status(400).send(err)
+              }
+              numT = result[0].num_t
+              sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (${numT}, ?,(SELECT PV.num_cd FROM PV
                     INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
+              db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
+                if (err) {
+                  res.status(400).send(err)
+                }
+              })
+            }
+          )
+        } else {
+          sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (LAST_INSERT_ID(), ?, (SELECT PV.num_cd FROM PV
+                INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
           db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
             if (err) {
               res.status(400).send(err)
             }
           })
-        })
-      } else {
-        sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (LAST_INSERT_ID(), ?, (SELECT PV.num_cd FROM PV
-                INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
-        db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
-          if (err) {
-            res.status(400).send(err)
-          }
-        })
+        }
       }
-    })
+    )
   }
   let sqlqueryS =
     'UPDATE Sanction s INNER JOIN PV ON PV.num_s = s.num_s SET s.libele_s = ? WHERE PV.num_pv = ?'
@@ -1086,8 +1107,9 @@ router.post('/getscd', (req, res) => {
   "numCD": int value
 }
 */
-router.get('/printcd', (req, res) => {
+router.post('/printcd', (req, res) => {
   let numCD = req.body.numCD
+  console.log('numCD:', numCD)
   const sqlquery = `SELECT
   cd.date_cd,
   (SELECT GROUP_CONCAT(pv.num_pv ORDER BY pv.num_pv)
@@ -1159,33 +1181,33 @@ LIMIT 1;
   db.query(sqlquery, numCD, async (err, result) => {
     if (err) {
       res.status(400).send(err)
-      }
-      console.log(result[0].datePV)
-      const data = {
-        dateCD: transformDateToFrench(formatDate(result[0].date_cd)),
-        numPV: numRapport(result[0].numPV),
-        datePV: transformDateFormat(result[0].datePV),
-        nomPR: result[0].nom_president.split(' ')[0].toUpperCase(),
-        prenomPR: maj(result[0].nom_president.split(',')[0].split(' ')[1]),
-        nomM: result[0].noms_membres,
-        prenomM: result[0].prenoms_membres,
-        nomE: result[0].nomE,
-        prenomE: result[0].prenomE,
-        niveauE: result[0].niveauE,
-        sectionE: result[0].sectionE,
-        groupeE: result[0].groupeE,
-        nomP: result[0].nomP,
-        prenomP: result[0].prenomP,
-        motifI: result[0].motifI,
-        libeleS: result[0].libeleS
-      }
-      try {
-        const pdfBuffer = await generatePDFcd(data, req.body.path)
-        res.send(pdfBuffer)
-      } catch (err) {
-        console.error(err)
-        res.status(400).send('An error occurred while generating the PDF')
-      }
+    }
+    console.log(result[0].datePV)
+    const data = {
+      dateCD: transformDateToFrench(formatDate(result[0].date_cd)),
+      numPV: numRapport(result[0].numPV),
+      datePV: transformDateFormat(result[0].datePV),
+      nomPR: result[0].nom_president.split(' ')[0].toUpperCase(),
+      prenomPR: maj(result[0].nom_president.split(',')[0].split(' ')[1]),
+      nomM: result[0].noms_membres,
+      prenomM: result[0].prenoms_membres,
+      nomE: result[0].nomE,
+      prenomE: result[0].prenomE,
+      niveauE: result[0].niveauE,
+      sectionE: result[0].sectionE,
+      groupeE: result[0].groupeE,
+      nomP: result[0].nomP,
+      prenomP: result[0].prenomP,
+      motifI: result[0].motifI,
+      libeleS: result[0].libeleS
+    }
+    try {
+      const pdfBuffer = await generatePDFcd(data, req.body.path)
+      res.send(pdfBuffer)
+    } catch (err) {
+      console.error(err)
+      res.status(400).send('An error occurred while generating the PDF')
+    }
   })
 })
 
