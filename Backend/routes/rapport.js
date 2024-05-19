@@ -95,14 +95,14 @@ router.patch('/edit', (req, res) => {
   WHERE r.num_r = ?`
   let values = [
     object.matriculeE,
-    object.nomE,
-    object.prenomE,
+    object.nomE.replace(/ /g, '\u00A0'),
+    object.prenomE.replace(/ /g, '\u00A0'),
     object.niveauE,
     object.groupeE,
     object.sectionE,
     object.email,
-    object.nomP,
-    object.prenomP,
+    object.nomP.replace(/ /g, '\u00A0'),
+    object.prenomP.replace(/ /g, '\u00A0'),
     object.dateI,
     object.lieuI,
     object.motifI,
@@ -178,8 +178,8 @@ router.post('/add', (req, res) => {
     sqlqueryE,
     [
       object.matriculeE,
-      object.nomE,
-      object.prenomE,
+      object.nomE.replace(/ /g, '\u00A0'),
+      object.prenomE.replace(/ /g, '\u00A0'),
       object.niveauE,
       object.groupeE,
       object.sectionE,
@@ -190,21 +190,21 @@ router.post('/add', (req, res) => {
         // Check for duplicate
         return res.status(400).send(err)
       } else {
-        db.query(sqlqueryP, [object.nomP, object.prenomP], (err, result) => {
+        db.query(sqlqueryP, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')], (err, result) => {
           if (err) {
             // Check for duplicate
             return res.status(400).send(err)
           } else {
             if (result[0] == null) {
-              db.query(sqlqueryP2, [object.nomP, object.prenomP])
-              db.query(sqlqueryP, [object.nomP, object.prenomP], (err, result) => {
+              db.query(sqlqueryP2, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')])
+              db.query(sqlqueryP, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')], (err, result) => {
                 if (err) {
                   console.log(err)
                 } else {
                   let x = result[0].id_p
                   db.query(
                     sqlqueryI,
-                    [object.lieuI, object.dateI, object.motifI, object.descI, object.degreI],
+                    [object.lieuI, object.dateI, object.motifI.replace(/,/g, ''), object.descI.replace(/,/g, ''), object.degreI],
                     (err, result) => {
                       if (err) {
                         return res.status(400).send(err)
@@ -215,7 +215,7 @@ router.post('/add', (req, res) => {
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
                             db.query(
-                              'SELECT email_m FROM Membre WHERE role_m = "President"',
+                              'SELECT email_m FROM Membre WHERE role_m = "President" AND est_actif = TRUE',
                               (err, result) => {
                                 if (err) {
                                   console.log(err)
@@ -326,7 +326,7 @@ router.post('/add', (req, res) => {
                 }
               })
             } else {
-              db.query(sqlqueryP, [object.nomP, object.prenomP], (err, result) => {
+              db.query(sqlqueryP, [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')], (err, result) => {
                 if (err) {
                   console.log(err)
                 } else {
@@ -344,7 +344,7 @@ router.post('/add', (req, res) => {
                           } else {
                             // Sending automatically a mail to notify the president about a new rapport
                             db.query(
-                              'SELECT email_m FROM Membre WHERE role_m = "President"',
+                              'SELECT email_m FROM Membre WHERE role_m = "President" AND est_actif = TRUE',
                               (err, result) => {
                                 if (err) {
                                   console.log(err)
@@ -361,9 +361,7 @@ router.post('/add', (req, res) => {
                                   })
                                   const mailOptions = {
                                     from: '"Logiciel Conseil de Discipline" <rapport@cd-usto.tech>',
-                                    //to: result[0].email_m,
-                                    to: 'amirmadjour133@gmail.com',
-                                    //to: "dounia.yedjour@univ-usto.dz",
+                                    to: result[0].email_m,
                                     subject: 'Nouveau rapport déposé.',
                                     html: `<!DOCTYPE html>
                                     <html lang="fr-FR">

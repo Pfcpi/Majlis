@@ -1,5 +1,6 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
+/* eslint-disable prettier/prettier */
+//* eslint-disable no-unused-vars */
 
 const express = require('express')
 const router = express.Router()
@@ -22,6 +23,62 @@ const transporter = nodemailer.createTransport({
 
 function maj(chaine) {
   return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
+}
+
+function transformDateString(dateString) {
+  // Convert input to string if it's not already a string
+  if (typeof dateString !== 'string') {
+      dateString = String(dateString);
+  }
+
+  // Ensure dateString has the expected format "YYYY-MM-DDTHH:MM:SS.000Z"
+  if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateString)) {
+      return "Invalid date format";
+  }
+
+  // Extract the year, month, and day from the ISO 8601 format
+  const [year, month, day] = dateString.slice(0, 10).split('-');
+
+  // Format the date in "DD/MM/YYYY"
+  const formattedDate = `${day}/${month}/${year}`;
+
+  return formattedDate;
+}
+
+function transformDateFormat(dateString) {
+  // Create a Date object from the input string
+  const date = new Date(dateString);
+
+  // Extract the day, month, and year components
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so we add 1
+  const year = date.getFullYear();
+
+  // Format the date as "DD/MM/YYYY"
+  const formattedDate = `${day}/${month}/${year}`;
+
+  return formattedDate;
+}
+
+function transformDateToFrench(dateString) {
+  // Define the days and months in French with capitalized months
+  const daysOfWeek = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  const monthsOfYear = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+  // Split the input string to extract day, month, and year
+  const [day, month, year] = dateString.split('/');
+
+  // Create a Date object from the input string
+  const date = new Date(`${year}-${month}-${day}`);
+
+  // Get the day of the week and month in French
+  const dayOfWeek = daysOfWeek[date.getDay()];
+  const monthOfYear = monthsOfYear[date.getMonth()];
+
+  // Format the date as "day DD month YYYY"
+  const formattedDate = `${dayOfWeek} ${day} ${monthOfYear} ${year}`;
+
+  return formattedDate;
 }
 
 function numRapport(num_rapport) {
@@ -54,20 +111,6 @@ function createTemoins(noms_temoins, prenoms_temoins, roles_temoins) {
 
     // Return the result
     return temoins
-}
-
-function transformNomsMembers(noms_members) {
-  // Split the input string by commas to get individual name pairs
-  const pairs = noms_members.split(',')
-
-  // Map over the pairs to apply the transformations
-  return pairs.map(pair => {
-      // Trim any leading/trailing whitespace and split by space to separate name and firstname
-      const [name, firstname] = pair.trim().split(' ')
-
-      // Transform name to uppercase and apply maj to firstname
-      return `${name.toUpperCase()} ${maj(firstname)}`
-  })
 }
 
 function formatNames(etudiants) {
@@ -141,40 +184,6 @@ function formatDate(inputDate) {
   const year = date.getFullYear()
 
   return `${day}/${month}/${year}`
-}
-
-function formatTuples(nomE, prenomE, niveauE, sectionE, groupeE, nomP, prenomP, motifI, libeleS) {
-  // Split each input string into an array of values
-  const nomEArray = nomE.split(',')
-  const prenomEArray = prenomE.split(',')
-  const niveauEArray = niveauE.split(',')
-  const sectionEArray = sectionE.split(',')
-  const groupeEArray = groupeE.split(',')
-  const nomPArray = nomP.split(',')
-  const prenomPArray = prenomP.split(',')
-  const motifIArray = motifI.split(',')
-  const libeleSArray = libeleS.split(',')
-
-  // Map over the arrays to create the tuples
-  return nomEArray.map((_, index) => {
-      // Check for null or undefined values and handle them
-      const nomEValue = nomEArray[index] ? nomEArray[index].toUpperCase() : null
-      const prenomEValue = prenomEArray[index] ? maj(prenomEArray[index]) : null
-      const nomPValue = nomPArray[index] ? nomPArray[index].toUpperCase() : null
-      const prenomPValue = prenomPArray[index] ? maj(prenomPArray[index]) : null
-
-      return {
-          nomE: nomEValue,
-          prenomE: prenomEValue,
-          niveauE: niveauEArray[index],
-          sectionE: sectionEArray[index],
-          groupeE: groupeEArray[index],
-          nomP: nomPValue,
-          prenomP: prenomPValue,
-          motifI: motifIArray[index],
-          libeleS: libeleSArray[index]
-      }
-  })
 }
 
 //VALID
@@ -438,13 +447,13 @@ router.patch('/editpv', (req, res) => {
   let sqlquerylinkT = null
   let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
   for (let temoin of temoinNewArray) {
-    db.query(sqlqueryaddT, [temoin.nomT, temoin.prenomT, temoin.roleT], (err, result) => {
+    db.query(sqlqueryaddT, [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0'), temoin.roleT], (err, result) => {
       if (err && err.errno != 1062) {
         res.status(400).send(err)
       } else if (err && err.errno == 1062) {
         let numT = null
         let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
-        db.query(sqlquerygetT, [temoin.nomT, temoin.prenomT], (err, result) => {
+        db.query(sqlquerygetT, [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0')], (err, result) => {
           if (err) {
             res.status(400).send(err)
           }
@@ -810,7 +819,7 @@ WHERE r.num_r = ?`
         sectionE: result[0].section_e,
         nomP: (result[0].nom_p).toUpperCase(),
         prenomP: maj(result[0].prenom_p),
-        dateI: formatDate(result[0].date_i),
+        dateI: transformDateToFrench(formatDate(result[0].date_i)),
         lieuI: result[0].lieu_i,
         motifI: result[0].motif_i,
         dateR: formatDate(result[0].date_r),
@@ -938,7 +947,7 @@ GROUP BY
       sectionE: result[0].section_e,
       nomP: result[0].nom_p.toUpperCase(),
       prenomP: maj(result[0].prenom_p),
-      dateCD: formatDate(result[0].date_cd),
+      dateCD: transformDateToFrench(formatDate(result[0].date_cd)),
       motifI: result[0].motif_i,
       datePV: formatDate(result[0].date_pv),
       libeleS: result[0].libele_s,
@@ -1027,59 +1036,94 @@ router.get('/printcd', (req, res) => {
   let numCD = req.body.numCD
   const sqlquery = `SELECT
   cd.date_cd,
-
-  GROUP_CONCAT(DISTINCT pv.num_pv) AS numPV,
-  GROUP_CONCAT(DISTINCT pv.date_pv) AS datePV,
-
-
-  GROUP_CONCAT(DISTINCT e.nom_e) AS nomE,
-  GROUP_CONCAT(DISTINCT e.prenom_e) AS prenomE,
-  GROUP_CONCAT(DISTINCT e.niveau_e) AS niveauE,
-  GROUP_CONCAT(DISTINCT e.section_e) AS sectionE,
-  GROUP_CONCAT(DISTINCT e.groupe_e) AS groupeE,
-  GROUP_CONCAT(DISTINCT p.nom_p) AS nomP,
-  GROUP_CONCAT(DISTINCT p.prenom_p) AS prenomP,
-  GROUP_CONCAT(DISTINCT i.motif_i) AS motifI,
-  GROUP_CONCAT(DISTINCT s.libele_s) AS libeleS,
-
-  (SELECT CONCAT(m.nom_m, ' ', m.prenom_m) FROM Membre m
-    LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
-    LEFT JOIN Commission c ON c.num_c = m.num_c
-
-    WHERE c.actif_c = 1 AND m.role_m = 'Président') as nom_president,
-  GROUP_CONCAT(DISTINCT m.nom_m, ' ', m.prenom_m) AS noms_membres
+  (SELECT GROUP_CONCAT(pv.num_pv ORDER BY pv.num_pv)
+   FROM PV pv WHERE pv.num_cd = cd.num_cd) AS numPV,
+  NOW() AS datePV,
+  (SELECT GROUP_CONCAT(e.nom_e ORDER BY e.nom_e)
+   FROM Etudiant e
+   LEFT JOIN Rapport r ON r.matricule_e = e.matricule_e
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS nomE,
+  (SELECT GROUP_CONCAT(e.prenom_e ORDER BY e.prenom_e)
+   FROM Etudiant e
+   LEFT JOIN Rapport r ON r.matricule_e = e.matricule_e
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS prenomE,
+  (SELECT GROUP_CONCAT(e.niveau_e ORDER BY e.niveau_e)
+   FROM Etudiant e
+   LEFT JOIN Rapport r ON r.matricule_e = e.matricule_e
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS niveauE,
+  (SELECT GROUP_CONCAT(e.section_e ORDER BY e.section_e)
+   FROM Etudiant e
+   LEFT JOIN Rapport r ON r.matricule_e = e.matricule_e
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS sectionE,
+  (SELECT GROUP_CONCAT(e.groupe_e ORDER BY e.groupe_e)
+   FROM Etudiant e
+   LEFT JOIN Rapport r ON r.matricule_e = e.matricule_e
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS groupeE,
+  (SELECT GROUP_CONCAT(p.nom_p ORDER BY p.nom_p)
+   FROM Plaignant p
+   LEFT JOIN Rapport r ON r.id_p = p.id_p
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS nomP,
+  (SELECT GROUP_CONCAT(p.prenom_p ORDER BY p.prenom_p)
+   FROM Plaignant p
+   LEFT JOIN Rapport r ON r.id_p = p.id_p
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS prenomP,
+  (SELECT GROUP_CONCAT(i.motif_i ORDER BY i.motif_i)
+   FROM Infraction i
+   LEFT JOIN Rapport r ON i.num_i = r.num_i
+   LEFT JOIN PV pv ON pv.num_r = r.num_r
+   WHERE pv.num_cd = cd.num_cd) AS motifI,
+  (SELECT GROUP_CONCAT(s.libele_s ORDER BY s.libele_s)
+   FROM Sanction s
+   LEFT JOIN PV pv ON pv.num_s = s.num_s
+   WHERE pv.num_cd = cd.num_cd) AS libeleS,
+  (SELECT GROUP_CONCAT(CONCAT(m.nom_m, ' ', m.prenom_m))
+   FROM Membre m
+   LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+   LEFT JOIN Commission c ON c.num_c = m.num_c
+   WHERE c.actif_c = 1 AND m.role_m = 'Président') AS nom_president,
+  (SELECT GROUP_CONCAT(CONCAT(m.nom_m))
+   FROM Membre m
+   LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+   WHERE cp.num_cd = cd.num_cd) AS noms_membres,
+  (SELECT GROUP_CONCAT(CONCAT(m.prenom_m))
+   FROM Membre m
+   LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+   WHERE cp.num_cd = cd.num_cd) AS prenoms_membres
 FROM
-    Conseil_Discipline cd
-INNER JOIN
-    PV pv ON pv.nu  m_cd = cd.num_cd
-LEFT JOIN
-    Rapport r ON r.num_r = pv.num_r
-LEFT JOIN
-    Sanction s ON pv.num_s = s.num_s
-LEFT JOIN
-    Etudiant e ON r.matricule_e = e.matricule_e
-LEFT JOIN
-    Plaignant p ON r.id_p = p.id_p
-LEFT JOIN
-    Commission_Presente cp ON pv.num_cd = cp.num_cd
-LEFT JOIN
-    Infraction i ON i.num_i = r.num_i
-LEFT JOIN
-    Membre m ON cp.id_m = m.id_m
-
-WHERE cd.num_cd = ?
+  Conseil_Discipline cd
+WHERE
+  cd.num_cd = ?
+LIMIT 1;
   `
   db.query(sqlquery, numCD, async (err, result) => {
     if (err) {
       res.status(400).send(err)
       }
+      console.log(result[0].datePV)
       const data = {
-        dateCD: result[0].date_cd,
+        dateCD: transformDateToFrench(formatDate(result[0].date_cd)),
         numPV: numRapport(result[0].numPV),
-        datePV: dateSplit(result[0].datePV),
-        tuples: formatTuples(result[0].nomE, result[0].prenomE, result[0].niveauE, result[0].sectionE, result[0].groupeE, result[0].nomP, result[0].prenomP, result[0].motifI, result[0].libeleS),
-        president: `${result[0].nom_president.split(' ')[0].toUpperCase()} ${maj(result[0].nom_president.split(' ')[1])}`,
-        membres: transformNomsMembers(result[0].noms_membres)
+        datePV: transformDateFormat(result[0].datePV),
+        nomPR: result[0].nom_president.split(' ')[0].toUpperCase(),
+        prenomPR: maj(result[0].nom_president.split(',')[0].split(' ')[1]),
+        nomM: result[0].noms_membres,
+        prenomM: result[0].prenoms_membres,
+        nomE: result[0].nomE,
+        prenomE: result[0].prenomE,
+        niveauE: result[0].niveauE,
+        sectionE: result[0].sectionE,
+        groupeE: result[0].groupeE,
+        nomP: result[0].nomP,
+        prenomP: result[0].prenomP,
+        motifI: result[0].motifI,
+        libeleS: result[0].libeleS
       }
       try {
         const pdfBuffer = await generatePDFcd(data, req.body.path)
