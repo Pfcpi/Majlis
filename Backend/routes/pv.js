@@ -192,7 +192,7 @@ router.post('/addPV', (req, res) => {
   let pvId,
     sent = false
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
-  db.query(sqlqueryS, libeleS, (err, result) => {
+  db.query(sqlqueryS, libeleS.replace(/,/g, ''), (err, result) => {
     if (err) {
       res.status(400).send(err)
     } else {

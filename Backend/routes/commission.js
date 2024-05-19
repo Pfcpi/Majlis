@@ -43,8 +43,8 @@ router.get('/get', (req, res) => {
 */
 router.post('/add', (req, res) => {
   let values = [
-    req.body.nomM,
-    req.body.prenomM,
+    req.body.nomM.replace(/ /g, '\u00A0'),
+    req.body.prenomM.replace(/ /g, '\u00A0'),
     req.body.roleM,
     req.body.emailM,
     req.body.dateDebutM
@@ -83,8 +83,8 @@ router.post('/add', (req, res) => {
 router.patch('/edit', (req, res) => {
   let values = [
     req.body.roleM,
-    req.body.nomM,
-    req.body.prenomM,
+    req.body.nomM.replace(/ /g, '\u00A0'),
+    req.body.prenomM.replace(/ /g, '\u00A0'),
     req.body.emailM,
     req.body.dateDebutM,
     req.body.idM
