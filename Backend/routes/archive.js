@@ -728,18 +728,18 @@ WHERE
 
     const data = {
       matriculeE: result[0].matricule_e,
-      nomE: result[0].nom_e.toUpperCase(),
+      nomE: (result[0].nom_e).toUpperCase(),
       prenomE: maj(result[0].prenom_e),
       niveauE: result[0].niveau_e,
       groupeE: result[0].groupe_e,
       sectionE: result[0].section_e,
-      nomP: result[0].nom_p.toUpperCase(),
+      nomP: (result[0].nom_p).toUpperCase(),
       prenomP: maj(result[0].prenom_p),
       dateCD: formatDate(result[0].date_cd),
       motifI: result[0].motif_i,
       datePV: formatDate(result[0].date_pv),
       libeleS: result[0].libele_s,
-      nomPR: result[0].nom_pres.toUpperCase(),
+      nomPR: (result[0].nom_pres).toUpperCase(),
       prenomPR: maj(result[0].prenom_pres),
       nomT: result[0].noms_temoins,
       prenomT: result[0].prenoms_temoins,
@@ -803,12 +803,12 @@ WHERE r.num_r = ?`
     if (result) {
       const data = {
         matriculeE: result[0].matricule_e,
-        nomE: result[0].nom_e.toUpperCase(),
+        nomE: (result[0].nom_e).toUpperCase(),
         prenomE: maj(result[0].prenom_e),
         niveauE: result[0].niveau_e,
         groupeE: result[0].groupe_e,
         sectionE: result[0].section_e,
-        nomP: result[0].nom_p.toUpperCase(),
+        nomP: (result[0].nom_p).toUpperCase(),
         prenomP: maj(result[0].prenom_p),
         dateI: formatDate(result[0].date_i),
         lieuI: result[0].lieu_i,
@@ -835,81 +835,94 @@ WHERE r.num_r = ?`
 */
 router.post('/printpv', async (req, res) => {
   let sqlquery = `SELECT
-    r.num_r,
-    e.matricule_e,
-    e.nom_e,
-    e.prenom_e,
-    e.niveau_e,
-    e.section_e,
-    e.groupe_e,
-    p.nom_p,
-    p.prenom_p,
-    cd.date_cd,
-    i.date_i,
-    i.lieu_i,
-    i.motif_i,
-    i.description_i,
-    pv.num_pv,
-    pv.date_pv,
-    s.libele_s,
+  r.num_r,
+  e.matricule_e,
+  e.nom_e,
+  e.prenom_e,
+  e.niveau_e,
+  e.section_e,
+  e.groupe_e,
+  p.nom_p,
+  p.prenom_p,
+  cd.date_cd,
+  i.date_i,
+  i.lieu_i,
+  i.motif_i,
+  i.description_i,
+  pv.num_pv,
+  pv.date_pv,
+  s.libele_s,
 
-    temoins.nom_tt AS noms_temoins,
-    temoins.prenom_tt AS prenoms_temoins,
-    temoins.role_tt AS roles_temoins,
+(SELECT CONCAT(m.nom_m) FROM Membre m
+  LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+  LEFT JOIN Commission c ON c.num_c = m.num_c
 
-    GROUP_CONCAT(m.nom_m) AS noms_membres,
-    GROUP_CONCAT(m.prenom_m) AS prenoms_membres,
-    GROUP_CONCAT(m.role_m) AS roles_membres
+  WHERE c.actif_c = 1 AND m.role_m = 'Président') as nom_pres,
+
+    (SELECT CONCAT(m.prenom_m) FROM Membre m
+  LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
+  LEFT JOIN Commission c ON c.num_c = m.num_c
+
+  WHERE c.actif_c = 1 AND m.role_m = 'Président') as prenom_pres,
+
+
+  temoins.nom_tt AS noms_temoins,
+  temoins.prenom_tt AS prenoms_temoins,
+  temoins.role_tt AS roles_temoins,
+
+  GROUP_CONCAT(m.nom_m) AS noms_membres,
+  GROUP_CONCAT(m.prenom_m) AS prenoms_membres,
+  GROUP_CONCAT(m.role_m) AS roles_membres
 FROM
-    PV pv
+  PV pv
 INNER JOIN
-    Rapport r ON r.num_r = pv.num_r
+  Rapport r ON r.num_r = pv.num_r
 INNER JOIN
-    Sanction s ON pv.num_s = s.num_s
+  Sanction s ON pv.num_s = s.num_s
 INNER JOIN
-    Conseil_Discipline cd ON pv.num_cd = cd.num_cd
+  Conseil_Discipline cd ON pv.num_cd = cd.num_cd
 LEFT JOIN
-    Etudiant e ON r.matricule_e = e.matricule_e
+  Etudiant e ON r.matricule_e = e.matricule_e
 LEFT JOIN
-    Plaignant p ON r.id_p = p.id_p
+  Plaignant p ON r.id_p = p.id_p
 LEFT JOIN
-    Infraction i ON r.num_i = i.num_i
+  Infraction i ON r.num_i = i.num_i
 LEFT JOIN
-    (SELECT
-        te.num_cd,
-        GROUP_CONCAT(t.nom_t) AS nom_tt,
-        GROUP_CONCAT(t.prenom_t) AS prenom_tt,
-        GROUP_CONCAT(t.role_t) AS role_tt
-    FROM
-        Temoigne te
-    LEFT JOIN
-        Temoin t ON te.num_t = t.num_t
-    GROUP BY
-        te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
+  (SELECT
+      te.num_cd,
+      GROUP_CONCAT(t.nom_t) AS nom_tt,
+      GROUP_CONCAT(t.prenom_t) AS prenom_tt,
+      GROUP_CONCAT(t.role_t) AS role_tt
+  FROM
+      Temoigne te
+  LEFT JOIN
+      Temoin t ON te.num_t = t.num_t
+  GROUP BY
+      te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
 LEFT JOIN
-    Commission_Presente cp ON pv.num_cd = cp.num_cd
+  Commission_Presente cp ON pv.num_cd = cp.num_cd
 LEFT JOIN
-    Membre m ON cp.id_m = m.id_m
+  Membre m ON cp.id_m = m.id_m
 WHERE
-    pv.num_pv = ?
+  pv.num_pv = ?
 GROUP BY
-    r.num_r,
-    e.matricule_e,
-    e.nom_e,
-    e.prenom_e,
-    e.niveau_e,
-    e.section_e,
-    e.groupe_e,
-    p.nom_p,
-    p.prenom_p,
-    cd.date_cd,
-    i.date_i,
-    i.lieu_i,
-    i.motif_i,
-    i.description_i,
-    pv.num_pv,
-    pv.date_pv,
-    s.libele_s`
+  r.num_r,
+  e.matricule_e,
+  e.nom_e,
+  e.prenom_e,
+  e.niveau_e,
+  e.section_e,
+  e.groupe_e,
+  p.nom_p,
+  p.prenom_p,
+  cd.date_cd,
+  i.date_i,
+  i.lieu_i,
+  i.motif_i,
+  i.description_i,
+  pv.num_pv,
+  pv.date_pv,
+  s.libele_s`
 
   db.query(sqlquery, req.body.numPV, async (err, result) => {
     if (err && err.errno != 1065) {
@@ -918,13 +931,13 @@ GROUP BY
 
     const data = {
       matriculeE: result[0].matricule_e,
-      nomE: result[0].nom_e,
-      prenomE: result[0].prenom_e,
+      nomE: result[0].nom_e.toUpperCase(),
+      prenomE: maj(result[0].prenom_e),
       niveauE: result[0].niveau_e,
       groupeE: result[0].groupe_e,
       sectionE: result[0].section_e,
-      nomP: result[0].nom_p,
-      prenomP: result[0].prenom_p,
+      nomP: result[0].nom_p.toUpperCase(),
+      prenomP: maj(result[0].prenom_p),
       dateCD: formatDate(result[0].date_cd),
       motifI: result[0].motif_i,
       datePV: formatDate(result[0].date_pv),
@@ -1038,7 +1051,7 @@ router.get('/printcd', (req, res) => {
 FROM
     Conseil_Discipline cd
 INNER JOIN
-    PV pv ON pv.num_cd = cd.num_cd
+    PV pv ON pv.nu  m_cd = cd.num_cd
 LEFT JOIN
     Rapport r ON r.num_r = pv.num_r
 LEFT JOIN

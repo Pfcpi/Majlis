@@ -16,151 +16,6 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-//VALID
-// Add a pv
-/* Body being in the format of :
-  {
-	 "dateCd": string value in the format of 'YYYY-MM-DD',
-   "idM": [
-    "1": int value,
-    "2": int value or null,
-    "3": int value or null,
-    "4": int value or null,
-    "5": int value or null
-   ],
-   "libeleS": string value,
-   "temoin": {
-    "1": {
-    "nomT": string value,
-    "prenomT": string value,
-    "roleT": string value
-    } or null,
-    "2": {
-    "nomT": string value,
-    "prenomT": string value,
-    "roleT": string value
-    } or null,
-    "3": {
-    "nomT": string value,
-    "prenomT": string value,
-    "roleT": string value
-    } or null
-  },
-   "numR": int value
-  }
-*/
-router.post('/add', (req, res) => {
-  let { dateCd, idM, libeleS, temoin, numR } = req.body
-
-  let sqlqueryCd = `INSERT INTO Conseil_Discipline (date_cd) VALUES (?)`
-  db.query(sqlqueryCd, dateCd, (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-  })
-
-  // Add multiple members to comission
-  let sqlqueryC = `INSERT INTO Commission_Presente (num_cd, id_m) VALUES (LAST_INSERT_ID(), ?)`
-  var i = 0
-  do {
-    if (idM[i] != null)
-      db.query(sqlqueryC, idM[i], (err, result) => {
-        if (err) {
-          res.status(400).send(err)
-        }
-      })
-    i++
-  } while (i < 5)
-
-  let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
-  db.query(sqlqueryS, libeleS, (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-  })
-
-  // Add a temoin to the database if it is in the body
-  let sqlqueryT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
-  var num = [null, null, null]
-  i = 0
-  do {
-    if (temoin[i] != null) {
-      db.query(sqlqueryT, [temoin[i].nomT, temoin[i].prenomT, temoin[i].roleT], (err, result) => {
-        if (err && err.errno != 1062) {
-          res.status(400).send(err)
-        }
-      })
-      db.query(
-        'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ?',
-        [temoin[i].nomT, temoin[i].prenomT],
-        (err, result) => {
-          if (err) {
-            res.status(400).send(err)
-          }
-          num[i] = result[0].num_t
-        }
-      )
-    }
-    i++
-  } while (i < 3)
-
-  // Counter to track number of temoin
-  i = 0
-  while (num[i] != null && i < 3) {
-    i++
-  }
-
-  // Connect temoins to cd
-  let sqlquerytem = 'INSERT INTO Temoigne (num_cd, num_t) VALUES (LAST_INSERT_ID(), ?)'
-  var k = 0
-  while (k < i) {
-    db.query(sqlquerytem, num[k], (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      }
-    })
-  }
-
-  // Add the pv
-  let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r) VALUES (NOW(), LAST_INSERT_ID(), LAST_INSERT_ID(), ?)`
-  db.query(sqlqueryPv, numR, (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-
-    db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
-      if (err) {
-        res.status(400).send(err)
-      } else {
-        const mail = result[0].email_u
-        const mailOptions = {
-          from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
-          to: mail,
-          subject: 'Nouveau PV déposé.',
-          html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
-        }
-        transporter.sendMail(mailOptions, function (err, info) {
-          if (err) {
-            res.status(400).send(err)
-          } else {
-            console.log('Email sent!')
-            res.status(204)
-          }
-        })
-      }
-    })
-  })
-
-  /*let sqlqueryTraitement = 'UPDATE Rapport SET est_traite=TRUE WHERE num_r = ?'
-  db.query(sqlqueryTraitement, numR, (err, result) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-  })
-  db.query(`SET FOREIGN_KEY_CHECKS = 1`)
-  res.sendStatus(204)*/
-})
-
 router.post('/getActiveCommissionAndMembersByData', (req, res) => {
   let { date } = req.body
   let sqlquery = `SELECT c.num_c FROM Commission c WHERE c.date_debut_c <= ? AND c.date_fin_c >= ?;`
@@ -218,10 +73,80 @@ router.post('/addCD', (req, res) => {
           const mail = result[0].email_u
           const mailOptions = {
             from: '"Logiciel Conseil de Discipline" <conseilpv@cd-usto.tech>',
-            //to: mail,
-            to: 'amirmadjour133@gmail.com',
+            to: mail,
             subject: 'Nouveau PV déposé.',
-            html: `<body><div style="text-align: center;"><img src="https://i.goopics.net/8uots5.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>`
+            html: `<!DOCTYPE html>
+            <html lang="fr-FR">
+            <head>
+                <meta charset="UTF-8">
+                <title>new pv</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+                <style>
+                    body {
+                        font-family: "PT Serif", serif;
+                        margin: 0;
+                        min-height: 100vh;
+                        text-align: center;
+                    }
+            
+                    .container {
+                        text-align: center;
+                        padding: 20px;
+                        margin: auto;
+                    }
+            
+                    .box1 {
+                        margin: 30px auto 60px;
+                        padding: 0;
+                        text-align: center;
+                    }
+            
+                    .box2 {
+                        text-align: center;
+                    }
+            
+                    #logo {
+                        width: 10em;
+                        height: 10em;
+                        margin: 0;
+                    }
+            
+                    #title {
+                        font-size: 2.3em;
+                        font-weight: 500;
+                        margin: 15px auto 0;
+                    }
+            
+                    #parg1 {
+                        font-size: 1.4em;
+                        font-weight: 400;
+                        margin: 0 auto 15px;
+                    }
+            
+                    #parg2 {
+                        font-size: 1.2em;
+                        font-weight: 500;
+                        margin: 15px auto 0;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="box1">
+                        <img src="https://i.goopics.net/drpcqh.png" id="logo">
+                        <h1 id="title">
+                            Nouveau Procès-Verbal
+                        </h1>
+                    </div>
+                    <div class="box2">
+                        <p id="parg1">Le président de la commission a rédigé un nouveau procès-verbal.</p>
+                        <p id="parg2">Vous pouvez le consulter dans l'archive du logiciel.</p>
+                    </div>
+                </div>
+            </body>
+            </html>`
           }
           transporter.sendMail(mailOptions, function (err, info) {
             if (err) {
