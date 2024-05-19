@@ -17,6 +17,8 @@ import EnvoyerSVG from './../../../assets/Envoyer.svg'
 import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import GOBackSVG from './../../../assets/GoBack.svg'
 import GOBackGraySVG from './../../../assets/BlueSvgs/GoBackGray.svg'
+import successmarkSVG from './../../../assets/success_mark.svg'
+import addPlusSVg from './../../../assets/add_plus.svg'
 import axios from 'axios'
 
 //Need to modify:
@@ -37,6 +39,12 @@ function Archive() {
   const [currentViewedPV, setCurrentViewedPV] = useState({})
   const [selectedPVs, setSelectedPVs] = useState([])
   const [queryPV, setQueryPV] = useState('')
+  const [pv, setPv] = useState({ numPV: '', libeleS: '', temoin: '' })
+  const [isAddingTemoin, setIsAddingTemoin] = useState(false)
+  const [temoinBuffer, setTemoinBuffer] = useState({ nom: '', prenom: '', role: '' })
+  const [temoinArray, setTemoinArray] = useState([])
+  const [pvError, setPvError] = useState({ sanctionError: '' })
+  const [temoinsError, setTemoinsError] = useState({ nomError: '', prenomError: '', roleError: '' })
 
   const [conseils, setConseils] = useState([])
   const [currentViewedCD, setCurrentViewedCD] = useState({})
@@ -52,19 +60,23 @@ function Archive() {
   const archivePage = useRef(null)
 
   const niveaux = [
-    'ING 1',
-    'ING 2',
-    'ING 3',
-    'ING 4',
-    'ING 5',
+    'ING1',
+    'ING2',
+    'ING3',
+    'ING4',
+    'ING5',
     'L1',
     'L2',
-    'L3',
-    'M1',
-    'M2',
+    'L3-ISIL',
+    'L3-SI',
+    'M1-IAA',
+    'M1-RSID',
+    'M1-SID',
+    'M2-IAA',
+    'M2-RSID',
+    'M2-SID',
     'Doctorat'
   ]
-  const accueilPage = useRef(null)
   const motif1 = [
     'Demande non fondée de double correction',
     'tentative de fraude ou fraude établie',
@@ -334,6 +346,93 @@ function Archive() {
     }))
   }
 
+  const handleInputTemoinChange = (e) => {
+    const { name, value } = e.target
+    setTemoinBuffer((prevState) => ({
+      ...prevState,
+      [name]: value
+    }))
+  }
+
+  const handleAjouterModifyPV = async (e) => {
+    e.preventDefault()
+    const newErrors = validateFormPV(pv)
+    if (Object.keys(newErrors).length === 0) {
+      setModify(false)
+      addLoadingBar()
+      console.log('pv: ', pv)
+      const tache = await axios
+        .patch(api + '/archive/editpv', pv)
+        .then((res) => {
+          console.log(res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+          alert('Vérifier la connexion internet')
+        })
+      RemoveLoadingBar()
+      setPv({ numPV: '', libeleS: '', temoin: '' })
+      setTemoinArray([])
+      setPvError({ sanctionError: '' })
+      setTemoinBuffer({ nom: '', prenom: '', role: '' })
+      setTemoinsError({ nomError: '', prenomError: '', roleError: '' })
+    }
+    setTimeout(() => {
+      setErrorsStep1({ sanctionError: '' })
+    }, 2000)
+  }
+
+  const handleAnnulerModifyPV = (e) => {
+    setModify(false)
+    setPv({ numPV: '', libeleS: '', temoin: '' })
+    setTemoinArray([])
+    setPvError({ sanctionError: '' })
+    setTemoinBuffer({ nom: '', prenom: '', role: '' })
+    setTemoinsError({ nomError: '', prenomError: '', roleError: '' })
+  }
+
+  const validateFormPV = (data) => {
+    let errors = {}
+
+    console.log('data: ', data)
+    if (data.libeleS.length == 0) {
+      errors.sanction = 'sanction est vide!'
+      setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
+      return errors
+    } else {
+      setPvError((prev) => ({ ...prev, sanctionError: '' }))
+    }
+    return errors
+  }
+
+  const validateFormTemoin = (data) => {
+    let errors = {}
+    //nom: '', prenom: '', role: '
+    console.log('data: ', data)
+    if (data.nom.length == 0) {
+      errors.nom = 'nom est vide!'
+      setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, nomError: '' }))
+    }
+    if (data.prenom.length == 0) {
+      errors.prenom = 'prenom est vide!'
+      setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, prenomError: '' }))
+    }
+    if (data.role.length == 0) {
+      errors.role = 'role est vide!'
+      setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
+      return errors
+    } else {
+      setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+    }
+    return errors
+  }
+
   function handlePreview(num) {
     return new Promise(async () => {
       let path = await window.electronAPI.getPath()
@@ -416,14 +515,19 @@ function Archive() {
 
   async function handleViewPV() {
     addLoadingBar()
-    setView(true)
-    console.log('selected pv: ', selectedPVs)
     const tache1 = await axios
       .post(api + '/archive/getspv', { numPV: selectedPVs[0].num_pv })
       .then((res) => {
         console.log(res.data)
-        setCurrentViewedPV({ ...res.data, numPV: selectedPVs[0].num_pv })
-        console.log('the object', { ...res.data, numPV: selectedPVs[0].num_pv })
+        if (res.status >= 200 && res.status < 300) {
+          setCurrentViewedPV({ ...res.data, numPV: selectedPVs[0].num_pv })
+          setPv({
+            libeleS: res.data.libeleS,
+            temoin: res.data.temoins,
+            numPV: selectedPVs[0].num_pv
+          })
+          setTemoinArray(res.data.temoins)
+        }
       })
       .catch((err) => console.log(err))
     RemoveLoadingBar()
@@ -819,6 +923,10 @@ function Archive() {
                   <button>
                     <div
                       className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                      onClick={() => {
+                        handleViewPV()
+                        setModify(true)
+                      }}
                     >
                       {modifierImage}Modifier
                     </div>
@@ -830,10 +938,34 @@ function Archive() {
                     onClick={() => {
                       if (selectedPVs.length == 1) {
                         handleViewPV()
+                        setView(true)
                       }
                     }}
                   >
                     {voirDossierImage}Voir
+                  </div>
+                </button>
+                <button className="text-blue">
+                  <div
+                    className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                    onClick={async () => {
+                      if (selectedPVs.length == 1) {
+                        addLoadingBar()
+                        const tache = await axios
+                          .post(api + '/archive/mail', {
+                            numPV: selectedPVs[0].num_pv,
+                            email: 'amirmadjour133@gmail.com'
+                          })
+                          .then((res) => console.log(res))
+                          .catch((err) => {
+                            console.log(err)
+                            alert('Vérifier la connexion internet')
+                          })
+                        RemoveLoadingBar()
+                      }
+                    }}
+                  >
+                    {voirDossierImage}Par email
                   </div>
                 </button>
               </div>
@@ -1002,7 +1134,7 @@ function Archive() {
           </div>
         </div>
       )}
-      {modify && (
+      {modify && currentWindow == win[0] && (
         <div className="h-full w-full flex flex-col justify-center items-center gap-6">
           <div className="w-full flex flex-col items-center justify-center">
             <div className="flex w-5/6 h-2 stretch-0 bg-[#D9D9D9] justify-evenly items-center [&>div]: [&>div]:h-8 [&>div]:aspect-square [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:rounded-full [&>div]:z-10">
@@ -1467,6 +1599,162 @@ function Archive() {
                 }}
               >
                 {step > 2 ? 'modifier' : 'continuer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+      {modify && currentWindow == win[1] && (
+        <div className="fullBgBlock">
+          <form className="w-1/2 overflow-y-auto flex flex-col justify-between items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray min-h-fit min-w-[500px]">
+            <h1 className="text-[36px] py-4">Détails du PV de {selectedPVs[0].nom_e || ''}</h1>
+            <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
+            <div className="flex w-5/6 flex-col gap-6 my-4">
+              <div className="container_input_rapport">
+                <input
+                  className="input_dossier"
+                  name="libeleS"
+                  id="libeleS"
+                  onChange={(e) => {
+                    setPv((prev) => ({ ...prev, libeleS: e.target.value }))
+                  }}
+                  value={pv.libeleS}
+                  required
+                ></input>
+                <label className="label_rapport" htmlFor="libeleS">
+                  Sanction
+                </label>
+                {pvError.sanctionError && (
+                  <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                    <img height="16" width="16" src={WarningSVG}></img>
+                    {pvError.sanctionError}
+                  </p>
+                )}
+              </div>
+              {!isAddingTemoin && temoinArray.length < 3 && (
+                <div className="flex w-full justify-between items-center">
+                  <div>Ajouter un temoin</div>
+                  <button className="bg-blue rounded-md" onClick={() => setIsAddingTemoin(true)}>
+                    <img className="h-6 aspect-square" src={addPlusSVg}></img>
+                  </button>
+                </div>
+              )}
+              {isAddingTemoin && (
+                <div className="flex w-full items-center gap-2">
+                  <div className="flex">
+                    <div className="container_input_rapport">
+                      <input
+                        className="input_dossier rounded-r-none"
+                        name="nom"
+                        id="nom"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.nom}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="nom">
+                        nom
+                      </label>
+                      {temoinsError.nomError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.nomError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="container_input_rapport">
+                      <input
+                        className="input_dossier rounded-none"
+                        name="prenom"
+                        id="prenom"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.prenom}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="prenom">
+                        Prenom
+                      </label>
+                      {temoinsError.prenomError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.prenomError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="container_input_rapport ">
+                      <input
+                        className="input_dossier rounded-l-none"
+                        name="role"
+                        id="role"
+                        onChange={handleInputTemoinChange}
+                        value={temoinBuffer.role}
+                        required
+                      ></input>
+                      <label className="label_rapport" htmlFor="role">
+                        Role
+                      </label>
+                      {temoinsError.roleError && (
+                        <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                          <img height="16" width="16" src={WarningSVG}></img>
+                          {temoinsError.roleError}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    className="bg-white h-8 w-8 flex rounded-md items-center justify-center"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      const newErrors = validateFormTemoin(temoinBuffer)
+                      if (Object.keys(newErrors).length === 0) {
+                        setTemoinArray((prev) => [...prev, temoinBuffer])
+                        setIsAddingTemoin(false)
+                        setTemoinBuffer({ nom: '', prenom: '', role: '' })
+                      }
+                      setTimeout(() => {
+                        setTemoinsError({ nomError: '', prenomError: '', roleError: '' })
+                      }, 2000)
+                    }}
+                  >
+                    <img className="h-6 w-6" src={successmarkSVG}></img>
+                  </button>
+                </div>
+              )}
+              <div className="container_input_rapport">
+                <h2>les témoins</h2>
+                <div className="w-full h-[99px] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                  {Array.isArray(temoinArray) &&
+                    temoinArray.length != 0 &&
+                    temoinArray.map((t) => (
+                      <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                        <div>{t.role}</div>
+                        <div>{t.nom}</div>
+                        <div>{t.prenom}</div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setTemoinArray(temoinArray.filter((item) => item !== t))
+                          }}
+                        >
+                          {supprimerImage}
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between py-4 w-5/6">
+              <button
+                className="button_dossier text-red border-red hover:bg-red/25"
+                onClick={handleAnnulerModifyPV}
+              >
+                Annuler
+              </button>
+              <button
+                className="button_dossier text-blue border-blue hover:bg-blue/25"
+                type="submit"
+                onClick={handleAjouterModifyPV}
+              >
+                Ajouter
               </button>
             </div>
           </form>

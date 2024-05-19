@@ -22,6 +22,10 @@
   .buttonHelp {
     @apply text-white w-24 h-8 bg-blue rounded-md shadow-md;
   }
+
+  button {
+    @apply shadow-sm;
+  }
 }
 
 @keyframes pulse {

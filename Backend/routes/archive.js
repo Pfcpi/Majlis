@@ -476,30 +476,28 @@ router.delete('/deletecommission', (req, res) => {
       "datePV": date format 'YYYY-MM-DD',
       "libeleS": String,
       "numPV": int,
-      "temoinNew": [
+      "temoin": [
         {
-        "nomT": string value,
-        "prenomT": string value,
-        "roleT": string value
+        "nom": string value,
+        "prenom": string value,
+        "role": string value
         } or null,
         {
-        "nomT": string value,
-        "prenomT": string value,
-        "roleT": string value
+        "nom": string value,
+        "prenom": string value,
+        "role": string value
         } or null,
         {
-        "nomT": string value,
-        "prenomT": string value,
-        "roleT": string value
+        "nom": string value,
+        "prenom": string value,
+        "role": string value
         } or null
       ]
     }
   */
 router.patch('/editpv', (req, res) => {
-  let { datePV, libeleS, numPV, temoinNew } = req.body
-  let temoinNewArray = Object.values(temoinNew).filter((temoin) => temoin !== null)
-  let sqlqueryP = `UPDATE PV SET PV.date_pv = ? WHERE PV.num_pv = ?`
-  db.query(sqlqueryP, [datePV, numPV])
+  let { libeleS, numPV, temoin } = req.body
+  let temoinArray = Object.values(temoin).filter((temoin) => temoin !== null)
 
   let sqlquerydelT = `DELETE te FROM Temoigne te
   INNER JOIN PV ON PV.num_pv = te.num_pv
@@ -511,10 +509,10 @@ router.patch('/editpv', (req, res) => {
   })
   let sqlquerylinkT = null
   let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
-  for (let temoin of temoinNewArray) {
+  for (let temoin of temoinArray) {
     db.query(
       sqlqueryaddT,
-      [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0'), temoin.roleT],
+      [temoin.nom.replace(/ /g, '\u00A0'), temoin.prenom.replace(/ /g, '\u00A0'), temoin.role],
       (err, result) => {
         if (err && err.errno != 1062) {
           res.status(400).send(err)
@@ -523,7 +521,7 @@ router.patch('/editpv', (req, res) => {
           let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
           db.query(
             sqlquerygetT,
-            [temoin.nomT.replace(/ /g, '\u00A0'), temoin.prenomT.replace(/ /g, '\u00A0')],
+            [temoin.nom.replace(/ /g, '\u00A0'), temoin.prenom.replace(/ /g, '\u00A0')],
             (err, result) => {
               if (err) {
                 res.status(400).send(err)

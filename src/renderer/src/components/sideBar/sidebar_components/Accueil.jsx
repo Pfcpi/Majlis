@@ -28,16 +28,21 @@ import axios from 'axios'
 
 function Archive() {
   const niveaux = [
-    'ING 1',
-    'ING 2',
-    'ING 3',
-    'ING 4',
-    'ING 5',
+    'ING1',
+    'ING2',
+    'ING3',
+    'ING4',
+    'ING5',
     'L1',
     'L2',
-    'L3',
-    'M1',
-    'M2',
+    'L3-ISIL',
+    'L3-SI',
+    'M1-IAA',
+    'M1-RSID',
+    'M1-SID',
+    'M2-IAA',
+    'M2-RSID',
+    'M2-SID',
     'Doctorat'
   ]
   const accueilPage = useRef(null)
