@@ -496,17 +496,18 @@ router.delete('/deletecommission', (req, res) => {
     }
   */
 router.patch('/editpv', (req, res) => {
-  let { libeleS, numPV, temoin } = req.body
+  let { datePV, libeleS, numPV, temoin } = req.body
   let temoinArray = Object.values(temoin).filter((temoin) => temoin !== null)
-
+  db.query('SET FOREIGN_KEY_CHECKS = 0')
   let sqlquerydelT = `DELETE te FROM Temoigne te
-  INNER JOIN PV ON PV.num_pv = te.num_pv
+  LEFT JOIN PV ON PV.num_pv = te.num_pv
   WHERE PV.num_pv = ?`
   db.query(sqlquerydelT, numPV, (err, result) => {
     if (err) {
       res.status(400).send(err)
     }
   })
+  db.query('SET FOREIGN_KEY_CHECKS = 1')
   let sqlquerylinkT = null
   let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
   for (let temoin of temoinArray) {
@@ -530,7 +531,8 @@ router.patch('/editpv', (req, res) => {
               sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (${numT}, ?,(SELECT PV.num_cd FROM PV
                     INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
               db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
-                if (err) {
+                if (err && err.errno != 1062) {
+                  console.log(err)
                   res.status(400).send(err)
                 }
               })
@@ -555,6 +557,7 @@ router.patch('/editpv', (req, res) => {
       res.status(400).send(err)
     }
   })
+
   res.sendStatus(204)
 })
 
