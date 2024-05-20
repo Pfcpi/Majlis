@@ -4,8 +4,6 @@
 
 ## Frontend
 
-- dynamic email for mail in frontend and backend for the student(in archive/pv front)
-- use manual (change text)
 - date always removes one day.
 - the confirmation window should not appear after pressing enter.
   - accueil
@@ -17,7 +15,6 @@
 ## Backend
 
 - before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
-- dynamic email for mail in frontend and backend for the student(in archive/pv front)
 - date always removes one day.
 
 - commission: view (route problem (did not understand))

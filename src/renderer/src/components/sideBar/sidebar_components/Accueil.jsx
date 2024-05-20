@@ -123,6 +123,7 @@ function Archive() {
     const tache1 = await axios
       .get(api + '/rapport/get')
       .then((res) => {
+        console.log(res.data)
         setEtudiants(res.data)
       })
       .catch((err) => {

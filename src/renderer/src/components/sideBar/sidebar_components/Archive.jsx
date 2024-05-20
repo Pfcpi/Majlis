@@ -983,13 +983,27 @@ function Archive() {
                     className={selectedPVs.length == 1 ? 'button_active_blue' : 'button_inactive'}
                     onClick={async () => {
                       if (selectedPVs.length == 1) {
+                        setSelectedPVs([])
                         addLoadingBar()
-                        const tache = await axios
-                          .post(api + '/archive/mail', {
-                            numPV: selectedPVs[0].num_pv,
-                            email: 'amirmadjour133@gmail.com'
+                        const tache1 = await axios
+                          .post(api + '/archive/getStudentMail', { numPV: selectedPVs[0].num_pv })
+                          .then((res) => {
+                            console.log(res.data)
+                            if (res.status >= 200 && res.status < 300) {
+                              axios
+                                .post(api + '/archive/mail', {
+                                  numPV: selectedPVs[0].num_pv,
+                                  email: res.data[0].email_e
+                                })
+                                .then((res) => {
+                                  console.log('res mail: ', res)
+                                })
+                                .catch((err) => {
+                                  console.log(err)
+                                  alert('Vérifier la connexion internet')
+                                })
+                            }
                           })
-                          .then((res) => console.log(res))
                           .catch((err) => {
                             console.log(err)
                             alert('Vérifier la connexion internet')

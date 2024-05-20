@@ -412,7 +412,7 @@ GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
     if (err) {
       res.status(400).send(err)
     } else {
-      console.log("getcom: ", result)
+      console.log('getcom: ', result)
       res.send(result)
     }
   })
@@ -1207,6 +1207,25 @@ LIMIT 1;
     } catch (err) {
       console.error(err)
       res.status(400).send('An error occurred while generating the PDF')
+    }
+  })
+})
+
+router.post('/getStudentMail', (req, res) => {
+  let numPV = req.body.numPV
+  sqlquery = `SELECT e.email_e
+
+FROM Etudiant e
+
+INNER JOIN Rapport r ON r.matricule_e= e.matricule_e
+LEFT JOIN PV pv ON pv.num_r = r.num_r
+
+WHERE pv.num_pv = ?;`
+  db.query(sqlquery, numPV, (err, result) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.send(result)
     }
   })
 })

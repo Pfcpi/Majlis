@@ -188,7 +188,7 @@ router.post('/addCD', (req, res) => {
   }
 */
 router.post('/addPV', (req, res) => {
-  let { numCD, libeleS, temoin, numR } = req.body
+  let { numCD, libeleS, temoin, numR, numC } = req.body
   let pvId,
     sent = false
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
@@ -196,8 +196,8 @@ router.post('/addPV', (req, res) => {
     if (err) {
       res.status(400).send(err)
     } else {
-      let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r) VALUES (NOW(), ?, ?, ?)`
-      db.query(sqlqueryPv, [numCD, result.insertId, numR], (err, result) => {
+      let sqlqueryPv = `INSERT INTO PV (date_pv, num_cd, num_s, num_r, num_c) VALUES (NOW(), ?, ?, ?, ?)`
+      db.query(sqlqueryPv, [numCD, result.insertId, numR, numC], (err, result) => {
         if (err) {
           res.status(400).send(err)
         } else {

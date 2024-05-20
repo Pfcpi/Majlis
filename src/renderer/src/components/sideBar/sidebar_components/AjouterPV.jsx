@@ -17,7 +17,7 @@ function AjouterPV() {
   const [currentSelectedRapports, setCurrentSelectedRapports] = useState([])
   const [query, setQuery] = useState('')
   const [supprimer, setSupprimer] = useState(false)
-  const [pv, setPv] = useState({ numCD: '', libeleS: '', temoin: '', numR: '' })
+  const [pv, setPv] = useState({ numCD: '', libeleS: '', temoin: '', numR: '', numC: '' })
   const [cd, setCd] = useState({ dateCd: '', id: '' })
   const [members, setMembers] = useState([])
   const [creerConseilState, setCreerConseildState] = useState(false)
