@@ -171,6 +171,7 @@ function AjouterPV() {
           numR: pv.numR,
           libeleS: pv.libeleS,
           numCD: pv.numCD,
+          numC: pv.numC,
           temoin: temoinArray
         })
         .then((res) => {
@@ -329,7 +330,8 @@ function AjouterPV() {
                       })
                       .then((res) => {
                         setMembers(res.data)
-                        console.log(res.data)
+                        setPv((prev) => ({ ...prev, numC: res.data[0].num_c }))
+                        console.log('members: ', res.data)
                       })
                       .catch((err) => console.log(err))
                     RemoveLoadingBar()

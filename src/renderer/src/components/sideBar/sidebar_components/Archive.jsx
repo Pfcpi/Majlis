@@ -1052,7 +1052,7 @@ function Archive() {
                   value={queryCom}
                   onChange={(e) => setQueryCom(e.target.value)}
                   type="search"
-                  placeholder="Membre"
+                  placeholder="date fin"
                 ></input>
               </div>
             </div>
@@ -1095,7 +1095,7 @@ function Archive() {
                   value={queryCon}
                   onChange={(e) => setQueryCon(e.target.value)}
                   type="search"
-                  placeholder="Conseil"
+                  placeholder="Date"
                 ></input>
               </div>
             </div>
@@ -1986,29 +1986,21 @@ function Archive() {
                 <h3 className="text-blue text-2xl">Informations de Commission</h3>
                 <div className="flex flex-col gap-3">
                   <p>
-                    Date de Conseil:{' '}
-                    {currentViewedCOM.dateCD ? currentViewedCOM.dateCD.slice(0, 10) : ''}
+                    Date de Debut:{' '}
+                    {selectedMem[0].date_debut_c ? selectedMem[0].date_debut_c.slice(0, 10) : ''}
+                  </p>
+                  <p>
+                    Date de fin:{' '}
+                    {selectedMem[0].date_fin_c ? selectedMem[0].date_fin_c.slice(0, 10) : ''}
                   </p>
                   <div>
-                    membres:{' '}
+                    Conseils :{' '}
                     <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                      {Array.isArray(currentViewedCOM.membres) &&
-                        currentViewedCOM.membres.length != 0 &&
-                        currentViewedCOM.membres.map((t) => (
+                      {Array.isArray(currentViewedCOM) &&
+                        currentViewedCOM.length != 0 &&
+                        currentViewedCOM.map((t) => (
                           <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                            <div>{t}</div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                  <div>
-                    etudiants qui ont été traduit a un conseil:{' '}
-                    <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                      {Array.isArray(currentViewedCOM.etudiants) &&
-                        currentViewedCOM.etudiants.length != 0 &&
-                        currentViewedCOM.etudiants.map((t) => (
-                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                            <div>{t}</div>
+                            <div>{t.date_cd.slice(0, 10)}</div>
                           </div>
                         ))}
                     </div>

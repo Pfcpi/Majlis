@@ -189,6 +189,7 @@ router.post('/addCD', (req, res) => {
 */
 router.post('/addPV', (req, res) => {
   let { numCD, libeleS, temoin, numR, numC } = req.body
+  console.log(req.body)
   let pvId,
     sent = false
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`

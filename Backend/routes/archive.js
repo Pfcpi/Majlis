@@ -412,7 +412,6 @@ GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
     if (err) {
       res.status(400).send(err)
     } else {
-      console.log('getcom: ', result)
       res.send(result)
     }
   })
