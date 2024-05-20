@@ -33,6 +33,7 @@ function Archive() {
 
   const [commissions, setCommissions] = useState([])
   const [selectedMem, setSelectedMem] = useState([])
+  const [currentViewedCOM, setCurrentViewedCOM] = useState({})
   const [queryCom, setQueryCom] = useState('')
 
   const [PVs, setPVs] = useState([])
@@ -142,21 +143,31 @@ function Archive() {
       .then((res) => {
         setRapports(res.data)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        alert('Vérifier la connexion internet')
+        console.log(err)
+      })
 
     const tache2 = await axios
       .get(api + '/archive/getpv')
       .then((res) => {
         setPVs(res.data)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        alert('Vérifier la connexion internet')
+      })
 
     const tache3 = await axios
       .get(api + '/archive/getcommission')
       .then((res) => {
         setCommissions(res.data)
+        console.log(res.data)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        alert('Vérifier la connexion internet')
+      })
 
     const tache4 = await axios
       .get(api + '/archive/getcd')
@@ -164,7 +175,10 @@ function Archive() {
         setConseils(res.data)
         console.log('/archive/getcd:', res.data)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        alert('Vérifier la connexion internet')
+      })
     RemoveLoadingBar()
   }
 
@@ -529,7 +543,25 @@ function Archive() {
           setTemoinArray(res.data.temoins)
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        alert('vérifier la connexion internet')
+      })
+    RemoveLoadingBar()
+  }
+
+  async function handleViewCOM() {
+    addLoadingBar()
+    const tache = await axios
+      .post(api + '/archive/getscommission', { numC: selectedMem[0].num_c })
+      .then((res) => {
+        console.log(res)
+        setCurrentViewedCOM(res.data)
+      })
+      .catch((err) => {
+        alert('vérifier la connexion internet')
+        console.log(err)
+      })
     RemoveLoadingBar()
   }
 
@@ -629,15 +661,10 @@ function Archive() {
     <></>
   )
 
-  /*
   const filteredMembers = useMemo(() => {
     return Array.isArray(commissions)
       ? commissions.filter((m) => {
-          return m.nom_m
-            .toLowerCase()
-            .concat(' ')
-            .concat(m.prenom_m.toLowerCase())
-            .includes(queryCom.toLowerCase())
+          return m.date_fin_c.slice(0, 10).includes(queryCom)
         })
       : ''
   }, [commissions, queryCom])
@@ -659,17 +686,15 @@ function Archive() {
         }}
       >
         <td>
-          <span>{m.id_m}</span>
+          <span>{m.num_c}</span>
         </td>
-        <td>{[m.nom_m, ' ', m.prenom_m]}</td>
         <td>{m.date_debut_c.slice(0, m.date_debut_c.indexOf('T'))}</td>
         <td>{m.date_fin_c.slice(0, m.date_fin_c.indexOf('T'))}</td>
-        <td>{m.role_m}</td>
       </tr>
     ))
   ) : (
     <></>
-  )*/
+  )
   const filteredCons = useMemo(() => {
     return Array.isArray(conseils)
       ? conseils.filter((c) => {
@@ -992,15 +1017,19 @@ function Archive() {
           )}
           {currentWindow == win[2] && (
             <div className="h-16 px-4 flex items-center justify-between bg-side-bar-white-theme-color text-[18px] dark:bg-dark-gray">
-              <div className="w-fit flex gap-4">
-                <button>
-                  <div
-                    className={selectedMem.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                  >
-                    {modifierImage}Modifier
-                  </div>
-                </button>
-              </div>
+              <button className="text-blue">
+                <div
+                  className={selectedMem.length == 1 ? 'button_active_blue' : 'button_inactive'}
+                  onClick={() => {
+                    if (selectedMem.length == 1) {
+                      handleViewCOM()
+                      setView(true)
+                    }
+                  }}
+                >
+                  {voirDossierImage}Voir
+                </div>
+              </button>
               <div className="searchDiv">
                 <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
                 <input
@@ -1102,23 +1131,17 @@ function Archive() {
                         <div>Membre</div>
                       </th>
                       <th className="w-1/5 ">
-                        <div>Nom Membre</div>
-                      </th>
-                      <th className="w-1/5 ">
                         <div>Date de debut</div>
                       </th>
                       <th className="w-1/5">
                         <div>Date de fin</div>
-                      </th>
-                      <th className="w-1/5">
-                        <div>Role </div>
                       </th>
                     </>
                   )}
                   {currentWindow == win[3] && (
                     <>
                       <th className="w-1/5">
-                        <div>Conseild Discipline</div>
+                        <div>Conseil Discipline</div>
                       </th>
                       <th className="w-1/5 ">
                         <div>Date</div>
@@ -1128,7 +1151,7 @@ function Archive() {
                 </tr>
                 {currentWindow == win[0] && tabRapports}
                 {currentWindow == win[1] && tabPVs}
-                {/*currentWindow == win[2] && tabComs */}
+                {currentWindow == win[2] && tabComs}
                 {currentWindow == win[3] && tabCons}
               </table>
             </div>
@@ -1923,6 +1946,58 @@ function Archive() {
                           ))}
                       </div>
                     </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {view && currentWindow == win[2] && (
+        <div className="w-full h-full flex">
+          <div className="h-full w-1/2 bg-side-bar-white-theme-color dark:bg-dark-gray flex flex-col">
+            <button
+              className="w-10 aspect-square"
+              onClick={() => {
+                setView(false)
+                setSelectedMem([])
+                setCurrentViewedCOM({})
+              }}
+            >
+              <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
+            </button>
+            <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
+              <h2 className="text-4xl">Details du Commssion</h2>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-blue text-2xl">Informations de Commission</h3>
+                <div className="flex flex-col gap-3">
+                  <p>
+                    Date de Conseil:{' '}
+                    {currentViewedCOM.dateCD ? currentViewedCOM.dateCD.slice(0, 10) : ''}
+                  </p>
+                  <div>
+                    membres:{' '}
+                    <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                      {Array.isArray(currentViewedCOM.membres) &&
+                        currentViewedCOM.membres.length != 0 &&
+                        currentViewedCOM.membres.map((t) => (
+                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                            <div>{t}</div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                  <div>
+                    etudiants qui ont été traduit a un conseil:{' '}
+                    <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                      {Array.isArray(currentViewedCOM.etudiants) &&
+                        currentViewedCOM.etudiants.length != 0 &&
+                        currentViewedCOM.etudiants.map((t) => (
+                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                            <div>{t}</div>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 </div>
               </div>

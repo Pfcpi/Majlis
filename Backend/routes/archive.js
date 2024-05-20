@@ -412,6 +412,7 @@ GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
     if (err) {
       res.status(400).send(err)
     } else {
+      console.log("getcom: ", result)
       res.send(result)
     }
   })
@@ -423,7 +424,7 @@ GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
     "numC": int value
   }
 */
-router.get('/getscommission', (req, res) => {
+router.post('/getscommission', (req, res) => {
   let numC = req.body.numC
   let sqlquery = `SELECT DISTINCT
   CD.num_cd,
