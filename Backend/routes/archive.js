@@ -498,7 +498,6 @@ router.delete('/deletecommission', (req, res) => {
 router.patch('/editpv', (req, res) => {
   let { datePV, libeleS, numPV, temoin } = req.body
   let temoinArray = Object.values(temoin).filter((temoin) => temoin !== null)
-  db.query('SET FOREIGN_KEY_CHECKS = 0')
   let sqlquerydelT = `DELETE te FROM Temoigne te
   LEFT JOIN PV ON PV.num_pv = te.num_pv
   WHERE PV.num_pv = ?`
@@ -507,7 +506,6 @@ router.patch('/editpv', (req, res) => {
       res.status(400).send(err)
     }
   })
-  db.query('SET FOREIGN_KEY_CHECKS = 1')
   let sqlquerylinkT = null
   let sqlqueryaddT = `INSERT INTO Temoin (nom_t, prenom_t, role_t) VALUES (?, ?, ?)`
   for (let temoin of temoinArray) {
@@ -607,81 +605,81 @@ router.post('/getspv', (req, res) => {
   let numpv = req.body.numPV
   console.log(numpv)
   let sqlquery = `SELECT
-    r.num_r,
-    e.matricule_e,
-    e.nom_e,
-    e.prenom_e,
-    e.niveau_e,
-    e.section_e,
-    e.groupe_e,
-    p.nom_p,
-    p.prenom_p,
-    cd.date_cd,
-    i.date_i,
-    i.lieu_i,
-    i.motif_i,
-    i.description_i,
-    pv.num_pv,
-    pv.date_pv,
-    s.libele_s,
+  r.num_r,
+  e.matricule_e,
+  e.nom_e,
+  e.prenom_e,
+  e.niveau_e,
+  e.section_e,
+  e.groupe_e,
+  p.nom_p,
+  p.prenom_p,
+  cd.date_cd,
+  i.date_i,
+  i.lieu_i,
+  i.motif_i,
+  i.description_i,
+  pv.num_pv,
+  pv.date_pv,
+  s.libele_s,
 
-    temoins.nom_tt AS noms_temoins,
-    temoins.prenom_tt AS prenoms_temoins,
-    temoins.role_tt AS roles_temoins,
+  temoins.nom_tt AS noms_temoins,
+  temoins.prenom_tt AS prenoms_temoins,
+  temoins.role_tt AS roles_temoins,
 
-    GROUP_CONCAT(m.nom_m) AS noms_membres,
-    GROUP_CONCAT(m.prenom_m) AS prenoms_membres,
-    GROUP_CONCAT(m.role_m) AS roles_membres
+  GROUP_CONCAT(m.nom_m) AS noms_membres,
+  GROUP_CONCAT(m.prenom_m) AS prenoms_membres,
+  GROUP_CONCAT(m.role_m) AS roles_membres
 FROM
-    PV pv
+  PV pv
 INNER JOIN
-    Rapport r ON r.num_r = pv.num_r
+  Rapport r ON r.num_r = pv.num_r
 INNER JOIN
-    Sanction s ON pv.num_s = s.num_s
+  Sanction s ON pv.num_s = s.num_s
 INNER JOIN
-    Conseil_Discipline cd ON pv.num_cd = cd.num_cd
+  Conseil_Discipline cd ON pv.num_cd = cd.num_cd
 LEFT JOIN
-    Etudiant e ON r.matricule_e = e.matricule_e
+  Etudiant e ON r.matricule_e = e.matricule_e
 LEFT JOIN
-    Plaignant p ON r.id_p = p.id_p
+  Plaignant p ON r.id_p = p.id_p
 LEFT JOIN
-    Infraction i ON r.num_i = i.num_i
+  Infraction i ON r.num_i = i.num_i
 LEFT JOIN
-    (SELECT
-        te.num_cd,
-        GROUP_CONCAT(t.nom_t) AS nom_tt,
-        GROUP_CONCAT(t.prenom_t) AS prenom_tt,
-        GROUP_CONCAT(t.role_t) AS role_tt
-    FROM
-        Temoigne te
-    LEFT JOIN
-        Temoin t ON te.num_t = t.num_t
-    GROUP BY
-        te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
+  (SELECT
+      te.num_pv,
+      GROUP_CONCAT(distinct t.nom_t) AS nom_tt,
+      GROUP_CONCAT(distinct t.prenom_t) AS prenom_tt,
+      GROUP_CONCAT(distinct t.role_t) AS role_tt
+  FROM
+      Temoigne te
+  inner JOIN
+      Temoin t ON te.num_t = t.num_t
+  GROUP BY
+      te.num_pv) AS temoins ON pv.num_pv = temoins.num_pv
 LEFT JOIN
-    Commission_Presente cp ON pv.num_cd = cp.num_cd
+  Commission_Presente cp ON pv.num_cd = cp.num_cd
 LEFT JOIN
-    Membre m ON cp.id_m = m.id_m
+  Membre m ON cp.id_m = m.id_m
 WHERE
-    pv.num_pv = ?
+  pv.num_pv = ?
 GROUP BY
-    r.num_r,
-    e.matricule_e,
-    e.nom_e,
-    e.prenom_e,
-    e.niveau_e,
-    e.section_e,
-    e.groupe_e,
-    p.nom_p,
-    p.prenom_p,
-    cd.date_cd,
-    i.date_i,
-    i.lieu_i,
-    i.motif_i,
-    i.description_i,
-    pv.num_pv,
-    pv.date_pv,
-    s.libele_s
+  r.num_r,
+  e.matricule_e,
+  e.nom_e,
+  e.prenom_e,
+  e.niveau_e,
+  e.section_e,
+  e.groupe_e,
+  p.nom_p,
+  p.prenom_p,
+  cd.date_cd,
+  i.date_i,
+  i.lieu_i,
+  i.motif_i,
+  i.description_i,
+  pv.num_pv,
+  pv.date_pv,
+  s.libele_s
 `
 
   db.query(sqlquery, numpv, (err, result) => {
