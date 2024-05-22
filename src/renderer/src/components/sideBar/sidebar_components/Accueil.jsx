@@ -11,6 +11,7 @@ import useCliped from '../../../zustand/cliped'
 import useDark from '../../../zustand/dark'
 import useAccount from '../../../zustand/account'
 import useApi from '../../../zustand/api'
+import useDate from '../../../zustand/currentDate'
 
 import BlueSearchSVG from './../../../assets/BlueSearch.svg'
 import VoirDossierSVG from './../../../assets/VoirDossier.svg'
@@ -27,6 +28,7 @@ import WarningSVG from './../../../assets/warning.svg'
 import axios from 'axios'
 
 function Archive() {
+  const { date } = useDate()
   const niveaux = [
     'ING1',
     'ING2',
@@ -979,6 +981,7 @@ function Archive() {
                       name="dateI"
                       id="dateI"
                       type="date"
+                      max={date}
                       onChange={(e) => {
                         handleInputChange(e)
                         setCurrentViewedEtudiant((prev) => ({ ...prev, date_i: e.target.value }))

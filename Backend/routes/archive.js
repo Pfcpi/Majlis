@@ -918,7 +918,6 @@ WHERE r.num_r = ?`
 */
 router.post('/printpv', async (req, res) => {
   let sqlquery = `SELECT
-  r.num_r,
   e.matricule_e,
   e.nom_e,
   e.prenom_e,
@@ -928,34 +927,16 @@ router.post('/printpv', async (req, res) => {
   p.nom_p,
   p.prenom_p,
   cd.date_cd,
-  i.date_i,
-  i.lieu_i,
   i.motif_i,
-  i.description_i,
-  pv.num_pv,
   pv.date_pv,
   s.libele_s,
-
-(SELECT CONCAT(m.nom_m) FROM Membre m
-  LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
-  LEFT JOIN Commission c ON c.num_c = m.num_c
-
-  WHERE c.actif_c = 1 AND m.role_m = 'Président') as nom_pres,
-
-    (SELECT CONCAT(m.prenom_m) FROM Membre m
-  LEFT JOIN Commission_Presente cp ON cp.id_m = m.id_m
-  LEFT JOIN Commission c ON c.num_c = m.num_c
-
-  WHERE c.actif_c = 1 AND m.role_m = 'Président') as prenom_pres,
-
-
+  (SELECT m.nom_m FROM Membre m INNER JOIN Commission c ON m.num_c = c.num_c WHERE m.role_m = "Président" AND c.actif_c = TRUE) AS nom_pres,
+  (SELECT m.prenom_m FROM Membre m INNER JOIN Commission c ON m.num_c = c.num_c WHERE m.role_m = "Président" AND c.actif_c = TRUE) AS prenom_pres,
   temoins.nom_tt AS noms_temoins,
   temoins.prenom_tt AS prenoms_temoins,
-  temoins.role_tt AS roles_temoins,
 
   GROUP_CONCAT(m.nom_m) AS noms_membres,
-  GROUP_CONCAT(m.prenom_m) AS prenoms_membres,
-  GROUP_CONCAT(m.role_m) AS roles_membres
+  GROUP_CONCAT(m.prenom_m) AS prenoms_membres
 FROM
   PV pv
 INNER JOIN
@@ -987,31 +968,14 @@ LEFT JOIN
 LEFT JOIN
   Membre m ON cp.id_m = m.id_m
 WHERE
-  pv.num_pv = ?
-GROUP BY
-  r.num_r,
-  e.matricule_e,
-  e.nom_e,
-  e.prenom_e,
-  e.niveau_e,
-  e.section_e,
-  e.groupe_e,
-  p.nom_p,
-  p.prenom_p,
-  cd.date_cd,
-  i.date_i,
-  i.lieu_i,
-  i.motif_i,
-  i.description_i,
-  pv.num_pv,
-  pv.date_pv,
-  s.libele_s`
+  pv.num_pv = ?`
 
   db.query(sqlquery, req.body.numPV, async (err, result) => {
     if (err && err.errno != 1065) {
       res.status(400).send(err)
     }
 
+    console.log('data:', result)
     const data = {
       matriculeE: result[0].matricule_e,
       nomE: result[0].nom_e.toUpperCase(),

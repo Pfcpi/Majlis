@@ -359,31 +359,19 @@ function Documentation() {
       </div>
       <div className="flex flex-col gap-[30px] w-1/3 items-center">
         <button
-          className="switchDoc"
-          style={{
-            backgroundColor: doc === 'Usto' ? '#2B81B8' : '',
-            color: doc === 'Usto' ? 'white' : ''
-          }}
+          className={`switchDoc ${doc === 'Usto' ? 'bg-blue text-white' : ''}`}
           onClick={() => setDoc('Usto')}
         >
           Règlement intérieur USTO
         </button>
         <button
-          className="switchDoc"
-          style={{
-            backgroundColor: doc === 'Arrete89' ? '#2B81B8' : '',
-            color: doc === 'Arrete89' ? 'white' : ''
-          }}
+          className={`switchDoc ${doc === 'Arrete89' ? 'bg-blue text-white' : ''}`}
           onClick={() => setDoc('Arrete89')}
         >
           Arrêté n°96 du 09 juin 1989
         </button>
         <button
-          className="switchDoc"
-          style={{
-            backgroundColor: doc === 'Arrete14' ? '#2B81B8' : '',
-            color: doc === 'Arrete14' ? 'white' : ''
-          }}
+          className={`switchDoc ${doc === 'Arrete14' ? 'bg-blue text-white' : ''}`}
           onClick={() => setDoc('Arrete14')}
         >
           Arrêté n°371 du 11 Juin 2014
