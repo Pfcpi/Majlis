@@ -54,13 +54,22 @@ function AjouterPV() {
   loadingBar.classList.add('loadingBarAni')
 
   function addLoadingBar() {
-    console.log('loading bar added')
     AjouterPVPage.current.appendChild(loadingBar)
   }
 
   function RemoveLoadingBar() {
-    console.log('loading bar removed')
     loadingBar.remove()
+  }
+
+  let coverWindow = document.createElement('div')
+  coverWindow.classList.add('fullBgBlock2')
+
+  function addCover() {
+    AjouterPVPage.current.appendChild(coverWindow)
+  }
+
+  function removeCover() {
+    coverWindow.remove()
   }
 
   const filteredRapports = useMemo(() => {
@@ -165,10 +174,16 @@ function AjouterPV() {
 
   const handleAjouter = async (e) => {
     e.preventDefault()
+    let numpv
     const newErrors = validateFormPV(pv)
     if (Object.keys(newErrors).length === 0) {
+      if (currentSelectedRapports.length == 1) {
+        setMembers([])
+      }
+      setCurrentSelectedRapports(currentSelectedRapports.slice(1))
       e.preventDefault()
       addLoadingBar()
+      addCover()
       const tache = await axios
         .post(api + '/pv/addPV', {
           numR: pv.numR,
@@ -177,35 +192,48 @@ function AjouterPV() {
           numC: pv.numC,
           temoin: temoinArray
         })
-        .then((res) => {
+        .then(async (res) => {
           RemoveLoadingBar()
-          console.log('result.data:', res.data)
-          members.map((m) => {
-            axios
-              .post(api + '/archive/mail', {
-                numPV: Number(res.data.numpv),
-                email: m.email_m
-              })
-              .then((res) => console.log(res))
-              .catch((err) => {
-                console.log(err)
-                alert('Vérifier la connexion internet')
-              })
-          })
+          removeCover()
           console.log(res)
+          numpv = res.data.numpv
         })
         .catch((err) => {
           RemoveLoadingBar()
+          removeCover()
           console.log(err)
+          alert("Vérifier la connexion internet \n le pv n'a pas été creé")
         })
 
+      setPv((prev) => ({ ...prev, libeleS: '', temoin: '', numR: '' }))
+      setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+      setTemoinArray([])
       if (currentSelectedRapports.length > 1) {
         setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
+        console.log('numR has been inisialized: ', currentSelectedRapports[1].num_r)
       }
-      if (currentSelectedRapports.length == 1) {
-        setMembers([])
-      }
+      console.log('numR outside if: ', currentSelectedRapports[1].num_r)
+      console.log('currentSelectedRapports.length: ', currentSelectedRapports.length)
       setCurrentSelectedRapports(currentSelectedRapports.slice(1))
+      if (numpv) {
+        for (const m of members) {
+          console.log('email on top of the loop: ', m)
+          const tache = await axios
+            .post(api + '/archive/mail', {
+              numPV: Number(numpv),
+              email: m.email_m
+            })
+            .then((res) => console.log(res))
+            .catch((err) => {
+              console.log(err)
+              alert("Vérifier la connexion internet \n mail n'a pas été envoyé")
+            })
+          console.log('result after trying to send an email:', tache)
+        }
+      } else {
+        alert("Vérifier la connexion internet \n le pv n'a pas été creé")
+      }
+
       const tache1 = await axios
         .get(api + '/rapport/get')
         .then((res) => {

@@ -10,7 +10,7 @@
     @apply absolute ml-4 mt-[13px] text-[#A9A9A9] cursor-text dark:text-white h-fit w-fit bg-transparent transition-all duration-150 ease-linear;
   }
   .label_rapport_fix {
-    @apply absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent; 
+    @apply absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent;
   }
   .input_dossier:valid + .label_rapport,
   .input_dossier:focus + .label_rapport {
@@ -20,12 +20,15 @@
     @apply w-full h-24 flex flex-col bg-blue/35;
   }
   .searchDiv {
-    @apply flex items-center min-w-[150px] bg-[#C2E6FF] w-1/4 dark:bg-blue/20 rounded-lg; 
+    @apply flex items-center min-w-[150px] bg-[#C2E6FF] w-1/4 dark:bg-blue/20 rounded-lg;
   }
   .searchInput {
     @apply flex justify-start items-center min-w-[110px] w-full px-2 h-10 py-1 font-medium rounded-lg bg-transparent outline-none text-light-gray placeholder:text-blue dark:text-white;
   }
   .fullBgBlock {
     @apply absolute flex items-center justify-center w-[100vw] h-[100vh] bg-blue/10 top-0 left-0 z-20;
+  }
+  .fullBgBlock2 {
+    @apply absolute flex items-center justify-center w-[100vw] h-[100vh] bg-blue/10 top-0 left-0 z-40;
   }
 }

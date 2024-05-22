@@ -542,16 +542,22 @@ function Archive() {
               </button>
               <button
                 onClick={async () => {
+                  setSupprimer(false)
                   const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
-                    .catch((err) => console.log(err))
+                    .catch((err) => {
+                      alert("Vérifier la connexion internet \nLe rapport n'a pas été supprimé")
+                      console.log(err)
+                    })
                   const tache2 = await axios
                     .get(api + '/rapport/get')
                     .then((res) => {
                       setEtudiants(res.data)
                     })
-                    .catch((err) => console.log(err))
-                  setSupprimer(false)
+                    .catch((err) => {
+                      console.log(err)
+                      alert('Vérifier la connextion internet')
+                    })
                 }}
                 className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
               >
@@ -747,13 +753,19 @@ function Archive() {
                     const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
-                      .catch((err) => console.log(err))
+                      .catch((err) => {
+                        alert("Vérifier la connexion internet \nLe rapport n'a pas été modifier")
+                        console.log(err)
+                      })
                     const tache2 = await axios
                       .get(api + '/rapport/get')
                       .then((res) => {
                         setEtudiants(res.data)
                       })
-                      .catch((err) => console.log(err))
+                      .catch((err) => {
+                        console.log(err)
+                        alert('Vérifier la connexion internet')
+                      })
                     RemoveLoadingBar()
                   }}
                   className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"

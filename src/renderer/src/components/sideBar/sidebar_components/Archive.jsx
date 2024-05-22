@@ -175,7 +175,6 @@ function Archive() {
       .get(api + '/archive/getcd')
       .then((res) => {
         setConseils(res.data)
-        console.log('/archive/getcd:', res.data)
       })
       .catch((err) => {
         console.log(err)
@@ -537,6 +536,7 @@ function Archive() {
         console.log(res.data)
         if (res.status >= 200 && res.status < 300) {
           setCurrentViewedPV({ ...res.data, numPV: selectedPVs[0].num_pv })
+          console.log('/archive/gets: temoins:', res.data.temoins)
           setPv({
             libeleS: res.data.libeleS,
             temoin: res.data.temoins,

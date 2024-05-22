@@ -50,6 +50,7 @@ router.post('/getActiveCommissionAndMembersByData', (req, res) => {
 */
 router.post('/addCD', (req, res) => {
   let { dateCd, idM } = req.body
+  let errBuffer = []
   let sqlqueryCd = `INSERT INTO Conseil_Discipline (date_cd) VALUES (?)`
   db.query(sqlqueryCd, dateCd, (err, result) => {
     if (err) {
@@ -61,13 +62,15 @@ router.post('/addCD', (req, res) => {
       idM.forEach((m) => {
         db.query(sqlqueryC, [result.insertId, m], (err, result) => {
           if (err) {
-            res.send(err)
+            errBuffer.push(err)
           }
         })
       })
       db.query('SELECT email_u FROM Utilisateur WHERE id_u = 1', (err, result) => {
         if (err) {
-          res.send(err)
+          errBuffer.push(err)
+          console.log('errBuffer: ', errBuffer)
+          res.status(400).send(errBuffer)
           return
         } else {
           const mail = result[0].email_u
@@ -192,6 +195,7 @@ router.post('/addPV', (req, res) => {
   console.log(req.body)
   let pvId,
     sent = false
+  let temoinErrBuffer = []
   let sqlqueryS = `INSERT INTO Sanction (libele_s) VALUES (?)`
   db.query(sqlqueryS, libeleS.replace(/,/g, ''), (err, result) => {
     if (err) {
@@ -223,44 +227,41 @@ router.post('/addPV', (req, res) => {
                       db.query(getIndex, [t.nomT, t.prenomT, t.roleT], (err, result) => {
                         if (err) {
                           console.log(err)
-                          res.status(400).send(err)
+                          temoinErrBuffer.push(err)
                           return
                         } else {
                           console.log('result[0].num_t', result[0].num_t)
-                          // Connect temoins to cd and pv
+                          // Connect un temoin to cd and pv
                           let sqlquerytem =
                             'INSERT INTO Temoigne (num_cd, num_t, num_pv) VALUES (?, ?, ?)'
                           db.query(sqlquerytem, [numCD, result[0].num_t, pvId], (err, result) => {
                             if (err) {
                               console.log('Error inside else', err)
-                              res.status(400).send(err)
-                              return
+                              temoinErrBuffer.push(err)
                             }
                           })
                         }
                       })
                     } else {
-                      res.status(400).send(err)
-                      return
+                      temoinErrBuffer.push(err)
                     }
                   } else {
-                    // Connect temoins to cd and pv
+                    // Connect un temoin to cd and pv
                     let sqlquerytem =
                       'INSERT INTO Temoigne (num_cd, num_t, num_pv) VALUES (?, ?, ?)'
                     console.log('pvId:', pvId)
                     db.query(sqlquerytem, [numCD, result.insertId, pvId], (err, result) => {
                       if (err) {
-                        if (!sent) {
-                          console.log('Error inside else else:', err)
-                          res.status(400).send(err)
-                          return
-                        }
+                        console.log('Error inside else else:', err)
+                        temoinErrBuffer.push(res)
                       }
                     })
                   }
                 })
               })
-              if (!sent) {
+              if (temoinErrBuffer.length != 0) {
+                res.status(400).send(temoinErrBuffer)
+              } else {
                 console.log('arrivedHere')
                 res.send({ numpv: pvId.toString() })
               }

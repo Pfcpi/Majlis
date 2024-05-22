@@ -7,22 +7,29 @@
 - date always removes one day.
 - the confirmation window should not appear after pressing enter.
 
-  - accueil
   - ajouter pv
-  - ajouter rapport
   - commission
   - archive
 
 - button for the drop down menus
 
-  - modifier rapport(archive, accueil)
-  - ajouter rapport
-  - add commission
-  - modify commission
+  - modifier rapport archive niveau
+  - modifier rapport archive infraction
+  - modifier rapport accueil niveau
+  - modifier rapport accueil infraction
+  - ajouter rapport niveau
+  - ajouter rapport infraction
+  - add commission role
+  - modify commission role
+  - add pv sanction
+  - add pv role
+  - modify pv sanction archive
+  - modify pv role archive
 
-- drop down menu for sanction
+- filtre for pv:
 
-- filtre for pv (par sanction, date)
+  - sanction
+  - date
 
 - annuler for ajouter rapport
 
@@ -32,10 +39,14 @@
   - modify mem
   - add mem
 
+- vérifie si un témoin est doublé 
+
+- remove the supprimer icon and replace it with X
+
 ## Backend
 
 - before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
 - date always removes one day.
 
 - editpv(problem in route(js error, duplicate temoins))
-- addpv
+- addpv email problem
