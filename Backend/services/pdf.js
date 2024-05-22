@@ -99,7 +99,8 @@ async function generatePDFpvForEmail(data) {
   
   .boxs {
       text-align: right;
-      margin-top: 0.5cm;
+      margin-bottom: 0.5cm;
+      margin-right: 1.2cm;
   }
   
   .sign {
@@ -140,40 +141,40 @@ async function generatePDFpvForEmail(data) {
     <div class="main">
         <div class="boxp">
             <p class="parg">
-                    Suite à l'infraction commise : <span class="infos">${data.motifI}</span> un conseil de discipline s'est tenu le <span class="infos">${data.dateCD}</span>, sous la demande de : <span class="infos">M./Mme. ${data.nomP} ${data.prenomP}</span> contre l'etudiant(e) concerné(e) suivant :</p>
+            Suite à l'infraction commise: <span class="infos">${data.motifI}</span>, un conseil de discipline s'est tenu le <span class="infos">${data.dateCD}</span>, sous la demande de : <span class="infos">M./Mme. ${data.nomP} ${data.prenomP}</span> à l'encontre l'étudiant(e) concerné(e) suivant:</p>
         </div>
         <div class="boxl">
             <ul class="list">
-                <li>Matricule : <span class="infos">${data.matriculeE}</span></li>
-                <li>Nom : <span class="infos">${data.nomE} ${data.prenomE}</span></li>
-                <li>Niveau : <span class="infos">${data.niveauE}-S${data.sectionE}G${data.groupeE}</span></li>
+                <li>Matricule: <span class="infos">${data.matriculeE}</span></li>
+                <li>Nom et prénom: <span class="infos">${data.nomE} ${data.prenomE}</span></li>
+                <li>Niveau d'étude: <span class="infos">${data.niveauE}-S${data.sectionE}G${data.groupeE}</span></li>
             </ul>
         </div>
         <div class="boxp">
-            <p class="parg">En présence des membres suivants :</p>
+            <p class="parg">En présence des membres suivants:</p>
         </div>
         <div class="boxl">
             <ul class="list" id="membrel">
             </ul>
         </div>
         <div class="boxp">
-            <p class="parg" id="temoinp" style="display: none;">Et en présence des temoins suivants :</p>
+            <p class="parg" id="temoinp" style="display: none;">Et en présence des temoins suivants:</p>
         </div>
         <div class="boxl">
             <ul class="list" id ="temoinl" style="display: none;">
             </ul>
         </div>
         <div class="boxp">
-            <p class="parg">Suite a ce conseil, les membres ont tranchés sur la sanction suivante : <span class="infos">${data.libeleS}</span></p>
-        </div>
-        <div class="boxs">
-            <p class="sign">
-                Le president du conseil :<br>
-                <span class="infos">${data.nomPR} ${data.prenomPR}</span>
-            </p>
+            <p class="parg">Suite à ce conseil, les membres ont tranché sur la décision suivante: <span class="infos">${data.libeleS}</span></p>
         </div>
     </div>
     <div class="footer">
+    <div class="boxs">
+            <p class="sign">
+                Président de la commission:<br>
+                M./Mme.<span class="infos"> ${data.nomPR} ${data.prenomPR}</span>
+            </p>
+        </div>
         <img src="https://i.goopics.net/sxwqhc.png" alt="pied-de-page USTO" id="pied-page">
     </div>
 
@@ -182,6 +183,20 @@ async function generatePDFpvForEmail(data) {
     return chaine.charAt(0).toUpperCase() + chaine.slice(1)
     }
 
+    // Function to add dynamic data to the membre list
+        function addDynamicMembre() {
+            const list = document.getElementById('membrel');
+            const data1 = ${JSON.stringify(data.nomM)};
+            const data2 = ${JSON.stringify(data.prenomM)};
+            const dataArray1 = data1.split(',');
+            const dataArray2 = data2.split(',');
+            for (let i = 0; i < dataArray1.length; i++) {
+                const listItem = document.createElement('li');
+                const fullName = dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]);
+                listItem.innerHTML = 'M./Mme. ' + '<span class="infos">' + fullName + '</span>';
+                list.appendChild(listItem);
+            }
+        }
 
     // Function to add dynamic data to the temoin list
         function addDynamicTemoin() {
@@ -201,32 +216,17 @@ async function generatePDFpvForEmail(data) {
             }
         }
 
-        // Function to add dynamic data to the membre list
-        function addDynamicMembre() {
-            const list = document.getElementById('membrel');
-            const data1 = ${JSON.stringify(data.nomM)};
-            const data2 = ${JSON.stringify(data.prenomM)};
-            const dataArray1 = data1.split(',');
-            const dataArray2 = data2.split(',');
-            for (let i = 0; i < dataArray1.length; i++) {
-                const listItem = document.createElement('li');
-                const fullName = dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]);
-                listItem.innerHTML = 'M./Mme. ' + '<span class="infos">' + fullName + '</span>';
-                list.appendChild(listItem);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            addDynamicTemoin();
-            addDynamicMembre();
-        });
-
         function visTemoin() {
             const parg = document.getElementById('temoinp');
             const list = document.getElementById('temoinl');
             parg.style.display = "block";
             list.style.display = "block";
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addDynamicMembre();
+            addDynamicTemoin();
+        });
     </script>
   </body>
   </html>
@@ -234,7 +234,7 @@ async function generatePDFpvForEmail(data) {
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
-  const pdfBuffer = page.pdf({ path: './out/s.pdf', format: 'A4' })
+  const pdfBuffer = page.pdf({ path: './out/s.pdf', format: 'A4', margin: {top: "0.5cm"} })
   return pdfBuffer
 }
 
@@ -333,7 +333,8 @@ async function generatePDFpv(data, pathReq) {
   
   .boxs {
       text-align: right;
-      margin-top: 0.5cm;
+      margin-bottom: 0.5cm;
+      margin-right: 1.2cm;
   }
   
   .sign {
@@ -374,40 +375,40 @@ async function generatePDFpv(data, pathReq) {
     <div class="main">
         <div class="boxp">
             <p class="parg">
-                    Suite à l'infraction commise : <span class="infos">${data.motifI}</span> un conseil de discipline s'est tenu le <span class="infos">${data.dateCD}</span>, sous la demande de : <span class="infos">M./Mme. ${data.nomP} ${data.prenomP}</span> contre l'etudiant(e) concerné(e) suivant :</p>
+            Suite à l'infraction commise: <span class="infos">${data.motifI}</span>, un conseil de discipline s'est tenu le <span class="infos">${data.dateCD}</span>, sous la demande de : M./Mme.<span class="infos"> ${data.nomP} ${data.prenomP}</span> à l'encontre l'étudiant(e) concerné(e) suivant:</p>
         </div>
         <div class="boxl">
             <ul class="list">
-                <li>Matricule : <span class="infos">${data.matriculeE}</span></li>
-                <li>Nom : <span class="infos">${data.nomE} ${data.prenomE}</span></li>
-                <li>Niveau : <span class="infos">${data.niveauE}-S${data.sectionE}G${data.groupeE}</span></li>
+                <li>Matricule: <span class="infos">${data.matriculeE}</span></li>
+                <li>Nom et prénom: <span class="infos">${data.nomE} ${data.prenomE}</span></li>
+                <li>Niveau d'étude: <span class="infos">${data.niveauE}-S${data.sectionE}G${data.groupeE}</span></li>
             </ul>
         </div>
         <div class="boxp">
-            <p class="parg">En présence des membres suivants :</p>
+            <p class="parg">En présence des membres suivants:</p>
         </div>
         <div class="boxl">
             <ul class="list" id="membrel">
             </ul>
         </div>
         <div class="boxp">
-            <p class="parg" id="temoinp" style="display: none;">Et en présence des temoins suivants :</p>
+            <p class="parg" id="temoinp" style="display: none;">Et en présence des temoins suivants:</p>
         </div>
         <div class="boxl">
             <ul class="list" id ="temoinl" style="display: none;">
             </ul>
         </div>
         <div class="boxp">
-            <p class="parg">Suite a ce conseil, les membres ont tranchés sur la sanction suivante : <span class="infos">${data.libeleS}</span></p>
-        </div>
-        <div class="boxs">
-            <p class="sign">
-                Le president du conseil :<br>
-                <span class="infos">${data.nomPR} ${data.prenomPR}</span>
-            </p>
+            <p class="parg">Suite à ce conseil, les membres ont tranché sur la décision suivante: <span class="infos">${data.libeleS}</span></p>
         </div>
     </div>
     <div class="footer">
+    <div class="boxs">
+            <p class="sign">
+                Président de la commission:<br>
+                M./Mme.<span class="infos"> ${data.nomPR} ${data.prenomPR}</span>
+            </p>
+        </div>
         <img src="https://i.goopics.net/sxwqhc.png" alt="pied-de-page USTO" id="pied-page">
     </div>
 
@@ -416,6 +417,20 @@ async function generatePDFpv(data, pathReq) {
     return chaine.charAt(0).toUpperCase() + chaine.slice(1)
     }
 
+    // Function to add dynamic data to the membre list
+        function addDynamicMembre() {
+            const list = document.getElementById('membrel');
+            const data1 = ${JSON.stringify(data.nomM)};
+            const data2 = ${JSON.stringify(data.prenomM)};
+            const dataArray1 = data1.split(',');
+            const dataArray2 = data2.split(',');
+            for (let i = 0; i < dataArray1.length; i++) {
+                const listItem = document.createElement('li');
+                const fullName = dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]);
+                listItem.innerHTML = 'M./Mme. ' + '<span class="infos">' + fullName + '</span>';
+                list.appendChild(listItem);
+            }
+        }
 
     // Function to add dynamic data to the temoin list
         function addDynamicTemoin() {
@@ -435,32 +450,17 @@ async function generatePDFpv(data, pathReq) {
             }
         }
 
-        // Function to add dynamic data to the membre list
-        function addDynamicMembre() {
-            const list = document.getElementById('membrel');
-            const data1 = ${JSON.stringify(data.nomM)};
-            const data2 = ${JSON.stringify(data.prenomM)};
-            const dataArray1 = data1.split(',');
-            const dataArray2 = data2.split(',');
-            for (let i = 0; i < dataArray1.length; i++) {
-                const listItem = document.createElement('li');
-                const fullName = dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]);
-                listItem.innerHTML = 'M./Mme. ' + '<span class="infos">' + fullName + '</span>';
-                list.appendChild(listItem);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            addDynamicTemoin();
-            addDynamicMembre();
-        });
-
         function visTemoin() {
             const parg = document.getElementById('temoinp');
             const list = document.getElementById('temoinl');
             parg.style.display = "block";
             list.style.display = "block";
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addDynamicMembre();
+            addDynamicTemoin();
+        });
     </script>
   </body>
   </html>
@@ -482,7 +482,7 @@ async function generatePDFpv(data, pathReq) {
   await page.goto(tempHtmlPath)
 
   // Generate PDF
-  const pdfBuffer = await page.pdf({ format: 'A4' })
+  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm",} })
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
@@ -539,8 +539,6 @@ async function generatePDFrapport(data, pathReq) {
       gap: 20px;
       justify-content: center;
       margin-bottom: 2.5cm;
-      margin-top: 1.5cm;
-      
   }
   
   .title {
@@ -596,7 +594,8 @@ async function generatePDFrapport(data, pathReq) {
   
   .boxs {
       text-align: right;
-      margin-top: 2cm;
+      margin-bottom: 0.5cm;
+      margin-right: 1.2cm;
   }
   
   .sign {
@@ -630,39 +629,39 @@ async function generatePDFrapport(data, pathReq) {
       </div>
       <div class="title">
           <h1>
-              Rapport pour un conseil de discipline<br>
-              du département d'informatique
+                Rapport pour un conseil de discipline<br>
+            du département d'informatique
           </h1>
-          <h2>Date du Rapport: <span>${data.dateR}</span></h2>
+          <h2>Date du rapport: <span>${data.dateR}</span></h2>
       </div>
       <div class="main">
           <div class="boxp">
               <p class="parg">
-                  En raison de l'infraction suivante commise: <span class="infos">${data.motifI}</span>, le  <span class="infos">${data.dateI}</span> à <span class="infos">${data.lieuI}</span>, par l'étudiant ci-dessous :
+                  En raison de l'infraction suivante : <span class="infos">${data.motifI}</span>, le  <span class="infos">${data.dateI}</span> à <span class="infos">${data.lieuI}</span>, commise par l'étudiant(e) suivant(e):
               </p>
           </div>
           <div class="boxl">
               <ul class="list">
-                  <li>Matricule : <span class="infos">${data.matriculeE}</span></li>
-                  <li>Nom : <span class="infos">${data.nomE} ${data.prenomE}</span></li>
-                  <li>Niveau : <span class="infos">${data.niveauE}-S${data.sectionE}G${data.groupeE}</span></li>
+                  <li>Matricule: <span class="infos">${data.matriculeE}</span></li>
+                  <li>Nom et prénom: <span class="infos">${data.nomE} ${data.prenomE}</span></li>
+                  <li>Niveau d'étude: <span class="infos">${data.niveauE}-S${data.sectionE}G${data.groupeE}</span></li>
               </ul>
           </div>
           <div class="boxp">
-              <p class="parg">Un conseil de discipline est demandé par le plaigant suivant :</p>
+              <p class="parg">Un conseil de discipline est demandé par le plaignant suivant:</p>
           </div>
           <div class="boxl">
               <ul class="list">
                   <li>M./Mme. <span class="infos">${data.nomP} ${data.prenomP}</span></li>
               </ul>
           </div>
-          <div class="boxs">
-              <p class="sign">
-                  Chef de département :<br>
-                  <span class="infos">${data.nomC} ${data.prenomC}</span>
-              </p>
-          </div>
       </div>
+      <div class="boxs">
+              <p class="sign">
+                  Chef du département:<br>
+                  M./Mme.<span class="infos"> ${data.nomC} ${data.prenomC}</span>
+              </p>
+        </div>
       <div class="footer">
           <img src="https://i.goopics.net/sxwqhc.png" alt="pied-de-page USTO" id="pied-page">
       </div>
@@ -680,7 +679,7 @@ async function generatePDFrapport(data, pathReq) {
   await page.goto(tempHtmlPath)
 
   // Generate PDF
-  const pdfBuffer = await page.pdf({ format: 'A4' })
+  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm", bottom: "0.5cm"} })
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
@@ -851,7 +850,7 @@ async function generatePDFcd(data, pathReq) {
         <div class="main">
         <div class="boxp">
             <p class="parg">
-                En ce jour, le ${data.dateCD}, s'est tenue une réunion du conseil de discipline du département d'informatique en présence de ses membres:
+                En ce jour, le ${data.dateCD}, s'est tenue une réunion du conseil de discipline du département d'informatique en présence des membres suivants:
             </p>
         </div>
         <div class="boxl">
@@ -860,16 +859,16 @@ async function generatePDFcd(data, pathReq) {
         </div>
         <div class="boxp">
             <p class="parg">
-                Le tableau ci-dessous résume les cas et les décisions prises pour chaqu'un des étudiants concernés conformément à l'arrêté ministériel n°371.
+                Le tableau ci-dessous résume les cas et les décisions prises pour chacun des étudiants concernés conformément à l'arrêté ministériel n°371.
             </p>
         </div>
         <div class="table">
             <table>
                 <thead>
                     <tr>
-                        <th>Etudiants concernés</th>
+                        <th>Étudiants concernés</th>
                         <th>Faits rapportés</th>
-                        <th>Enseignants témoins</th>
+                        <th>Plaignants</th>
                         <th>Décisions du conseil de discipline</th>
                     </tr>
                 </thead>
@@ -880,8 +879,8 @@ async function generatePDFcd(data, pathReq) {
         <div class="footer">
         <div class="boxs">
             <p class="sign">
-                Le president du conseil :<br>
-                <span class="infos">${data.nomPR}</span> <span class="infos">${data.prenomPR}</span>
+                Président de la commission:<br>
+                M./Mme.<span class="infos"> ${data.nomPR}</span> <span class="infos">${data.prenomPR}</span>
             </p>
         </div>
           <img src="https://i.goopics.net/sxwqhc.png" alt="pied-de-page USTO" id="pied-page">
@@ -898,11 +897,11 @@ async function generatePDFcd(data, pathReq) {
                 const data2 = ${JSON.stringify(data.prenomM)};
                 const dataArray1 = data1.split(',');
                 const dataArray2 = data2.split(',');
-
                 for (let i = 0; i < dataArray1.length; i++) {
-                    const item = document.createElement('li');
-                    item.textContent = 'M./Mme. ' + dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]);
-                    list.appendChild(item);
+                    const listItem = document.createElement('li');
+                    const fullName = dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]);
+                    listItem.innerHTML = 'M./Mme. ' + '<span class="infos">' + fullName + '</span>';
+                    list.appendChild(listItem);
                 }
             }
             
@@ -953,8 +952,8 @@ async function generatePDFcd(data, pathReq) {
             }
 
             document.addEventListener('DOMContentLoaded', function() {
-                addDynamicMembre();
                 addDynamicPV();
+                addDynamicMembre();
             });
         </script>
   </body>
@@ -993,7 +992,7 @@ await page.evaluate((minHeight) => {
 }, minHeight)
 
   // Generate PDF
-  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "1cm", bottom: "0.5cm"} })
+  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm", bottom: "0.5cm"} })
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
