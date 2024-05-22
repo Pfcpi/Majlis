@@ -898,8 +898,8 @@ WHERE r.num_r = ?`
         lieuI: result[0].lieu_i,
         motifI: result[0].motif_i,
         dateR: formatDate(result[0].date_r),
-        nomC: result[0].nom_chef,
-        prenomC: result[0].prenom_chef
+        nomC: result[0].nom_chef.toUpperCase(),
+        prenomC: maj(result[0].prenom_chef)
       }
       try {
         const pdfBuffer = await generatePDFrapport(data, req.body.path)
@@ -976,7 +976,6 @@ WHERE
       res.status(400).send(err)
     }
 
-    console.log('data:', result)
     const data = {
       matriculeE: result[0].matricule_e,
       nomE: result[0].nom_e.toUpperCase(),
@@ -997,7 +996,7 @@ WHERE
       nomM: result[0].noms_membres,
       prenomM: result[0].prenoms_membres
     }
-
+    console.log(data)
     try {
       const pdfBuffer = await generatePDFpv(data, req.body.path)
       res.send(pdfBuffer)
@@ -1146,7 +1145,6 @@ LIMIT 1;
     if (err) {
       res.status(400).send(err)
     }
-    console.log(result[0].datePV)
     const data = {
       dateCD: transformDateToFrench(formatDate(result[0].date_cd)),
       numPV: numRapport(result[0].numPV),
