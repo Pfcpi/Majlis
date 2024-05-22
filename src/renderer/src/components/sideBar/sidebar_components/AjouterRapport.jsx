@@ -708,6 +708,25 @@ function AjouterRapport() {
             onClick={(e) => {
               e.preventDefault()
               if (step > 1) setStep((prev) => prev - 1)
+              if (step == 1) {
+                setRapport({
+                  matriculeE: '',
+                  nomE: '',
+                  prenomE: '',
+                  niveauE: '',
+                  groupeE: '',
+                  email: '',
+                  sectionE: '',
+                  nomP: '',
+                  prenomP: '',
+                  dateI: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                  lieuI: '',
+                  motifI: '',
+                  descI: '',
+                  degreI: 1
+                })
+                setdropNiveauValue('')
+              }
               setTimeout(() => {
                 setErrorsStep1({
                   matriculeError: '',

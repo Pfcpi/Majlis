@@ -10,7 +10,7 @@ function NavBar() {
   return (
     <div className="h-[44px] w-full flex items-center justify-between bg-[#DADADA] dark:bg-[#333333] px-5">
       <div></div>
-      <h2 className="w-fit text-blue">
+      <h2 className="w-fit text-blue bg-white h-7 flex justify-center items-center px-4 rounded-md shadow-sm">
         {[
           'Bienvenue, M./Mme. ',
           account == 'chef' ? 'Chef de département' : 'Président du conseil'

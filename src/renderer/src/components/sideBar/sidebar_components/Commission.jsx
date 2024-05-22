@@ -522,6 +522,7 @@ function Archive() {
                 onClick={async (e) => {
                   e.preventDefault()
                   if (renouvelerComMessage) {
+                    setRenouvelerComMessage(false)
                     console.log('passed from renouvelycomMessage')
                     const tache1 = await axios
                       .patch(api + '/commission/archivecom')
@@ -533,19 +534,18 @@ function Archive() {
                       .get(api + '/commission/get')
                       .then((res) => setMembres(res.data))
                       .catch((err) => console.log(err))
-                    setRenouvelerComMessage(false)
                   }
                   if (addMemberMessage) {
-                    handleAddMember()
                     setAddMemberMessage(false)
+                    handleAddMember()
                   }
                   if (modifyMemberMessage) {
-                    handleModifyMember()
                     setModifyMemberMessage(false)
+                    handleModifyMember()
                   }
                   if (deleteMembersMessage) {
-                    handleRemoveMembers()
                     setDeleteMembersMessage(false)
+                    handleRemoveMembers()
                   }
                 }}
                 className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"

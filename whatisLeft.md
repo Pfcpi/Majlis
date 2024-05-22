@@ -7,10 +7,6 @@
 - date always removes one day.
 - the confirmation window should not appear after pressing enter.
 
-  - ajouter pv
-  - commission
-  - archive
-
 - button for the drop down menus
 
   - modifier rapport archive niveau
@@ -31,17 +27,15 @@
   - sanction
   - date
 
-- annuler for ajouter rapport
-
 - Change the heading that is on the nav.
 
-- limite the date to only today.
+- limite the date to only today and active date of the commission.
+
   - modify mem
   - add mem
 
-- vérifie si un témoin est doublé 
-
-- remove the supprimer icon and replace it with X
+- vérifie si un témoin est doublé addpv
+- vérifie si un témoin est doublé modifierpv
 
 ## Backend
 

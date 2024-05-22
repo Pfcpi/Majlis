@@ -395,7 +395,7 @@ function AjouterPV() {
                             setMembers(members.filter((item) => item !== p))
                           }}
                         >
-                          <div>{supprimerImage}</div>
+                          <div className='bg-red flex justify-center items-center h-full aspect-square rounded-md text-white'>X</div>
                         </button>
                       )}
                     </div>
