@@ -496,15 +496,17 @@ router.delete('/deletecommission', (req, res) => {
     }
   */
 router.patch('/editpv', (req, res) => {
-  let { datePV, libeleS, numPV, temoin } = req.body
-  console.log("/editpv: ", req.body)
+  let { libeleS, numPV, temoin } = req.body
+  let errBuffer = []
+  console.log('/editpv: ', req.body)
   let temoinArray = Object.values(temoin).filter((temoin) => temoin !== null)
   let sqlquerydelT = `DELETE te FROM Temoigne te
   LEFT JOIN PV ON PV.num_pv = te.num_pv
   WHERE PV.num_pv = ?`
   db.query(sqlquerydelT, numPV, (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      //res.status(400).send(err)
+      errBuffer.push(err)
     }
   })
   let sqlquerylinkT = null
@@ -515,7 +517,8 @@ router.patch('/editpv', (req, res) => {
       [temoin.nom.replace(/ /g, '\u00A0'), temoin.prenom.replace(/ /g, '\u00A0'), temoin.role],
       (err, result) => {
         if (err && err.errno != 1062) {
-          res.status(400).send(err)
+          //res.status(400).send(err)
+          errBuffer.push(err)
         } else if (err && err.errno == 1062) {
           let numT = null
           let sqlquerygetT = `SELECT num_t FROM Temoin WHERE nom_t = ? and prenom_t = ?`
@@ -524,7 +527,8 @@ router.patch('/editpv', (req, res) => {
             [temoin.nom.replace(/ /g, '\u00A0'), temoin.prenom.replace(/ /g, '\u00A0')],
             (err, result) => {
               if (err) {
-                res.status(400).send(err)
+                //res.status(400).send(err)
+                errBuffer.push(err)
               }
               numT = result[0].num_t
               sqlquerylinkT = `INSERT INTO Temoigne (num_t, num_pv, num_cd) VALUES (${numT}, ?,(SELECT PV.num_cd FROM PV
@@ -532,7 +536,8 @@ router.patch('/editpv', (req, res) => {
               db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
                 if (err && err.errno != 1062) {
                   console.log(err)
-                  res.status(400).send(err)
+                  //res.status(400).send(err)
+                  errBuffer.push(err)
                 }
               })
             }
@@ -542,7 +547,8 @@ router.patch('/editpv', (req, res) => {
                 INNER JOIN Conseil_Discipline cd ON cd.num_cd = PV.num_cd WHERE PV.num_pv = ?))`
           db.query(sqlquerylinkT, [numPV, numPV], (err, result) => {
             if (err) {
-              res.status(400).send(err)
+              //res.status(400).send(err)
+              errBuffer.push(err)
             }
           })
         }
@@ -553,11 +559,15 @@ router.patch('/editpv', (req, res) => {
     'UPDATE Sanction s INNER JOIN PV ON PV.num_s = s.num_s SET s.libele_s = ? WHERE PV.num_pv = ?'
   db.query(sqlqueryS, [libeleS, numPV], (err, result) => {
     if (err) {
-      res.status(400).send(err)
+      //res.status(400).send(err)
+      errBuffer.push(err)
     }
   })
-
-  res.sendStatus(204)
+  if (errBuffer.length == 0) {
+    res.sendStatus(204)
+  } else {
+    res.status(400).send(err)
+  }
 })
 
 // VALID

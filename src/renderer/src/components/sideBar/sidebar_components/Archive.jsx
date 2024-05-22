@@ -88,18 +88,20 @@ function Archive() {
     'Doctorat'
   ]
   const motif1 = [
-    'Demande non fondée de double correction',
-    'tentative de fraude ou fraude établie',
-    "rufus d'obtempérer à des directives émanant de l'administration, du personnel enseignant ou de sécurité"
+    "Tentative de fraude à l'examen",
+    "Fraude établie et reconnue à l'examen",
+    "Insulte et propos irrévérencieux à l'égard de l'ensemble du personnel universitaire et des étudiants",
+    "Indiscipline caractérisée envers l'ensemble du personnel universitaire"
   ]
   const motif2 = [
-    'Les récidives des infractions du 1er degré',
-    "l'entrave à la bonne marche de l'établissement",
-    'le désordre organisé',
-    'la voilance',
-    'les menaces et voies de fais',
-    'le faux',
-    "la détérioration délibérée des beins de l'établissement",
+    "Fraude préméditée à l'examen",
+    "Entrave à la bonne marche de l'université, violence, menace, voles de faits de toute nature, désordre organisé",
+    "Détention de tout moyen aux fins de porter atteinte à l'intégrité physique du personnel universitaire et des étudiants",
+    'Faux et usage de faux, falsification',
+    "Diffamation de l'égard de l'ensemble du personnel universitaire et des étudiants",
+    'Actions délibérées de perturbation et désordre caractérisé portant atteinte au bon déroulement des activités pédagogiques',
+    "Vols, abus de confiance et détournements de biens de l'établissement des enseignants et des étudiants",
+    "Détérioration de biens de l'établissement",
     'autres...'
   ]
   const [dropNiveau, setdropNiveau] = useState(false)
@@ -452,11 +454,7 @@ function Archive() {
       addLoadingBar()
       console.log('temoinArray: ', temoinArray)
       const tache = await axios
-        .patch(api + '/archive/editpv', {
-          libeleS: pv.libeleS,
-          numPV: pv.numPV,
-          temoin: temoinArray
-        })
+        .patch(api + '/archive/editpv', { libeleS: pv.libeleS, numPV: pv.numPV, temoin: temoinArray })
         .then((res) => {
           console.log(res.data)
         })
