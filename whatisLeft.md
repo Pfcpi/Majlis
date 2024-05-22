@@ -24,6 +24,5 @@
 - before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
 - date always removes one day.
 
-- editpv(problem in route(js error, duplicate temoins))
 - addpv email problem
 - verify the mem finish date.

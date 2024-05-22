@@ -425,7 +425,7 @@ function Archive() {
   useEffect(() => {
     setTemoinBuffer((prevState) => ({
       ...prevState,
-      roleT: dropRoleValue
+      role: dropRoleValue
     }))
   }, [dropRoleValue])
 
@@ -450,9 +450,13 @@ function Archive() {
     if (Object.keys(newErrors).length === 0) {
       setModify(false)
       addLoadingBar()
-      console.log('pv: ', pv)
+      console.log('temoinArray: ', temoinArray)
       const tache = await axios
-        .patch(api + '/archive/editpv', pv)
+        .patch(api + '/archive/editpv', {
+          libeleS: pv.libeleS,
+          numPV: pv.numPV,
+          temoin: temoinArray
+        })
         .then((res) => {
           console.log(res.data)
         })
@@ -1886,6 +1890,7 @@ function Archive() {
                       const newErrors = validateFormTemoin(temoinBuffer)
                       if (Object.keys(newErrors).length === 0) {
                         setTemoinArray((prev) => [...prev, temoinBuffer])
+                        console.log('temoinBuffer: ', temoinBuffer)
                         setIsAddingTemoin(false)
                         setTemoinBuffer({ nom: '', prenom: '', role: '' })
                       }

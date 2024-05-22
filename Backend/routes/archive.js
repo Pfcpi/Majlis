@@ -497,6 +497,7 @@ router.delete('/deletecommission', (req, res) => {
   */
 router.patch('/editpv', (req, res) => {
   let { datePV, libeleS, numPV, temoin } = req.body
+  console.log("/editpv: ", req.body)
   let temoinArray = Object.values(temoin).filter((temoin) => temoin !== null)
   let sqlquerydelT = `DELETE te FROM Temoigne te
   LEFT JOIN PV ON PV.num_pv = te.num_pv
