@@ -83,10 +83,6 @@ function Archive() {
   }, [])
 
   useEffect(() => {
-    setDropRoleValue(currentAddedMember.roleM)
-  }, [currentAddedMember.roleM])
-
-  useEffect(() => {
     setCurrentAddedMember((prev) => ({ ...prev, roleM: dropRoleValue }))
   }, [dropRoleValue])
 
@@ -103,6 +99,29 @@ function Archive() {
     console.log('loading bar removed')
     loadingBar.remove()
   }
+
+  const ChoiceDown = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1 1L7 7L13 1"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+  const ChoiceUp = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M13 7L7 1L1 7"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
 
   const dropRoledownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
@@ -522,6 +541,7 @@ function Archive() {
                 onClick={async (e) => {
                   e.preventDefault()
                   if (renouvelerComMessage) {
+                    setRenouvelerComMessage(false)
                     console.log('passed from renouvelycomMessage')
                     const tache1 = await axios
                       .patch(api + '/commission/archivecom')
@@ -533,19 +553,18 @@ function Archive() {
                       .get(api + '/commission/get')
                       .then((res) => setMembres(res.data))
                       .catch((err) => console.log(err))
-                    setRenouvelerComMessage(false)
                   }
                   if (addMemberMessage) {
-                    handleAddMember()
                     setAddMemberMessage(false)
+                    handleAddMember()
                   }
                   if (modifyMemberMessage) {
-                    handleModifyMember()
                     setModifyMemberMessage(false)
+                    handleModifyMember()
                   }
                   if (deleteMembersMessage) {
-                    handleRemoveMembers()
                     setDeleteMembersMessage(false)
+                    handleRemoveMembers()
                   }
                 }}
                 className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
@@ -624,16 +643,25 @@ function Archive() {
                 )}
               </div>
               <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="roleM"
-                  id="roleM"
-                  onChange={handleInputChange}
-                  onClick={() => setDropRole(true)}
-                  value={currentAddedMember.roleM}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="roleM">
+                <div className="flex items-center gap-4">
+                  <input
+                    className="input_dossier"
+                    name="roleM"
+                    id="roleM"
+                    value={currentAddedMember.roleM}
+                    required
+                  ></input>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setDropRole((prev) => !prev)
+                    }}
+                    className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                  >
+                    {dropRole ? ChoiceUp : ChoiceDown}
+                  </button>
+                </div>
+                <label className="label_rapport_fix" htmlFor="roleM">
                   Role
                 </label>
                 {errors.roleError && (

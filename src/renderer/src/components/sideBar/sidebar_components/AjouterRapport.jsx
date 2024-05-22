@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import WarningSVG from './../../../assets/warning.svg'
+import ChoiceSVG from './../../../assets/Choice.svg'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
@@ -106,6 +107,29 @@ function AjouterRapport() {
   const { api } = useApi()
 
   const buttonRef = useRef(null)
+
+  const ChoiceDown = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1 1L7 7L13 1"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+  const ChoiceUp = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M13 7L7 1L1 7"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -496,20 +520,26 @@ function AjouterRapport() {
                 )}
               </div>
               <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="niveauE"
-                  id="niveauE"
-                  onClick={() => {
-                    if (!dropNiveau) {
-                      setdropNiveau(true)
-                    }
-                  }}
-                  value={dropNiveauValue}
-                  onChange={handleInputChange}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="niveauE">
+                <div className="flex items-center gap-4">
+                  <input
+                    className="input_dossier"
+                    name="niveauE"
+                    id="niveauE"
+                    value={dropNiveauValue}
+                    onChange={handleInputChange}
+                    required
+                  ></input>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setdropNiveau((prev) => !prev)
+                    }}
+                    className="bg-blue h-full aspect-square rounded-md flex items-center justify-center"
+                  >
+                    {dropNiveau ? ChoiceUp : ChoiceDown}
+                  </button>
+                </div>
+                <label className="label_rapport_fix" htmlFor="niveauE">
                   Niveau
                 </label>
                 {errorsStep1.niveauError && (
@@ -645,24 +675,32 @@ function AjouterRapport() {
                 )}
               </div>
               <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="motifI"
-                  id="motifI"
-                  onClick={() => {
-                    if (!dropMotif && dropMotifValue != 'autres...') setDropMotif(true)
-                  }}
-                  value={dropMotifValue == 'autres...' ? rapport.motifI : dropMotifValue}
-                  onChange={(e) => {
-                    if (dropMotifValue == 'autres...') {
-                      handleInputChange(e)
-                      setRapport((prev) => ({ ...prev, motifI: e.target.value }))
-                      if (dropMotif) setDropMotif(false)
-                    }
-                  }}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="motifI">
+                <div className="flex items-center gap-4">
+                  <input
+                    className="input_dossier"
+                    name="motifI"
+                    id="motifI"
+                    value={dropMotifValue == 'autres...' ? rapport.motifI : dropMotifValue}
+                    onChange={(e) => {
+                      if (dropMotifValue == 'autres...') {
+                        handleInputChange(e)
+                        setRapport((prev) => ({ ...prev, motifI: e.target.value }))
+                        if (dropMotif) setDropMotif(false)
+                      }
+                    }}
+                    required
+                  ></input>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setDropMotif((prev) => !prev)
+                    }}
+                    className="bg-blue h-full aspect-square rounded-md flex items-center justify-center"
+                  >
+                    {dropMotif ? ChoiceUp : ChoiceDown}
+                  </button>
+                </div>
+                <label className="label_rapport_fix" htmlFor="motifI">
                   Motif
                 </label>
                 {errorsStep3.motifError && (
@@ -708,6 +746,25 @@ function AjouterRapport() {
             onClick={(e) => {
               e.preventDefault()
               if (step > 1) setStep((prev) => prev - 1)
+              if (step == 1) {
+                setRapport({
+                  matriculeE: '',
+                  nomE: '',
+                  prenomE: '',
+                  niveauE: '',
+                  groupeE: '',
+                  email: '',
+                  sectionE: '',
+                  nomP: '',
+                  prenomP: '',
+                  dateI: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                  lieuI: '',
+                  motifI: '',
+                  descI: '',
+                  degreI: 1
+                })
+                setdropNiveauValue('')
+              }
               setTimeout(() => {
                 setErrorsStep1({
                   matriculeError: '',

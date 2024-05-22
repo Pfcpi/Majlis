@@ -117,6 +117,29 @@ function Archive() {
     numR: 0
   })
 
+  const ChoiceDown = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1 1L7 7L13 1"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+  const ChoiceUp = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M13 7L7 1L1 7"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+
   async function fetchData() {
     addLoadingBar()
     const tache1 = await axios
@@ -542,16 +565,22 @@ function Archive() {
               </button>
               <button
                 onClick={async () => {
+                  setSupprimer(false)
                   const tache1 = await axios
                     .delete(api + '/rapport/delete', { data: { numR: currentDeletedStudent } })
-                    .catch((err) => console.log(err))
+                    .catch((err) => {
+                      alert("Vérifier la connexion internet \nLe rapport n'a pas été supprimé")
+                      console.log(err)
+                    })
                   const tache2 = await axios
                     .get(api + '/rapport/get')
                     .then((res) => {
                       setEtudiants(res.data)
                     })
-                    .catch((err) => console.log(err))
-                  setSupprimer(false)
+                    .catch((err) => {
+                      console.log(err)
+                      alert('Vérifier la connextion internet')
+                    })
                 }}
                 className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
               >
@@ -747,13 +776,19 @@ function Archive() {
                     const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
-                      .catch((err) => console.log(err))
+                      .catch((err) => {
+                        alert("Vérifier la connexion internet \nLe rapport n'a pas été modifier")
+                        console.log(err)
+                      })
                     const tache2 = await axios
                       .get(api + '/rapport/get')
                       .then((res) => {
                         setEtudiants(res.data)
                       })
-                      .catch((err) => console.log(err))
+                      .catch((err) => {
+                        console.log(err)
+                        alert('Vérifier la connexion internet')
+                      })
                     RemoveLoadingBar()
                   }}
                   className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
@@ -862,20 +897,25 @@ function Archive() {
                     )}
                   </div>
                   <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="niveauE"
-                      id="niveauE"
-                      onClick={() => {
-                        if (!dropNiveau) {
-                          setdropNiveau(true)
-                        }
-                      }}
-                      onChange={handleInputChange}
-                      value={dropNiveauValue || currentViewedEtudiant.niveau_e}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <div className="flex items-center gap-4">
+                      <input
+                        className="input_dossier"
+                        name="niveauE"
+                        id="niveauE"
+                        value={dropNiveauValue || currentViewedEtudiant.niveau_e}
+                        required
+                      ></input>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setdropNiveau((prev) => !prev)
+                        }}
+                        className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                      >
+                        {dropNiveau ? ChoiceUp : ChoiceDown}
+                      </button>
+                    </div>
+                    <label className="label_rapport_fix" htmlFor="niveauE">
                       Niveau
                     </label>
                     {errorsStep1.niveauError && (
@@ -1032,29 +1072,40 @@ function Archive() {
                     )}
                   </div>
                   <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="motifI"
-                      id="motifI"
-                      onChange={(e) => {
-                        console.log('dropMotifValue:', dropMotifValue)
-                        if (dropMotifValue == 'autres...') {
-                          handleInputChange(e)
-                          setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
-                          if (dropMotif) setDropMotif(false)
+                    <div className="flex items-center gap-4">
+                      <input
+                        className="input_dossier"
+                        name="motifI"
+                        id="motifI"
+                        onChange={(e) => {
+                          console.log('dropMotifValue:', dropMotifValue)
+                          if (dropMotifValue == 'autres...') {
+                            handleInputChange(e)
+                            setCurrentViewedEtudiant((prev) => ({
+                              ...prev,
+                              motif_i: e.target.value
+                            }))
+                            if (dropMotif) setDropMotif(false)
+                          }
+                        }}
+                        value={
+                          dropMotifValue == 'autres...' || dropMotifValue == ''
+                            ? currentViewedEtudiant.motif_i
+                            : dropMotifValue
                         }
-                      }}
-                      onClick={() => {
-                        if (!dropMotif && dropMotifValue != 'autres...') setDropMotif(true)
-                      }}
-                      value={
-                        dropMotifValue == 'autres...' || dropMotifValue == ''
-                          ? currentViewedEtudiant.motif_i
-                          : dropMotifValue
-                      }
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="motifI">
+                        required
+                      ></input>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setDropMotif((prev) => !prev)
+                        }}
+                        className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                      >
+                        {dropMotif ? ChoiceUp : ChoiceDown}
+                      </button>
+                    </div>
+                    <label className="label_rapport_fix" htmlFor="motifI">
                       Motif
                     </label>
                     {errorsStep3.motifError && (

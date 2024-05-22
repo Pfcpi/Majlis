@@ -5,37 +5,24 @@
 ## Frontend
 
 - date always removes one day.
-- the confirmation window should not appear after pressing enter.
 
-  - accueil
-  - ajouter pv
-  - ajouter rapport
-  - commission
-  - archive
+- filtre for pv:
 
-- button for the drop down menus
+  - sanction
+  - date
 
-  - modifier rapport(archive, accueil)
-  - ajouter rapport
-  - add commission
-  - modify commission
+- limite the date to only today and active date of the commission.
 
-- drop down menu for sanction
-
-- filtre for pv (par sanction, date)
-
-- annuler for ajouter rapport
-
-- Change the heading that is on the nav.
-
-- limite the date to only today.
   - modify mem
   - add mem
+
+- vérifie si un témoin est doublé addpv
+- vérifie si un témoin est doublé modifierpv
 
 ## Backend
 
 - before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
 - date always removes one day.
 
-- editpv(problem in route(js error, duplicate temoins))
-- addpv
+- addpv email problem
+- verify the mem finish date.

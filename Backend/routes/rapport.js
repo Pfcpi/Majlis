@@ -209,6 +209,9 @@ router.post('/add', (req, res) => {
                       res.status(400).send(err)
                     } else {
                       let x = result.insertId
+                      if (!object.descI) {
+                        object.desc = ''
+                      }
                       db.query(
                         sqlqueryI,
                         [

@@ -26,6 +26,13 @@ import axios from 'axios'
 function Archive() {
   const { date } = useDate()
   const win = ['rapport', 'pv', 'conseil', 'commission']
+  const sanctions = ['san1', 'san2', 'san3', 'autres...']
+  const roles = ['Administrateur', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
+
+  const [dropSanction, setDropSanction] = useState(false)
+  const [dropSanctionValue, setDropSanctionValue] = useState('')
+  const [dropRole, setDropRole] = useState(false)
+  const [dropRoleValue, setDropRoleValue] = useState('')
 
   const [currentWindow, setCurrentWindow] = useState(win[0])
 
@@ -138,6 +145,29 @@ function Archive() {
   const [step, setStep] = useState(1)
   const [currentViewedEtudiant, setCurrentViewedEtudiant] = useState({})
 
+  const ChoiceDown = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1 1L7 7L13 1"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+  const ChoiceUp = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M13 7L7 1L1 7"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+
   async function fetchData() {
     addLoadingBar()
     const tache1 = await axios
@@ -175,7 +205,6 @@ function Archive() {
       .get(api + '/archive/getcd')
       .then((res) => {
         setConseils(res.data)
-        console.log('/archive/getcd:', res.data)
       })
       .catch((err) => {
         console.log(err)
@@ -239,6 +268,37 @@ function Archive() {
     loadingBar.remove()
   }
 
+  const dropSanctionItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {sanctions.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropSanction(false)
+            setDropSanctionValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropRoledownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {roles.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropRole(false)
+            setDropRoleValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
   const supprimerImage = (
     <svg
       width="18"
@@ -362,7 +422,21 @@ function Archive() {
     }))
   }
 
-  const handleInputTemoinChange = (e) => {
+  useEffect(() => {
+    setTemoinBuffer((prevState) => ({
+      ...prevState,
+      role: dropRoleValue
+    }))
+  }, [dropRoleValue])
+
+  useEffect(() => {
+    setPv((prevState) => ({
+      ...prevState,
+      libeleS: dropSanctionValue
+    }))
+  }, [dropSanctionValue])
+
+  function handleInputTemoinChange(e) {
     const { name, value } = e.target
     setTemoinBuffer((prevState) => ({
       ...prevState,
@@ -376,9 +450,13 @@ function Archive() {
     if (Object.keys(newErrors).length === 0) {
       setModify(false)
       addLoadingBar()
-      console.log('pv: ', pv)
+      console.log('temoinArray: ', temoinArray)
       const tache = await axios
-        .patch(api + '/archive/editpv', pv)
+        .patch(api + '/archive/editpv', {
+          libeleS: pv.libeleS,
+          numPV: pv.numPV,
+          temoin: temoinArray
+        })
         .then((res) => {
           console.log(res.data)
         })
@@ -411,12 +489,16 @@ function Archive() {
     let errors = {}
 
     console.log('data: ', data)
-    if (data.libeleS.length == 0) {
-      errors.sanction = 'sanction est vide!'
-      setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
-      return errors
-    } else {
+    if (dropSanctionValue != '' && dropSanctionValue != 'autres...') {
       setPvError((prev) => ({ ...prev, sanctionError: '' }))
+    } else {
+      if (data.libeleS.length == 0) {
+        errors.sanction = 'sanction est vide!'
+        setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
+        return errors
+      } else {
+        setPvError((prev) => ({ ...prev, sanctionError: '' }))
+      }
     }
     return errors
   }
@@ -439,12 +521,16 @@ function Archive() {
     } else {
       setTemoinsError((prev) => ({ ...prev, prenomError: '' }))
     }
-    if (data.role.length == 0) {
-      errors.role = 'role est vide!'
-      setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
-      return errors
-    } else {
+    if (dropRoleValue != '' && dropRoleValue != 'autres...') {
       setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+    } else {
+      if (data.role.length == 0) {
+        errors.role = 'role est vide!'
+        setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
+        return errors
+      } else {
+        setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+      }
     }
     return errors
   }
@@ -537,6 +623,7 @@ function Archive() {
         console.log(res.data)
         if (res.status >= 200 && res.status < 300) {
           setCurrentViewedPV({ ...res.data, numPV: selectedPVs[0].num_pv })
+          console.log('/archive/gets: temoins:', res.data.temoins)
           setPv({
             libeleS: res.data.libeleS,
             temoin: res.data.temoins,
@@ -1326,20 +1413,25 @@ function Archive() {
                     )}
                   </div>
                   <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="niveauE"
-                      id="niveauE"
-                      onClick={() => {
-                        if (!dropNiveau) {
-                          setdropNiveau(true)
-                        }
-                      }}
-                      onChange={handleInputChange}
-                      value={dropNiveauValue || currentViewedEtudiant.niveau_e}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="niveauE">
+                    <div className="flex gap-4 items-center">
+                      <input
+                        className="input_dossier"
+                        name="niveauE"
+                        id="niveauE"
+                        value={dropNiveauValue || currentViewedEtudiant.niveau_e}
+                        required
+                      ></input>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setdropNiveau((prev) => !prev)
+                        }}
+                        className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                      >
+                        {dropNiveau ? ChoiceUp : ChoiceDown}
+                      </button>
+                    </div>
+                    <label className="label_rapport_fix" htmlFor="niveauE">
                       Niveau
                     </label>
                     {errorsStep1.niveauError && (
@@ -1496,29 +1588,40 @@ function Archive() {
                     )}
                   </div>
                   <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="motifI"
-                      id="motifI"
-                      onChange={(e) => {
-                        console.log('dropMotifValue:', dropMotifValue)
-                        if (dropMotifValue == 'autres...') {
-                          handleInputChange(e)
-                          setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: e.target.value }))
-                          if (dropMotif) setDropMotif(false)
+                    <div className="flex gap-4 items-center">
+                      <input
+                        className="input_dossier"
+                        name="motifI"
+                        id="motifI"
+                        onChange={(e) => {
+                          console.log('dropMotifValue:', dropMotifValue)
+                          if (dropMotifValue == 'autres...') {
+                            handleInputChange(e)
+                            setCurrentViewedEtudiant((prev) => ({
+                              ...prev,
+                              motif_i: e.target.value
+                            }))
+                            if (dropMotif) setDropMotif(false)
+                          }
+                        }}
+                        value={
+                          dropMotifValue == 'autres...' || dropMotifValue == ''
+                            ? currentViewedEtudiant.motif_i
+                            : dropMotifValue
                         }
-                      }}
-                      onClick={() => {
-                        if (!dropMotif && dropMotifValue != 'autres...') setDropMotif(true)
-                      }}
-                      value={
-                        dropMotifValue == 'autres...' || dropMotifValue == ''
-                          ? currentViewedEtudiant.motif_i
-                          : dropMotifValue
-                      }
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="motifI">
+                        required
+                      ></input>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setDropMotif((prev) => !prev)
+                        }}
+                        className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                      >
+                        {dropMotif ? ChoiceUp : ChoiceDown}
+                      </button>
+                    </div>
+                    <label className="label_rapport_fix" htmlFor="motifI">
                       Motif
                     </label>
                     {errorsStep3.motifError && (
@@ -1652,17 +1755,35 @@ function Archive() {
             <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
             <div className="flex w-5/6 flex-col gap-6 my-4">
               <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="libeleS"
-                  id="libeleS"
-                  onChange={(e) => {
-                    setPv((prev) => ({ ...prev, libeleS: e.target.value }))
-                  }}
-                  value={pv.libeleS}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="libeleS">
+                <div className="flex items-center gap-4">
+                  <input
+                    className="input_dossier"
+                    name="libeleS"
+                    id="libeleS"
+                    onChange={(e) => {
+                      e.preventDefault()
+                      if (dropSanctionValue == 'autres...') {
+                        setPv((prev) => ({ ...prev, libeleS: e.target.value }))
+                      }
+                    }}
+                    value={
+                      dropSanctionValue == 'autres...' || dropSanctionValue == ''
+                        ? pv.libeleS
+                        : dropSanctionValue
+                    }
+                    required
+                  ></input>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setDropSanction((prev) => !prev)
+                    }}
+                    className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                  >
+                    {dropSanction ? ChoiceUp : ChoiceDown}
+                  </button>
+                </div>
+                <label className="label_rapport_fix" htmlFor="libeleS">
                   Sanction
                 </label>
                 {pvError.sanctionError && (
@@ -1671,6 +1792,7 @@ function Archive() {
                     {pvError.sanctionError}
                   </p>
                 )}
+                {dropSanction && dropSanctionItems}
               </div>
               {!isAddingTemoin && temoinArray.length < 3 && (
                 <div className="flex w-full justify-between items-center">
@@ -1688,7 +1810,9 @@ function Archive() {
                         className="input_dossier rounded-r-none"
                         name="nom"
                         id="nom"
-                        onChange={handleInputTemoinChange}
+                        onChange={(e) => {
+                          handleInputTemoinChange(e)
+                        }}
                         value={temoinBuffer.nom}
                         required
                       ></input>
@@ -1707,7 +1831,9 @@ function Archive() {
                         className="input_dossier rounded-none"
                         name="prenom"
                         id="prenom"
-                        onChange={handleInputTemoinChange}
+                        onChange={(e) => {
+                          handleInputTemoinChange(e)
+                        }}
                         value={temoinBuffer.prenom}
                         required
                       ></input>
@@ -1722,15 +1848,30 @@ function Archive() {
                       )}
                     </div>
                     <div className="container_input_rapport ">
-                      <input
-                        className="input_dossier rounded-l-none"
-                        name="role"
-                        id="role"
-                        onChange={handleInputTemoinChange}
-                        value={temoinBuffer.role}
-                        required
-                      ></input>
-                      <label className="label_rapport" htmlFor="role">
+                      <div className="flex items-center gap-4">
+                        <input
+                          className="input_dossier rounded-l-none"
+                          name="role"
+                          id="role"
+                          onChange={(e) => {
+                            if (dropRoleValue == 'autres...') {
+                              handleInputTemoinChange(e)
+                            }
+                          }}
+                          value={dropRoleValue == 'autres...' ? temoinBuffer.roleT : dropRoleValue}
+                          required
+                        ></input>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setDropRole((prev) => !prev)
+                          }}
+                          className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                        >
+                          {dropRole ? ChoiceUp : ChoiceDown}
+                        </button>
+                      </div>
+                      <label className="label_rapport_fix" htmlFor="role">
                         Role
                       </label>
                       {temoinsError.roleError && (
@@ -1739,6 +1880,7 @@ function Archive() {
                           {temoinsError.roleError}
                         </p>
                       )}
+                      {dropRole && dropRoledownItems}
                     </div>
                   </div>
                   <button
@@ -1748,6 +1890,7 @@ function Archive() {
                       const newErrors = validateFormTemoin(temoinBuffer)
                       if (Object.keys(newErrors).length === 0) {
                         setTemoinArray((prev) => [...prev, temoinBuffer])
+                        console.log('temoinBuffer: ', temoinBuffer)
                         setIsAddingTemoin(false)
                         setTemoinBuffer({ nom: '', prenom: '', role: '' })
                       }
@@ -1760,12 +1903,11 @@ function Archive() {
                   </button>
                 </div>
               )}
-              <div className="container_input_rapport">
-                <h2>les témoins</h2>
-                <div className="w-full h-[99px] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                  {Array.isArray(temoinArray) &&
-                    temoinArray.length != 0 &&
-                    temoinArray.map((t) => (
+              {Array.isArray(temoinArray) && temoinArray.length != 0 && (
+                <div className="container_input_rapport">
+                  <h2>les témoins</h2>
+                  <div className="w-full h-[99px] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-0">
+                    {temoinArray.map((t) => (
                       <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                         <div>{t.role}</div>
                         <div>{t.nom}</div>
@@ -1780,8 +1922,9 @@ function Archive() {
                         </button>
                       </div>
                     ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="flex justify-between py-4 w-5/6">
               <button

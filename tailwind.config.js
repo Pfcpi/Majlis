@@ -24,6 +24,7 @@ export default {
         'light-blue': 'rgba(15, 68, 102, 0.78)',
         '0.08-blue': 'rgba(51, 160, 231, 0.08)',
         'side-bar-white-theme-color': '#EFEFEF',
+        'side-bar-dark-theme-color': '#333333',
         'primary-white-theme-text-color': '#2A2B2D',
         'table-border-white-theme-color': '#C0C2CA'
       }
