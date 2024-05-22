@@ -1,6 +1,3 @@
-//Tasks:
-//In edit section (imprimer, enregistrer, envoyer) (do it after you complete the whole functionnality of the project)
-
 import { useState, useEffect, useMemo, useRef } from 'react'
 
 import './sidebar_com_css/archives.css'
@@ -209,6 +206,19 @@ function Archive() {
     }))
   }
 
+  function handlePreview(num) {
+    return new Promise(async () => {
+      let path = await window.electronAPI.getPath()
+      addLoadingBar()
+      const pdfToPreview = await axios
+        .post(api + '/archive/printrapport', { numR: num, path: path })
+        .then((res) => {
+          const result = window.electronAPI.getUrl()
+        })
+        .catch((err) => console.log(err))
+      RemoveLoadingBar()
+    })
+  }
   const dropNiveaudownItems = (
     <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
       {niveaux.map((n) => (
@@ -272,7 +282,7 @@ function Archive() {
                   axios
                     .post(api + '/rapport/gets', { numR: etudiant.num_r })
                     .then((res) => {
-                      setCurrentViewedEtudiant(res.data[0])
+                      setCurrentViewedEtudiant({ ...res.data[0], num_r: etudiant.num_r })
                       RemoveLoadingBar()
                     })
                     .catch((err) => {
@@ -633,11 +643,14 @@ function Archive() {
                   </div>
                 )}
                 <div className="flex justify-evenly">
-                  <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
+                  <button
+                    onClick={() => {
+                      handlePreview(currentViewedEtudiant.num_r)
+                      console.log(currentViewedEtudiant.num_r)
+                    }}
+                    className="button_active_blue "
+                  >
                     <img src={ImprimerSVG}></img>imprimer
-                  </button>
-                  <button className="py-2 px-4 border rounded-xl flex gap-3 justify-center items-center">
-                    <img src={PdfSVG}></img>enregistrer
                   </button>
                 </div>
               </div>
