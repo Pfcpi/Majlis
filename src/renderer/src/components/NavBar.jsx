@@ -8,9 +8,9 @@ function NavBar() {
   const { help, setHelp, ExitHelp } = useHelp()
 
   return (
-    <div className="h-[44px] w-full flex items-center justify-between bg-[#DADADA] dark:bg-[#333333] px-5">
+    <div className="h-[44px] w-full flex items-center justify-between bg-[#DADADA] dark:bg-side-bar-dark-theme-color px-5">
       <div></div>
-      <h2 className="w-fit text-blue bg-white h-7 flex justify-center items-center px-4 rounded-md shadow-sm">
+      <h2 className="w-fit text-blue bg-white dark:bg-side-bar-dark-theme-color h-7 flex justify-center items-center px-4 rounded-md shadow-sm">
         {[
           'Bienvenue, M./Mme. ',
           account == 'chef' ? 'Chef de département' : 'Président du conseil'

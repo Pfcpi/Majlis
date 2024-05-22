@@ -16,6 +16,14 @@ function AjouterPV() {
   const { api } = useApi()
   const { date } = useDate()
 
+  const sanctions = ['san1', 'san2', 'san3', 'autres...']
+  const roles = ['Administrateur', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
+
+  const [dropSanction, setDropSanction] = useState(false)
+  const [dropSanctionValue, setDropSanctionValue] = useState('')
+  const [dropRole, setDropRole] = useState(false)
+  const [dropRoleValue, setDropRoleValue] = useState('')
+
   const [rapports, setRapports] = useState()
   const [currentSelectedRapports, setCurrentSelectedRapports] = useState([])
   const [query, setQuery] = useState('')
@@ -72,6 +80,28 @@ function AjouterPV() {
     coverWindow.remove()
   }
 
+  const ChoiceDown = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1 1L7 7L13 1"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+  const ChoiceUp = (
+    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M13 7L7 1L1 7"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
   const filteredRapports = useMemo(() => {
     return Array.isArray(rapports)
       ? rapports.filter((rapport) => {
@@ -84,6 +114,37 @@ function AjouterPV() {
       : ''
   }, [rapports, query])
 
+  const dropSanctionItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {sanctions.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropSanction(false)
+            setDropSanctionValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropRoledownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {roles.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropRole(false)
+            setDropRoleValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
   const tableRapport = Array.isArray(filteredRapports) ? (
     filteredRapports.map((rapport) => (
       <tr
@@ -210,10 +271,7 @@ function AjouterPV() {
       setTemoinArray([])
       if (currentSelectedRapports.length > 1) {
         setPv((prev) => ({ ...prev, numR: currentSelectedRapports[1].num_r }))
-        console.log('numR has been inisialized: ', currentSelectedRapports[1].num_r)
       }
-      console.log('numR outside if: ', currentSelectedRapports[1].num_r)
-      console.log('currentSelectedRapports.length: ', currentSelectedRapports.length)
       setCurrentSelectedRapports(currentSelectedRapports.slice(1))
       if (numpv) {
         for (const m of members) {
@@ -272,7 +330,21 @@ function AjouterPV() {
     }
   }
 
-  const handleInputTemoinChange = async (e) => {
+  useEffect(() => {
+    setTemoinBuffer((prevState) => ({
+      ...prevState,
+      roleT: dropRoleValue
+    }))
+  }, [dropRoleValue])
+
+  useEffect(() => {
+    setPv((prevState) => ({
+      ...prevState,
+      libeleS: dropSanctionValue
+    }))
+  }, [dropSanctionValue])
+
+  function handleInputTemoinChange(e) {
     const { name, value } = e.target
     setTemoinBuffer((prevState) => ({
       ...prevState,
@@ -303,12 +375,16 @@ function AjouterPV() {
     let errors = {}
 
     console.log('data: ', data)
-    if (data.libeleS.length == 0) {
-      errors.sanction = 'sanction est vide!'
-      setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
-      return errors
-    } else {
+    if (dropSanctionValue != '' && dropSanctionValue != 'autres...') {
       setPvError((prev) => ({ ...prev, sanctionError: '' }))
+    } else {
+      if (data.libeleS.length == 0) {
+        errors.sanction = 'sanction est vide!'
+        setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
+        return errors
+      } else {
+        setPvError((prev) => ({ ...prev, sanctionError: '' }))
+      }
     }
     return errors
   }
@@ -331,12 +407,16 @@ function AjouterPV() {
     } else {
       setTemoinsError((prev) => ({ ...prev, prenomError: '' }))
     }
-    if (data.roleT.length == 0) {
-      errors.role = 'role est vide!'
-      setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
-      return errors
-    } else {
+    if (dropRoleValue != '' && dropRoleValue != 'autres...') {
       setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+    } else {
+      if (data.roleT.length == 0) {
+        errors.role = 'role est vide!'
+        setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
+        return errors
+      } else {
+        setTemoinsError((prev) => ({ ...prev, roleError: '' }))
+      }
     }
     return errors
   }
@@ -395,7 +475,9 @@ function AjouterPV() {
                             setMembers(members.filter((item) => item !== p))
                           }}
                         >
-                          <div className='bg-red flex justify-center items-center h-full aspect-square rounded-md text-white'>X</div>
+                          <div className="bg-red flex justify-center items-center h-full aspect-square rounded-md text-white">
+                            X
+                          </div>
                         </button>
                       )}
                     </div>
@@ -460,17 +542,31 @@ function AjouterPV() {
             <hr className="w-full text-dark-gray/50 dark:text-gray"></hr>
             <div className="flex w-5/6 flex-col gap-6 my-4">
               <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="libeleS"
-                  id="libeleS"
-                  onChange={(e) => {
-                    setPv((prev) => ({ ...prev, libeleS: e.target.value }))
-                  }}
-                  value={pv.libeleS}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="libeleS">
+                <div className="flex items-center gap-4">
+                  <input
+                    className="input_dossier"
+                    name="libeleS"
+                    id="libeleS"
+                    onChange={(e) => {
+                      e.preventDefault()
+                      if (dropSanctionValue == 'autres...') {
+                        setPv((prev) => ({ ...prev, libeleS: e.target.value }))
+                      }
+                    }}
+                    value={dropSanctionValue == 'autres...' ? pv.libeleS : dropSanctionValue}
+                    required
+                  ></input>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setDropSanction((prev) => !prev)
+                    }}
+                    className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                  >
+                    {dropSanction ? ChoiceUp : ChoiceDown}
+                  </button>
+                </div>
+                <label className="label_rapport_fix" htmlFor="libeleS">
                   Sanction
                 </label>
                 {pvError.sanctionError && (
@@ -479,6 +575,7 @@ function AjouterPV() {
                     {pvError.sanctionError}
                   </p>
                 )}
+                {dropSanction && dropSanctionItems}
               </div>
               {!isAddingTemoin && temoinArray.length < 3 && (
                 <div className="flex w-full justify-between items-center">
@@ -496,7 +593,9 @@ function AjouterPV() {
                         className="input_dossier rounded-r-none"
                         name="nomT"
                         id="nomT"
-                        onChange={handleInputTemoinChange}
+                        onChange={(e) => {
+                          handleInputTemoinChange(e)
+                        }}
                         value={temoinBuffer.nomT}
                         required
                       ></input>
@@ -515,7 +614,9 @@ function AjouterPV() {
                         className="input_dossier rounded-none"
                         name="prenomT"
                         id="prenomT"
-                        onChange={handleInputTemoinChange}
+                        onChange={(e) => {
+                          handleInputTemoinChange(e)
+                        }}
                         value={temoinBuffer.prenomT}
                         required
                       ></input>
@@ -530,15 +631,30 @@ function AjouterPV() {
                       )}
                     </div>
                     <div className="container_input_rapport ">
-                      <input
-                        className="input_dossier rounded-l-none"
-                        name="roleT"
-                        id="roleT"
-                        onChange={handleInputTemoinChange}
-                        value={temoinBuffer.roleT}
-                        required
-                      ></input>
-                      <label className="label_rapport" htmlFor="roleT">
+                      <div className="flex items-center gap-4">
+                        <input
+                          className="input_dossier rounded-l-none"
+                          name="roleT"
+                          id="roleT"
+                          onChange={(e) => {
+                            if (dropRoleValue == 'autres...') {
+                              handleInputTemoinChange(e)
+                            }
+                          }}
+                          value={dropRoleValue == 'autres...' ? temoinBuffer.roleT : dropRoleValue}
+                          required
+                        ></input>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setDropRole((prev) => !prev)
+                          }}
+                          className="bg-blue h-12 aspect-square rounded-md flex items-center justify-center"
+                        >
+                          {dropRole ? ChoiceUp : ChoiceDown}
+                        </button>
+                      </div>
+                      <label className="label_rapport_fix" htmlFor="roleT">
                         Role
                       </label>
                       {temoinsError.roleError && (
@@ -547,6 +663,7 @@ function AjouterPV() {
                           {temoinsError.roleError}
                         </p>
                       )}
+                      {dropRole && dropRoledownItems}
                     </div>
                   </div>
                   <button
@@ -568,28 +685,30 @@ function AjouterPV() {
                   </button>
                 </div>
               )}
-              <div className="container_input_rapport">
-                <h2>les témoins</h2>
-                <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
-                  {Array.isArray(temoinArray) &&
-                    temoinArray.length != 0 &&
-                    temoinArray.map((t) => (
-                      <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                        <div>{t.roleT}</div>
-                        <div>{t.nomT}</div>
-                        <div>{t.prenomT}</div>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setTemoinArray(temoinArray.filter((item) => item !== t))
-                          }}
-                        >
-                          {supprimerImage}
-                        </button>
-                      </div>
-                    ))}
+              {Array.isArray(temoinArray) && temoinArray.length != 0 && (
+                <div className="container_input_rapport">
+                  <h2>les témoins</h2>
+                  <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray">
+                    {Array.isArray(temoinArray) &&
+                      temoinArray.length != 0 &&
+                      temoinArray.map((t) => (
+                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          <div>{t.roleT}</div>
+                          <div>{t.nomT}</div>
+                          <div>{t.prenomT}</div>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setTemoinArray(temoinArray.filter((item) => item !== t))
+                            }}
+                          >
+                            {supprimerImage}
+                          </button>
+                        </div>
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="flex justify-between py-4 w-5/6">
               <button
