@@ -51,12 +51,12 @@ function App() {
     'top-[540px]'
   ]
   const guide = [
-    'View the list of untreated reports',
-    'view members of commission',
-    'add a report',
-    'To view the archive',
-    'View documentation about the reglamentation',
-    'After finishing work, you can log out'
+    'Consulter la liste des déclarations non traitées',
+    'Voir les membres de la commission',
+    `${account == 'chef' ? 'Ajouter un rapport' : 'Ajouter un Procès-Verbal'}`,
+    "Voir l'archive des rapports, pvs, commissions et conseils",
+    'Voir la reglementation ',
+    'Une fois le travail terminé, vous pouvez vous déconnecter'
   ]
   const buttonRef = useRef(null)
 

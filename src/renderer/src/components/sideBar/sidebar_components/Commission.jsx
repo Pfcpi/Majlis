@@ -55,7 +55,6 @@ function Archive() {
 
   const commissionPage = useRef(null)
 
-
   const [currentAddedMember, setCurrentAddedMember] = useState({
     roleM: '',
     nomM: '',
@@ -73,6 +72,7 @@ function Archive() {
       .get(api + '/commission/get')
       .then((res) => {
         setMembres(res.data)
+        console.log(res.data)
       })
       .catch((err) => console.log(err))
     RemoveLoadingBar()
@@ -806,16 +806,18 @@ function Archive() {
           {account == 'president' && (
             <button
               onClick={async () => {
-                setIsSendingMail(true)
-                addLoadingBar()
-                const tache = await axios
-                  .get(api + '/rapport/get')
-                  .then((res) => {
-                    console.log(res)
-                    setRapports(res.data)
-                  })
-                  .catch((err) => console.log(err))
-                RemoveLoadingBar()
+                if (currentSelectedMembres.length >= 1) {
+                  setIsSendingMail(true)
+                  addLoadingBar()
+                  const tache = await axios
+                    .get(api + '/rapport/get')
+                    .then((res) => {
+                      console.log(res)
+                      setRapports(res.data)
+                    })
+                    .catch((err) => console.log(err))
+                  RemoveLoadingBar()
+                }
               }}
               className={
                 currentSelectedMembres.length != 0

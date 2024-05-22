@@ -6,18 +6,21 @@ import WarningSVG from './../../../assets/warning.svg'
 import successmarkSVG from './../../../assets/success_mark.svg'
 import addPlusSVg from './../../../assets/add_plus.svg'
 
+import useDate from '../../../zustand/currentDate'
+
 import './sidebar_com_css/archives.css'
 
 import useApi from '../../../zustand/api'
 
 function AjouterPV() {
   const { api } = useApi()
+  const { date } = useDate()
 
   const [rapports, setRapports] = useState()
   const [currentSelectedRapports, setCurrentSelectedRapports] = useState([])
   const [query, setQuery] = useState('')
   const [supprimer, setSupprimer] = useState(false)
-  const [pv, setPv] = useState({ numCD: '', libeleS: '', temoin: '', numR: '' })
+  const [pv, setPv] = useState({ numCD: '', libeleS: '', temoin: '', numR: '', numC: '' })
   const [cd, setCd] = useState({ dateCd: '', id: '' })
   const [members, setMembers] = useState([])
   const [creerConseilState, setCreerConseildState] = useState(false)
@@ -171,6 +174,7 @@ function AjouterPV() {
           numR: pv.numR,
           libeleS: pv.libeleS,
           numCD: pv.numCD,
+          numC: pv.numC,
           temoin: temoinArray
         })
         .then((res) => {
@@ -329,13 +333,15 @@ function AjouterPV() {
                       })
                       .then((res) => {
                         setMembers(res.data)
-                        console.log(res.data)
+                        setPv((prev) => ({ ...prev, numC: res.data[0].num_c }))
+                        console.log('members: ', res.data)
                       })
                       .catch((err) => console.log(err))
                     RemoveLoadingBar()
                   }}
                   value={cd.dateCd}
                   type="date"
+                  max={date}
                   required
                 ></input>
                 {error.dateCdError && (
@@ -609,7 +615,9 @@ function AjouterPV() {
                     : 'flex border py-2 px-4 rounded-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
                 }
                 onClick={() => {
-                  setCreerConseildState(true)
+                  if (currentSelectedRapports.length > 0) {
+                    setCreerConseildState(true)
+                  }
                 }}
               >
                 Créer un conseil
@@ -621,7 +629,9 @@ function AjouterPV() {
                     : 'flex border py-2 px-4 rounded-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
                 }
                 onClick={() => {
-                  handlePreview(currentSelectedRapports[0].num_r)
+                  if (currentSelectedRapports.length == 1) {
+                    handlePreview(currentSelectedRapports[0].num_r)
+                  }
                 }}
               >
                 {enregistrerImage}
@@ -634,7 +644,9 @@ function AjouterPV() {
                     : 'flex border py-2 px-4 rounded-xl gap-2 text-dark-gray/25 dark:text-white/25 duration-100 cursor-not-allowed'
                 }
                 onClick={() => {
-                  setSupprimer(true)
+                  if (currentSelectedRapports.length == 1) {
+                    setSupprimer(true)
+                  }
                 }}
               >
                 {supprimerImage}

@@ -3,10 +3,12 @@ import WarningSVG from './../../../assets/warning.svg'
 import './sidebar_com_css/accueil.css'
 import './sidebar_com_css/ajouterRapport.css'
 import axios from 'axios'
+import useDate from '../../../zustand/currentDate'
 
 import useApi from '../../../zustand/api'
 
 function AjouterRapport() {
+  const { date } = useDate()
   const niveaux = [
     'ING1',
     'ING2',
@@ -393,14 +395,14 @@ function AjouterRapport() {
             <button
               onClick={async () => {
                 addLoadingBar()
-                const tache = await axios
-                  .post(api + '/rapport/add', rapport)
-                  .then((res) => console.log(res))
-                  .catch((err) => console.log(err))
                 setStep(1)
                 setdropNiveauValue('')
                 setDropMotifValue('')
                 setRapport({})
+                const tache = await axios
+                  .post(api + '/rapport/add', rapport)
+                  .then((res) => console.log(res))
+                  .catch((err) => console.log(err))
                 RemoveLoadingBar()
               }}
               className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
@@ -614,6 +616,7 @@ function AjouterRapport() {
                   name="dateI"
                   id="dateI"
                   type="date"
+                  max={date}
                   onChange={handleInputChange}
                   value={rapport.dateI}
                   required
