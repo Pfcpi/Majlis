@@ -973,16 +973,16 @@ LEFT JOIN
   Infraction i ON r.num_i = i.num_i
 LEFT JOIN
   (SELECT
-      te.num_cd,
-      GROUP_CONCAT(t.nom_t) AS nom_tt,
-      GROUP_CONCAT(t.prenom_t) AS prenom_tt,
-      GROUP_CONCAT(t.role_t) AS role_tt
+      te.num_pv,
+      GROUP_CONCAT(DISTINCT t.nom_t) AS nom_tt,
+      GROUP_CONCAT(DISTINCT t.prenom_t) AS prenom_tt,
+      GROUP_CONCAT(DISTINCT t.role_t) AS role_tt
   FROM
       Temoigne te
   LEFT JOIN
       Temoin t ON te.num_t = t.num_t
-  GROUP BY
-      te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
+      WHERE num_pv = ?)
+ AS temoins ON pv.num_pv = temoins.num_pv
 LEFT JOIN
   Commission_Presente cp ON pv.num_cd = cp.num_cd
 LEFT JOIN
@@ -1008,7 +1008,7 @@ GROUP BY
   pv.date_pv,
   s.libele_s`
 
-  db.query(sqlquery, req.body.numPV, async (err, result) => {
+  db.query(sqlquery, [req.body.numPV, req.body.numPV], async (err, result) => {
     if (err && err.errno != 1065) {
       res.status(400).send(err)
     }
