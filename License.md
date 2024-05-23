@@ -31,7 +31,7 @@ La presente licence entre en vigueur a la date d'acceptation et reste en vigueur
 
 7. Droits reserves :
 
-Tous droits reserves. Universite USTO-MB.
+Tous droits reserves. Copyright 2024 USTO-MB.
 
 8. Acceptation de la licence :
 
