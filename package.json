@@ -1,6 +1,6 @@
 {
-  "name": "majlis",
-  "version": "1.0.0",
+  "name": "Majlis",
+  "version": "1.0.1",
   "description": "Application de gestion des étudiants traduits en conseil de discipline du département d'informatique.",
   "main": "./out/main/index.js",
   "author": "Badache Radi, Abdelmoumene Mouhcine, Aboura Yacine, Salah Oussam, Madjour Amir, Bennabi Mohammed",
