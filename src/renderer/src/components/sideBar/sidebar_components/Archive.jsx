@@ -696,7 +696,7 @@ function Archive() {
           <span>{m.num_r}</span>
         </td>
         <td>{[m.nom_e, ' ', m.prenom_e]}</td>
-        <td>{m.date_i.slice(0, m.date_i.indexOf('T'))}</td>
+        <td>{m.date_i ? m.date_i.slice(0, m.date_i.indexOf('T')) : ''}</td>
         <td>
           <div className="w-full flex justify-evenly">
             <button
@@ -752,8 +752,8 @@ function Archive() {
           <span>{m.num_pv}</span>
         </td>
         <td>{[m.nom_e, ' ', m.prenom_e]}</td>
-        <td>{m.date_i.slice(0, m.date_i.indexOf('T'))}</td>
-        <td>{m.date_pv.slice(0, m.date_i.indexOf('T'))}</td>
+        <td>{m.date_i ? m.date_i.slice(0, m.date_i.indexOf('T')) : ''}</td>
+        <td>{m.date_pv ? m.date_pv.slice(0, m.date_i.indexOf('T')) : ''}</td>
         <td>{m.libele_s}</td>
       </tr>
     ))
@@ -764,7 +764,9 @@ function Archive() {
   const filteredMembers = useMemo(() => {
     return Array.isArray(commissions)
       ? commissions.filter((m) => {
-          return m.date_fin_c.slice(0, 10).includes(queryCom)
+          if (m.date_fin_c) {
+            return m.date_fin_c.slice(0, 10).includes(queryCom)
+          }
         })
       : ''
   }, [commissions, queryCom])
@@ -788,8 +790,8 @@ function Archive() {
         <td>
           <span>{m.num_c}</span>
         </td>
-        <td>{m.date_debut_c.slice(0, m.date_debut_c.indexOf('T'))}</td>
-        <td>{m.date_fin_c.slice(0, m.date_fin_c.indexOf('T'))}</td>
+        <td>{m.date_debut_c ? m.date_debut_c.slice(0, m.date_debut_c.indexOf('T')) : ''}</td>
+        <td>{m.date_fin_c ? m.date_fin_c.slice(0, m.date_fin_c.indexOf('T')) : ''}</td>
       </tr>
     ))
   ) : (
@@ -798,7 +800,9 @@ function Archive() {
   const filteredCons = useMemo(() => {
     return Array.isArray(conseils)
       ? conseils.filter((c) => {
-          return c.date_cd.slice(0, 10).includes(queryCon)
+          if (c.date_cd) {
+            return c.date_cd.slice(0, 10).includes(queryCon)
+          }
         })
       : ''
   }, [conseils, queryCon])
@@ -822,7 +826,7 @@ function Archive() {
         <td>
           <span>{m.num_cd}</span>
         </td>
-        <td>{m.date_cd.slice(0, m.date_cd.indexOf('T'))}</td>
+        <td>{m.date_cd ? m.date_cd.slice(0, m.date_cd.indexOf('T')) : ''}</td>
       </tr>
     ))
   ) : (
