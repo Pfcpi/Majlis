@@ -24,7 +24,7 @@ router.get('/get', (req, res) => {
   WHERE m.est_actif = TRUE AND c.actif_c = TRUE`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status(400).send(err)
     } else {
       res.send(result)
     }
@@ -55,7 +55,7 @@ router.post('/add', (req, res) => {
       [values[3], values[0], values[1]],
       (err, result) => {
         if (err) {
-          res.send('Error while changing président')
+          res.status(400).send('Error while changing président')
         }
       }
     )
@@ -95,7 +95,7 @@ router.patch('/edit', (req, res) => {
       [values[3], values[1], values[2]],
       (err, result) => {
         if (err) {
-          res.send('Error while changing président')
+          res.status(400).send('Error while changing président')
         }
       }
     )

@@ -300,6 +300,7 @@ function Archive() {
             <div className="flex justify-evenly *:shrink-0">
               <button
                 className=""
+                title="Afficher le rapport"
                 onClick={() => {
                   if (!cliped) setCliped()
                   setView(true)
@@ -321,6 +322,7 @@ function Archive() {
               </button>
               {account == 'chef' && (
                 <button
+                  title="Modifier le rapport"
                   onClick={() => {
                     setModify(true)
                     setCurrentViewedEtudiant({})
@@ -365,6 +367,7 @@ function Archive() {
               )}
               {account == 'chef' && (
                 <button
+                  title="Supprimer le rapport"
                   onClick={() => {
                     setSupprimer(true)
                     setCurrentDeletedStudent(etudiant.num_r)

@@ -149,7 +149,7 @@ router.get('/cmail', (req, res) => {
   let sqlquery = `SELECT * FROM Utilisateur WHERE id_u = 1`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status(400).send(err)
     } else {
       const newPass = generatePassword()
       console.log('newPass:', newPass, ', result:', result)
@@ -276,7 +276,7 @@ router.get('/pmail', (req, res) => {
   WHERE c.actif_c = TRUE AND m.role_m = "Président"`
   db.query(sqlquery, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status.send(err)
     } else {
       const newPass = generatePassword()
       console.log('newPass:', newPass, ', result:', result)
@@ -409,7 +409,7 @@ router.patch('/chefupdate', (req, res) => {
   let sqlquery = `UPDATE Utilisateur SET email_u = ? , nomU = ? , prenomU = ? WHERE id_u = 1`
   db.query(sqlquery, values, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status.send(err)
     } else {
       res.sendStatus(204)
     }

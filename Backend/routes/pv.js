@@ -21,14 +21,14 @@ router.post('/getActiveCommissionAndMembersByData', (req, res) => {
   let sqlquery = `SELECT c.num_c FROM Commission c WHERE c.date_debut_c <= ? AND c.date_fin_c >= ?;`
   db.query(sqlquery, [date, date], (err, result) => {
     if (err) {
-      res.send(err)
+      res.status(400).send(err)
     } else {
       let members = `SELECT * FROM Membre m WHERE m.num_c = ?;`
       db.query(members, result[0].num_c, (err, result) => {
         if (err) {
-          res.send(err)
+          res.status(400).send(err)
         } else {
-          res.send(result)
+          res.status.send(result)
         }
       })
     }
@@ -54,7 +54,7 @@ router.post('/addCD', (req, res) => {
   let sqlqueryCd = `INSERT INTO Conseil_Discipline (date_cd) VALUES (?)`
   db.query(sqlqueryCd, dateCd, (err, result) => {
     if (err) {
-      res.send(err)
+      res.status(400).send(err)
       return
     } else {
       // Add multiple members to comission

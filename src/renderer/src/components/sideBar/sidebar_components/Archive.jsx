@@ -700,6 +700,7 @@ function Archive() {
         <td>
           <div className="w-full flex justify-evenly">
             <button
+              title="Afficher le rapport"
               onClick={() => {
                 handleDetailedViewRapport(m.num_r)
               }}
@@ -707,7 +708,7 @@ function Archive() {
               <img src={VoirDossierSVG} alt=""></img>
             </button>
             {account == 'chef' && (
-              <button onClick={() => handleModifyRapport(m.num_r)}>
+              <button title="Modifier le rapport" onClick={() => handleModifyRapport(m.num_r)}>
                 <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
               </button>
             )}
@@ -2143,12 +2144,12 @@ function Archive() {
               <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
             </button>
             <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
-              <h2 className="text-4xl">Details du Commssion</h2>
+              <h2 className="text-4xl">Détails de la commission</h2>
               <div className="flex flex-col gap-4">
-                <h3 className="text-blue text-2xl">Informations de Commission</h3>
+                <h3 className="text-blue text-2xl">Informations de la commission</h3>
                 <div className="flex flex-col gap-3">
                   <p>
-                    Date de Debut:{' '}
+                    Date de début:{' '}
                     {selectedMem[0].date_debut_c ? selectedMem[0].date_debut_c.slice(0, 10) : ''}
                   </p>
                   <p>

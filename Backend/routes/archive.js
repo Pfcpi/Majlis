@@ -915,7 +915,7 @@ WHERE r.num_r = ?`
         const pdfBuffer = await generatePDFrapport(data, req.body.path)
         res.send(pdfBuffer)
       } catch (err) {
-        res.send(err)
+        res.status(400).send(err)
       }
     }
   })
@@ -1023,8 +1023,9 @@ router.get('/getcd', (req, res) => {
   db.query(sqlquery, (err, result) => {
     if (err) {
       res.status(400).send(err)
+    } else {
+      res.send(result)
     }
-    res.send(result)
   })
 })
 
@@ -1061,16 +1062,17 @@ router.post('/getscd', (req, res) => {
   db.query(sqlquery, numcd, (err, result) => {
     if (err) {
       res.status(400).send(err)
+    } else {
+      const data = {
+        numCD: result[0].num_cd,
+        dateCD: result[0].date_cd,
+        numRapport: numRapport(result[0].num_rapport),
+        dateRapport: result[0].date_rapport,
+        etudiants: formatNames(result[0].etudiants),
+        membres: formatNames(result[0].membres)
+      }
+      res.send(data)
     }
-    const data = {
-      numCD: result[0].num_cd,
-      dateCD: result[0].date_cd,
-      numRapport: numRapport(result[0].num_rapport),
-      dateRapport: result[0].date_rapport,
-      etudiants: formatNames(result[0].etudiants),
-      membres: formatNames(result[0].membres)
-    }
-    res.send(data)
   })
 })
 
