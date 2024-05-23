@@ -28,7 +28,7 @@ router.post('/getActiveCommissionAndMembersByData', (req, res) => {
         if (err) {
           res.status(400).send(err)
         } else {
-          res.status.send(result)
+          res.send(result)
         }
       })
     }

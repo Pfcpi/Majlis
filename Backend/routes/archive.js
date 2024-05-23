@@ -1020,12 +1020,33 @@ WHERE
 
 //Get all conseils
 router.get('/getcd', (req, res) => {
-  const sqlquery = `SELECT * FROM Conseil_Discipline ORDER BY date_cd DESC`
-  db.query(sqlquery, (err, result) => {
+  const deleteUnrefrenced = `DELETE FROM Commission_Presente
+WHERE num_cd NOT IN(SELECT num_cd FROM PV)
+
+`
+  db.query(deleteUnrefrenced, (err, result) => {
     if (err) {
       res.status(400).send(err)
     } else {
-      res.send(result)
+      console.log(result)
+      const deleteUnrefrenced2 = `
+            DELETE FROM Conseil_Discipline
+            WHERE num_cd NOT IN(SELECT num_cd FROM PV)`
+      db.query(deleteUnrefrenced2, (err, result) => {
+        if (err) {
+          res.status(400).send(err)
+        } else {
+          console.log(result)
+          const sqlquery = `SELECT * FROM Conseil_Discipline ORDER BY date_cd DESC`
+          db.query(sqlquery, (err, result) => {
+            if (err) {
+              res.status(400).send(err)
+            } else {
+              res.send(result)
+            }
+          })
+        }
+      })
     }
   })
 })

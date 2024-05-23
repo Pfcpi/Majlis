@@ -234,7 +234,7 @@ async function generatePDFpvForEmail(data) {
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
-  const pdfBuffer = page.pdf({ path: './out/s.pdf', format: 'A4', margin: {top: "0.5cm"} })
+  const pdfBuffer = page.pdf({ path: './out/s.pdf', format: 'A4', margin: {top: "0.5cm"}, timeout: 60000 })
   return pdfBuffer
 }
 
@@ -482,7 +482,7 @@ async function generatePDFpv(data, pathReq) {
   await page.goto(tempHtmlPath)
 
   // Generate PDF
-  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm",} })
+  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm",}, timeout: 60000 })
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
@@ -679,7 +679,7 @@ async function generatePDFrapport(data, pathReq) {
   await page.goto(tempHtmlPath)
 
   // Generate PDF
-  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm", bottom: "0.5cm"} })
+  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm", bottom: "0.5cm"}, timeout: 60000 })
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
@@ -992,7 +992,7 @@ await page.evaluate((minHeight) => {
 }, minHeight)
 
   // Generate PDF
-  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm", bottom: "0.5cm"} })
+  const pdfBuffer = await page.pdf({ format: 'A4', margin: {top: "0.5cm", bottom: "0.5cm"}, timeout: 60000 })
 
   // Define file path
   const pdfFilePath = path.join(app.getPath('userData'), 'sortie.pdf')
