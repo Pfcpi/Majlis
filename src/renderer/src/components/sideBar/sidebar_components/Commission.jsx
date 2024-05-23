@@ -435,7 +435,7 @@ function Archive() {
       setErrors((prev) => ({ ...prev, emailError: '' }))
     }
     if (data.roleM.length == 0) {
-      errors.role = 'Role est vide!'
+      errors.role = 'Rôle est vide!'
       setErrors((prev) => ({ ...prev, roleError: errors.role }))
       return errors
     } else {
@@ -613,7 +613,7 @@ function Archive() {
                     required
                   ></input>
                   <label className="label_rapport" htmlFor="prenomM">
-                    Prenom
+                    Prénom
                   </label>
                   {errors.prenomError && (
                     <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -662,7 +662,7 @@ function Archive() {
                   </button>
                 </div>
                 <label className="label_rapport_fix" htmlFor="roleM">
-                  Role
+                  Rôle
                 </label>
                 {errors.roleError && (
                   <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">

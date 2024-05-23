@@ -243,7 +243,7 @@ function SideBar() {
               className="link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped"
             >
               <img src={dark ? LogOutWhiteSVG : LogOutSVG}></img>
-              {!cliped && <p>Se deconnecter</p>}
+              {!cliped && <p>Se déconnecter</p>}
             </button>
           </div>
         </div>

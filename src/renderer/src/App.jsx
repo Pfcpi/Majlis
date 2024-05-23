@@ -52,10 +52,10 @@ function App() {
   ]
   const guide = [
     'Consulter la liste des déclarations non traitées',
-    'Voir les membres de la commission',
+    'la commission et ses membres',
     `${account == 'chef' ? 'Ajouter un rapport' : 'Ajouter un Procès-Verbal'}`,
     "Voir l'archive des rapports, pvs, commissions et conseils",
-    'Voir la reglementation ',
+    'Voir le réglement intérieur',
     'Une fois le travail terminé, vous pouvez vous déconnecter'
   ]
   const buttonRef = useRef(null)
@@ -408,7 +408,7 @@ function App() {
                 </h1>
                 <p className="h-8 text-center">
                   {isUpdatingInfo
-                    ? 'Saisir les informations (chef)'
+                    ? 'Saisir les nouvelles informations du chef de département'
                     : 'Veulliez choisir une session'}
                 </p>
               </div>

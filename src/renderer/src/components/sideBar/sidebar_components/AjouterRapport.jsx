@@ -626,7 +626,7 @@ function AjouterRapport() {
                   required
                 ></input>
                 <label className="label_rapport" htmlFor="prenomP">
-                  Prenom
+                  Prénom
                 </label>
                 {errorsStep2.prenomError && (
                   <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -789,7 +789,7 @@ function AjouterRapport() {
             }}
             type="reset"
           >
-            {step > 1 ? 'Retourner' : 'Annuler'}
+            {step > 1 ? 'Précédent' : 'Annuler'}
           </button>
           <button
             ref={buttonRef}
@@ -836,7 +836,7 @@ function AjouterRapport() {
               }, 2000)
             }}
           >
-            {step > 2 ? 'terminer' : 'continuer'}
+            {step > 2 ? 'Ajouter' : 'Suivant'}
           </button>
         </div>
       </form>

@@ -596,7 +596,7 @@ function Archive() {
         <div className="flex w-full h-full font-poppins flex-row-reverse justify-evenly">
           {!view && (
             <div className="flex flex-col w-1/5 min-w-[130px] mt-[4vh]">
-              <h2 className="text-[1.5vw] text-center py-4">Commission Active</h2>
+              <h2 className="text-[1.4vw] text-center font-bold py-4">Commission active</h2>
               <div className="w-full h-[80vh] bg-side-bar-white-theme-color dark:bg-dark-gray snap-y snap-mandatory overflow-x-auto overflow-y-scroll scroll-pt-1 flex flex-col gap-1 rounded-lg">
                 {ListCom}
               </div>
@@ -614,7 +614,7 @@ function Archive() {
                 <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
               </button>
               <div className="overflow-y-auto max-h-[85vh] flex flex-col w-full px-6 gap-4">
-                <h2 className="text-4xl">Details du Dossier </h2>
+                <h2 className="text-4xl">Détails du Dossier </h2>
                 <div className="flex flex-col gap-4">
                   <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
                   <div className="flex flex-col gap-3">
@@ -623,10 +623,11 @@ function Archive() {
                     )}
                     {currentViewedEtudiant.nom_e && currentViewedEtudiant.prenom_e && (
                       <p>
-                        Nom: {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}
+                        Nom et prénom:{' '}
+                        {[currentViewedEtudiant.nom_e, ' ', currentViewedEtudiant.prenom_e]}
                       </p>
                     )}
-                    {currentViewedEtudiant.email_e && <p>email: {currentViewedEtudiant.email_e}</p>}
+                    {currentViewedEtudiant.email_e && <p>Email: {currentViewedEtudiant.email_e}</p>}
                     {currentViewedEtudiant.niveau_e && (
                       <p>Niveau: {currentViewedEtudiant.niveau_e}</p>
                     )}
@@ -643,7 +644,8 @@ function Archive() {
                   <div className="flex flex-col gap-3">
                     {currentViewedEtudiant.nom_p && currentViewedEtudiant.prenom_p && (
                       <p>
-                        Nom: {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}
+                        Nom et prénom:{' '}
+                        {[currentViewedEtudiant.nom_p, ' ', currentViewedEtudiant.prenom_p]}
                       </p>
                     )}
                   </div>
@@ -681,7 +683,7 @@ function Archive() {
                     }}
                     className="button_active_blue "
                   >
-                    <img src={ImprimerSVG}></img>imprimer
+                    <img src={ImprimerSVG}></img>PDF
                   </button>
                 </div>
               </div>
@@ -695,13 +697,13 @@ function Archive() {
                   {[
                     etudiants.length,
                     etudiants.length == 1
-                      ? ' Nouveau rapport ajouté...'
-                      : ' Nouveax rapports ajoutés...'
+                      ? ' nouveau rapport ajouté...'
+                      : ' nouveax rapports ajoutés...'
                   ]}
                 </p>
               </div>
             )}
-            <h1 className="text-3xl py-4 font-semibold">Rapport à traiter</h1>
+            <h1 className="text-3xl py-4 font-semibold">Rapports à traiter</h1>
             <div className="flex px-12 justify-end h-16 w-full items-center rounded-tl-lg rounded-tr-lg border-t border-x border-table-border-white-theme-color dark:border-white/20 bg-side-bar-white-theme-color dark:bg-dark-gray">
               <div className="searchDiv">
                 <img className="imgp" src={BlueSearchSVG} alt="search icon"></img>
@@ -720,10 +722,10 @@ function Archive() {
                 <table className="w-full">
                   <tr className="border-t">
                     <th className="w-1/4 border-x">
-                      <div>Rapport</div>
+                      <div>N° Rapport</div>
                     </th>
                     <th className="w-1/4 border-x">
-                      <div>Nom Etudiant</div>
+                      <div>Étudiant</div>
                     </th>
                     <th className="w-1/4 border-x">
                       <div>Date de l'infraction</div>
@@ -1183,7 +1185,7 @@ function Archive() {
                   }, 2000)
                 }}
               >
-                {step >= 2 ? 'retourner' : 'annuler'}
+                {step >= 2 ? 'Précédent' : 'Annuler'}
               </button>
               <button
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
@@ -1228,7 +1230,7 @@ function Archive() {
                   }, 2000)
                 }}
               >
-                {step > 2 ? 'modifier' : 'continuer'}
+                {step > 2 ? 'Modifier' : 'Suivant'}
               </button>
             </div>
           </form>

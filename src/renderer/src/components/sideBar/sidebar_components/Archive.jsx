@@ -26,7 +26,15 @@ import axios from 'axios'
 function Archive() {
   const { date } = useDate()
   const win = ['rapport', 'pv', 'conseil', 'commission']
-  const sanctions = ['san1', 'san2', 'san3', 'autres...']
+  const sanctions = [
+    'Aucune sanction',
+    'Avertissement verbal',
+    'Avertissement écrit',
+    'Blâme',
+    'Exclusion pour un semestre ou une année',
+    'Exclusion pour deux ans',
+    'Exclusion définitive'
+  ]
   const roles = ['Administrateur', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
 
   const [dropSanction, setDropSanction] = useState(false)
@@ -454,7 +462,11 @@ function Archive() {
       addLoadingBar()
       console.log('temoinArray: ', temoinArray)
       const tache = await axios
-        .patch(api + '/archive/editpv', { libeleS: pv.libeleS, numPV: pv.numPV, temoin: temoinArray })
+        .patch(api + '/archive/editpv', {
+          libeleS: pv.libeleS,
+          numPV: pv.numPV,
+          temoin: temoinArray
+        })
         .then((res) => {
           console.log(res.data)
         })
@@ -1004,7 +1016,7 @@ function Archive() {
               className="w-1/2 text-2xl py-4 rounded-xl data-[rapportDossier=true]:text-blue data-[rapportdossier=true]:bg-0.08-blue data-[rapportdossier=true]:border data-[rapportdossier=true]:border-blue"
               onClick={() => setCurrentWindow(win[3])}
             >
-              Conseil de Discipline
+              Conseil de discipline
             </button>
           </div>
           {currentWindow == win[0] && (
@@ -1099,7 +1111,7 @@ function Archive() {
                       }
                     }}
                   >
-                    {voirDossierImage}Par email
+                    {voirDossierImage}Envoyer
                   </div>
                 </button>
               </div>
@@ -1139,7 +1151,7 @@ function Archive() {
                   value={queryCom}
                   onChange={(e) => setQueryCom(e.target.value)}
                   type="search"
-                  placeholder="date fin"
+                  placeholder="Date fin"
                 ></input>
               </div>
             </div>
@@ -1194,10 +1206,10 @@ function Archive() {
                   {currentWindow == win[0] && (
                     <>
                       <th className="w-1/4">
-                        <div>Rapport</div>
+                        <div>N° Rapport</div>
                       </th>
                       <th className="w-1/4 ">
-                        <div>Nom Etudiant</div>
+                        <div>Étudiant</div>
                       </th>
                       <th className="w-1/4">
                         <div>Date de l'infraction</div>
@@ -1210,26 +1222,26 @@ function Archive() {
                   {currentWindow == win[1] && (
                     <>
                       <th className="w-1/5 ">
-                        <div>PV</div>
+                        <div>N° PV</div>
                       </th>
                       <th className="w-1/5">
-                        <div>Nom Etudiant</div>
+                        <div>Étudiant</div>
                       </th>
                       <th className="w-1/5 ">
                         <div>Date de l'infraction</div>
                       </th>
                       <th className="w-1/5">
-                        <div>Date de PV</div>
+                        <div>Date du PV</div>
                       </th>
                       <th className="w-1/5">
-                        <div>Sanction </div>
+                        <div>Décision</div>
                       </th>
                     </>
                   )}
                   {currentWindow == win[2] && (
                     <>
                       <th className="w-1/5">
-                        <div>Membre</div>
+                        <div>N° Membre</div>
                       </th>
                       <th className="w-1/5 ">
                         <div>Date de debut</div>
@@ -1242,7 +1254,7 @@ function Archive() {
                   {currentWindow == win[3] && (
                     <>
                       <th className="w-1/5">
-                        <div>Conseil Discipline</div>
+                        <div>N° Conseil</div>
                       </th>
                       <th className="w-1/5 ">
                         <div>Date</div>
@@ -1695,7 +1707,7 @@ function Archive() {
                   }, 2000)
                 }}
               >
-                {step >= 2 ? 'retourner' : 'annuler'}
+                {step >= 2 ? 'Précédent' : 'annuler'}
               </button>
               <button
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
@@ -1740,7 +1752,7 @@ function Archive() {
                   }, 2000)
                 }}
               >
-                {step > 2 ? 'modifier' : 'continuer'}
+                {step > 2 ? 'Modifier' : 'Suivant'}
               </button>
             </div>
           </form>
@@ -1794,7 +1806,7 @@ function Archive() {
               </div>
               {!isAddingTemoin && temoinArray.length < 3 && (
                 <div className="flex w-full justify-between items-center">
-                  <div>Ajouter un temoin</div>
+                  <div>Ajouter un témoin</div>
                   <button className="bg-blue rounded-md" onClick={() => setIsAddingTemoin(true)}>
                     <img className="h-6 aspect-square" src={addPlusSVg}></img>
                   </button>
@@ -1903,7 +1915,7 @@ function Archive() {
               )}
               {Array.isArray(temoinArray) && temoinArray.length != 0 && (
                 <div className="container_input_rapport">
-                  <h2>les témoins</h2>
+                  <h2>Témoins</h2>
                   <div className="w-full h-[99px] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-0">
                     {temoinArray.map((t) => (
                       <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
@@ -1936,7 +1948,7 @@ function Archive() {
                 type="submit"
                 onClick={handleAjouterModifyPV}
               >
-                Ajouter
+                Modifier
               </button>
             </div>
           </form>
@@ -1954,12 +1966,15 @@ function Archive() {
               <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
             </button>
             <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
-              <h2 className="text-4xl">Details du Dossier </h2>
+              <h2 className="text-4xl">Détails du Dossier </h2>
               <div className="flex flex-col gap-4">
-                <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
+                <h3 className="text-blue text-2xl">Informations de l'étudiant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>matricule: {currentViewedRapport.matricule_e}</p>
-                  <p>Nom: {[currentViewedRapport.nom_e, ' ', currentViewedRapport.prenom_e]}</p>
+                  <p>Matricule: {currentViewedRapport.matricule_e}</p>
+                  <p>
+                    Nom et prénom:{' '}
+                    {[currentViewedRapport.nom_e, ' ', currentViewedRapport.prenom_e]}
+                  </p>
                   <p>Email: {currentViewedRapport.email_e}</p>
                   <p>Niveau: {currentViewedRapport.niveau_e}</p>
                   <p>Section: {currentViewedRapport.section_e}</p>
@@ -1969,7 +1984,10 @@ function Archive() {
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Nom: {[currentViewedRapport.nom_p, ' ', currentViewedRapport.prenom_p]}</p>
+                  <p>
+                    Nom et prénom:{' '}
+                    {[currentViewedRapport.nom_p, ' ', currentViewedRapport.prenom_p]}
+                  </p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
@@ -1977,7 +1995,7 @@ function Archive() {
                 <div className="flex flex-col gap-3">
                   {currentViewedRapport.date_i && (
                     <p>
-                      Date de l’infraction:
+                      Date de l’infraction:{' '}
                       {currentViewedRapport.date_i.slice(
                         0,
                         currentViewedRapport.date_i.indexOf('T')
@@ -1986,7 +2004,7 @@ function Archive() {
                   )}
                   {currentViewedRapport.date_r && (
                     <p>
-                      Date de Rapport:
+                      Date de Rapport:{' '}
                       {currentViewedRapport.date_r.slice(
                         0,
                         currentViewedRapport.date_r.indexOf('T')
@@ -1995,7 +2013,7 @@ function Archive() {
                   )}
                   <p>Lieu: {currentViewedRapport.lieu_i}</p>
                   <p>Motif: {currentViewedRapport.motif_i}</p>
-                  <p>Degre: {currentViewedRapport.degre_i}</p>
+                  <p>Degré: {currentViewedRapport.degre_i}</p>
                   {currentViewedRapport.description_i && (
                     <p>Description: {currentViewedRapport.description_i}</p>
                   )}
@@ -2014,7 +2032,7 @@ function Archive() {
               PDF
             </button>
             <button className="modify_rapport_button">
-              <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>envoyer
+              <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>Envoyer
             </button>
           </div>
         </div>
@@ -2032,12 +2050,12 @@ function Archive() {
               <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
             </button>
             <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
-              <h2 className="text-4xl">Details du PV</h2>
+              <h2 className="text-4xl">Détails du PV</h2>
               <div className="flex flex-col gap-4">
-                <h3 className="text-blue text-2xl">Informations de l'étudiant:</h3>
+                <h3 className="text-blue text-2xl">Informations de l'étudiant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>matricule: {currentViewedPV.matriculeE}</p>
-                  <p>Nom: {[currentViewedPV.nomE, ' ', currentViewedPV.prenomE]}</p>
+                  <p>Matricule: {currentViewedPV.matriculeE}</p>
+                  <p>Nom et prénom: {[currentViewedPV.nomE, ' ', currentViewedPV.prenomE]}</p>
                   <p>Niveau: {currentViewedPV.niveauE}</p>
                   <p>Section: {currentViewedPV.sectionE}</p>
                   <p>Groupe: {currentViewedPV.groupeE}</p>
@@ -2046,7 +2064,7 @@ function Archive() {
               <div className="flex flex-col gap-4">
                 <h3 className="text-blue text-2xl">Informations du plaignant</h3>
                 <div className="flex flex-col gap-3">
-                  <p>Nom: {[currentViewedPV.nomP, ' ', currentViewedPV.prenomP]}</p>
+                  <p>Nom et prénom: {[currentViewedPV.nomP, ' ', currentViewedPV.prenomP]}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
@@ -2065,11 +2083,11 @@ function Archive() {
             <div className="w-full grow h-[50vh]">
               <div className="w-full h-full overflow-y-auto">
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-blue text-2xl">Informations du Conseil discipline</h3>
+                  <h3 className="text-blue text-2xl">Informations du Conseil de discipline</h3>
                   <div className="flex flex-col gap-3">
                     <p>Date: {currentViewedPV.dateCd ? currentViewedPV.dateCd.slice(0, 10) : ''}</p>
                     <div>
-                      membres:{' '}
+                      Membres:{' '}
                       <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                         {Array.isArray(currentViewedPV.membres) &&
                           currentViewedPV.membres.length != 0 &&
@@ -2091,7 +2109,7 @@ function Archive() {
                     <p>Date: {currentViewedPV.datePV ? currentViewedPV.datePV.slice(0, 10) : ''}</p>
 
                     <p>
-                      temoins:{' '}
+                      Témoins:{' '}
                       <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                         {Array.isArray(currentViewedPV.temoins) &&
                           currentViewedPV.temoins.length != 0 &&
@@ -2168,16 +2186,16 @@ function Archive() {
               <img src={!dark ? GOBackGraySVG : GOBackSVG}></img>
             </button>
             <div className="overflow-y-auto max-h-[86vh] flex flex-col w-full h-auto px-8 gap-4">
-              <h2 className="text-4xl">Details du Cd</h2>
+              <h2 className="text-4xl">Détails du conseil de discipline</h2>
               <div className="flex flex-col gap-4">
-                <h3 className="text-blue text-2xl">Informations de Cd</h3>
+                <h3 className="text-blue text-2xl">Informations du conseil de discipline</h3>
                 <div className="flex flex-col gap-3">
                   <p>
-                    Date de Conseil:{' '}
+                    Date de conseil:{' '}
                     {currentViewedCD.dateCD ? currentViewedCD.dateCD.slice(0, 10) : ''}
                   </p>
                   <div>
-                    membres:{' '}
+                    Membres:{' '}
                     <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                       {Array.isArray(currentViewedCD.membres) &&
                         currentViewedCD.membres.length != 0 &&
@@ -2189,7 +2207,7 @@ function Archive() {
                     </div>
                   </div>
                   <div>
-                    etudiants:{' '}
+                    Étudiants:{' '}
                     <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                       {Array.isArray(currentViewedCD.etudiants) &&
                         currentViewedCD.etudiants.length != 0 &&
