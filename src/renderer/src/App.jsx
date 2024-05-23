@@ -13,6 +13,7 @@ import authAni from './assets/animations/authentication.json'
 import useHelp from './zustand/help.js'
 import arrowSVG from './assets/arrow.svg'
 import useCliped from './zustand/cliped.js'
+import ThreeDots from './assets/ThreeDots.svg'
 
 import WarningSVG from './assets/warning.svg'
 
@@ -30,6 +31,7 @@ function App() {
   const [password, setPassword] = useState('')
   const [ancienPassword, setAncienPassword] = useState('')
   const [isUpdatingInfo, setIsUpdatingInfo] = useState(false)
+  const [isDotting, setIsDotting] = useState(false)
   const [updatedInfo, setUpdatedInfo] = useState({ nom: '', prenom: '', email: '', oldPass: '' })
   const [blurBg, setBlurBg] = useState(false)
   const [step, setStep] = useState(0)
@@ -562,87 +564,113 @@ function App() {
                   Continuer
                 </button>
               </div>
-              <div className="flex w-3/5 justify-between items-center gap-3">
-                {!isUpdatingInfo && (
+              <div className="flex w-3/5 justify-between items-center h-20 gap-3">
+                {!isUpdatingInfo && !isDotting && (
                   <button
                     className={ChangePassword ? 'text-red' : 'text-blue'}
                     onClick={() => {
                       setChangePassword((prev) => !prev)
                     }}
                   >
-                    {ChangePassword ? 'Annuler' : 'Changer'}
+                    {ChangePassword ? 'Annuler' : 'Changer le mot de passe'}
                   </button>
                 )}
-                {!ChangePassword && !isUpdatingInfo && (
-                  <button
-                    className="text-blue"
-                    onClick={async () => {
-                      if (account == '') {
-                        setMsg("Aucun compte n'a été sélectionné")
-                        setTimeout(() => setMsg(''), 2500)
-                      } else {
-                        addLoadingBar()
-                        if (account == 'chef') {
-                          axios
-                            .get(api + '/auth/cmail')
-                            .then((res) => {
-                              RemoveLoadingBar()
-                              console.log(res)
-                              setTimeout(
-                                () =>
-                                  setMsg(
-                                    'Vérifier ta boite email pour consulter le nouveau mot de passe'
-                                  ),
-                                500
-                              )
-                              setTimeout(() => setMsg(''), 2500)
-                            })
-                            .catch((err) => {
-                              console.log(err)
-                              RemoveLoadingBar()
-                              setTimeout(() => setMsg('Vérifier la connection internet'), 500)
-                              setTimeout(() => setMsg(''), 2500)
-                            })
+                {!ChangePassword && !isUpdatingInfo && !isDotting && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsDotting(true)
+                      }}
+                      className="h-10 aspect-square flex justify-center items-center rounded-full"
+                    >
+                      <img className="h-5 aspect-square" src={ThreeDots}></img>
+                    </button>
+                  </>
+                )}
+                {isDotting && (
+                  <div className="flex flex-col items-start gap-2 h-20 bg-white">
+                    <button
+                      className={isUpdatingInfo ? 'text-red' : 'text-blue'}
+                      onClick={() => {
+                        if (!isUpdatingInfo) {
+                          setIsUpdatingInfo(true)
                         } else {
-                          axios
-                            .get(api + '/auth/pmail')
-                            .then((res) => {
-                              console.log(res)
-                              RemoveLoadingBar()
-                              setTimeout(
-                                () =>
-                                  setMsg(
-                                    'Vérifier ta boite email pour consulter le nouveau mot de passe'
-                                  ),
-                                500
-                              )
-                              setTimeout(() => setMsg(''), 2500)
-                            })
-                            .catch((err) => {
-                              console.log(err)
-                              RemoveLoadingBar()
-                              setTimeout(() => setMsg('Vérifier la connection internet'), 500)
-                              setTimeout(() => setMsg(''), 2500)
-                            })
+                          setIsUpdatingInfo(false)
+                          setIsDotting(false)
                         }
-                      }
-                    }}
-                  >
-                    Oublié
-                  </button>
+                      }}
+                    >
+                      {isUpdatingInfo ? 'Annuler' : ' Modifier les informations'}
+                    </button>
+                    {!isUpdatingInfo && (
+                      <button
+                        className="text-blue"
+                        onClick={async () => {
+                          setIsDotting(false)
+                          if (account == '') {
+                            setMsg("Aucun compte n'a été sélectionné")
+                            setTimeout(() => setMsg(''), 2500)
+                          } else {
+                            addLoadingBar()
+                            if (account == 'chef') {
+                              axios
+                                .get(api + '/auth/cmail')
+                                .then((res) => {
+                                  RemoveLoadingBar()
+                                  console.log(res)
+                                  setTimeout(
+                                    () =>
+                                      setMsg(
+                                        'Vérifier ta boite email pour consulter le nouveau mot de passe'
+                                      ),
+                                    500
+                                  )
+                                  setTimeout(() => setMsg(''), 2500)
+                                })
+                                .catch((err) => {
+                                  console.log(err)
+                                  RemoveLoadingBar()
+                                  setTimeout(() => setMsg('Vérifier la connection internet'), 500)
+                                  setTimeout(() => setMsg(''), 2500)
+                                })
+                            } else {
+                              axios
+                                .get(api + '/auth/pmail')
+                                .then((res) => {
+                                  console.log(res)
+                                  RemoveLoadingBar()
+                                  setTimeout(
+                                    () =>
+                                      setMsg(
+                                        'Vérifier ta boite email pour consulter le nouveau mot de passe'
+                                      ),
+                                    500
+                                  )
+                                  setTimeout(() => setMsg(''), 2500)
+                                })
+                                .catch((err) => {
+                                  console.log(err)
+                                  RemoveLoadingBar()
+                                  setTimeout(() => setMsg('Vérifier la connection internet'), 500)
+                                  setTimeout(() => setMsg(''), 2500)
+                                })
+                            }
+                          }
+                        }}
+                      >
+                        Mot de passe oublié?
+                      </button>
+                    )}
+                  </div>
                 )}
-                {!ChangePassword && (
+                {isDotting && !isUpdatingInfo && !ChangePassword && (
                   <button
-                    className={isUpdatingInfo ? 'text-red' : 'text-blue'}
                     onClick={() => {
-                      if (!isUpdatingInfo) {
-                        setIsUpdatingInfo(true)
-                      } else {
-                        setIsUpdatingInfo(false)
-                      }
+                      setIsDotting(false)
                     }}
+                    className="h-8 aspect-square bg-red rounded-md text-white flex items-center justify-center"
                   >
-                    {isUpdatingInfo ? 'Annuler' : 'Info'}
+                    X
                   </button>
                 )}
               </div>
