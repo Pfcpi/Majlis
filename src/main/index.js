@@ -1,8 +1,9 @@
 'use strict'
 
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+const axios = require('axios')
 const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
 const portfinder = require('portfinder')
@@ -101,7 +102,7 @@ async function handlePort() {
 }
 
 async function getUrl() {
-  const browser = await pie.connect(app, puppeteer)
+  //const browser = await pie.connect(app, puppeteer)
 
   const window = new BrowserWindow({
     width: 900,
@@ -118,12 +119,13 @@ async function getUrl() {
   window.on('ready-to-show', () => {
     window.maximize()
   })
-  const url = path.join(app.getPath('sessionData'), 'sortie.pdf')
-  console.log('url', url)
-  await window.loadURL(url)
 
-  const page = await pie.getPage(browser, window)
-  return page.url()
+  const url = path.join(app.getPath('sessionData'), 'sortie.pdf')
+  await window.loadURL('http://localhost:3000/sortie.pdf', )
+  console.log("passed from here under window.loadURL")
+
+  //const page = await pie.getPage(browser, window)
+  return 
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -133,69 +135,4 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
-
-//-------------------- print function -----------------
-
-// List of all options at -
-// https://www.electronjs.org/docs/latest/api/web-contents#contentsprintoptions-callback
-const printOptions = {
-  silent: false,
-  printBackground: true,
-  color: true,
-  margin: {
-    marginType: 'printableArea'
-  },
-  landscape: false,
-  pagesPerSheet: 1,
-  collate: false,
-  copies: 1,
-  header: 'Page header',
-  footer: 'Page footer'
-}
-
-//handle print
-ipcMain.handle('printComponent', (event, url) => {
-  let win = new BrowserWindow({ show: false })
-
-  win.loadURL(url)
-
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.print(printOptions, (success, failureReason) => {
-      console.log('Print Initiated in Main...')
-      if (!success) console.log(failureReason)
-    })
-  })
-  return 'shown print dialog'
-})
-
-//handle preview
-ipcMain.handle('previewComponent', (event, url) => {
-  let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true })
-  win.loadURL(url)
-
-  win.webContents.once('did-finish-load', () => {
-    win.webContents
-      .printToPDF(printOptions)
-      .then((data) => {
-        /*let buf = Buffer.from(data)
-        var data = buf.toString('base64')
-        let url = 'data:application/pdf;base64,' + data*/
-
-        win.webContents.on('ready-to-show', () => {
-          win.show()
-          win.setTitle('Preview')
-        })
-
-        win.webContents.on('closed', () => (win = null))
-        win.loadURL(url)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  })
-  return 'shown preview window'
 })

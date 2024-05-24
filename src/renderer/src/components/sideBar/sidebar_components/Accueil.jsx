@@ -84,7 +84,7 @@ function Archive() {
     motifError: ''
   })
 
-  const { api } = useApi()
+  const { api, apiPDF } = useApi()
   const { cliped, setCliped } = useCliped()
   const { dark } = useDark()
   const { account } = useAccount()
@@ -236,7 +236,7 @@ function Archive() {
       let path = await window.electronAPI.getPath()
       addLoadingBar()
       const pdfToPreview = await axios
-        .post(api + '/archive/printrapport', { numR: num, path: path })
+        .post(apiPDF + 'generateRA', { numR: num })
         .then((res) => {
           const result = window.electronAPI.getUrl()
         })

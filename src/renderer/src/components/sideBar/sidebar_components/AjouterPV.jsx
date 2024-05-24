@@ -13,7 +13,7 @@ import './sidebar_com_css/archives.css'
 import useApi from '../../../zustand/api'
 
 function AjouterPV() {
-  const { api } = useApi()
+  const { api, apiPDF } = useApi()
   const { date } = useDate()
 
   const sanctions = [
@@ -221,7 +221,7 @@ function AjouterPV() {
       addLoadingBar()
       let path = await window.electronAPI.getPath()
       const pdfToPreview = await axios
-        .post(api + '/archive/printrapport', { numR: numR, path: path })
+        .post(apiPDF + 'generateRA', { numR: numR })
         .then((res) => {
           const result = window.electronAPI.getUrl()
           console.log(res)

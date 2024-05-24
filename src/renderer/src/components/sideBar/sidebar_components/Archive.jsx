@@ -72,7 +72,7 @@ function Archive() {
   const [view, setView] = useState(false)
 
   const { dark } = useDark()
-  const { api } = useApi()
+  const { api, apiPDF } = useApi()
   const { account } = useAccount()
 
   const archivePage = useRef(null)
@@ -552,7 +552,7 @@ function Archive() {
       if (currentWindow == win[0]) {
         console.log('in rapport')
         const pdfToPreview = await axios
-          .post(api + '/archive/printrapport', { numR: num, path: path })
+          .post(apiPDF + 'generateRA', { numR: num })
           .then((res) => {
             const result = window.electronAPI.getUrl()
           })
@@ -562,7 +562,7 @@ function Archive() {
       if (currentWindow == win[1]) {
         console.log('in pv')
         const pdfToPreview = await axios
-          .post(api + '/archive/printpv', { numPV: num, path: path })
+          .post(apiPDF + 'generatePV', { numPV: num })
           .then((res) => {
             const result = window.electronAPI.getUrl()
           })
@@ -572,7 +572,7 @@ function Archive() {
       if (currentWindow == win[3]) {
         console.log('in cons')
         const pdfToPreview = await axios
-          .post(api + '/archive/printcd', { numCD: num, path: path })
+          .post(apiPDF + 'generateCD', { numCD: num })
           .then((res) => {
             const result = window.electronAPI.getUrl()
           })
@@ -1095,7 +1095,7 @@ function Archive() {
                             console.log(res.data)
                             if (res.status >= 200 && res.status < 300) {
                               axios
-                                .post(api + '/archive/mail', {
+                                .post(apiPDF + 'mail', {
                                   numPV: selectedPVs[0].num_pv,
                                   email: res.data[0].email_e
                                 })
