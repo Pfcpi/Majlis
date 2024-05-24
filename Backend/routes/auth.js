@@ -6,6 +6,10 @@ const { db } = require('../config/db')
 const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 
+function maj(chaine) {
+  return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
+}
+
 // Automatic mailling setup
 const transporter = nodemailer.createTransport({
   host: 'smtp.zoho.com',
@@ -404,7 +408,7 @@ router.get('/pmail', (req, res) => {
 }
 */
 router.patch('/chefupdate', (req, res) => {
-  let values = [req.body.email, req.body.nom, req.body.prenom]
+  let values = [req.body.email, req.body.nom.replace(/ /g, '\u00A0').toUppercase(), maj(req.body.prenom.replace(/ /g, '\u00A0'))]
   console.log('values:', values)
   let sqlquery = `UPDATE Utilisateur SET email_u = ? , nomU = ? , prenomU = ? WHERE id_u = 1`
   db.query(sqlquery, values, (err, result) => {

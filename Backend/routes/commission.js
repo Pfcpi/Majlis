@@ -5,6 +5,10 @@ const router = express.Router()
 const { db } = require('../config/db')
 const nodemailer = require('nodemailer')
 
+function maj(chaine) {
+  return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
+}
+
 // Automatic mailling setup
 const transporter = nodemailer.createTransport({
   host: 'smtp.zoho.com',
@@ -43,8 +47,8 @@ router.get('/get', (req, res) => {
 */
 router.post('/add', (req, res) => {
   let values = [
-    req.body.nomM.replace(/ /g, '\u00A0'),
-    req.body.prenomM.replace(/ /g, '\u00A0'),
+    req.body.nomM.replace(/ /g, '\u00A0').toUpperCase(),
+    maj(req.body.prenomM.replace(/ /g, '\u00A0')),
     req.body.roleM,
     req.body.emailM,
     req.body.dateDebutM
@@ -83,8 +87,8 @@ router.post('/add', (req, res) => {
 router.patch('/edit', (req, res) => {
   let values = [
     req.body.roleM,
-    req.body.nomM.replace(/ /g, '\u00A0'),
-    req.body.prenomM.replace(/ /g, '\u00A0'),
+    req.body.nomM.replace(/ /g, '\u00A0').toUpperCase(),
+    maj(req.body.prenomM.replace(/ /g, '\u00A0')),
     req.body.emailM,
     req.body.dateDebutM,
     req.body.idM
