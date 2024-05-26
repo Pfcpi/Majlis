@@ -1,6 +1,8 @@
 /* eslint-disable prettier/prettier */
 const puppeteer = require('puppeteer')
+const PDFDocument = require('pdfkit')
 const fs = require('fs')
+const svgToPdf = require('svg-to-pdfkit')
 const path = require('path')
 
 async function generatePDFpv(data, pathReq) {
@@ -230,18 +232,11 @@ async function generatePDFpv(data, pathReq) {
   </body>
   </html>
   `
-  /*
-  const browser = await puppeteer.launch({ headless: true })
-  const page = await browser.newPage()
-  await page.setContent(html)
-  await page.pdf({ path: './out/s.pdf', format: 'A4' })
-  return page.pdf({ format: 'A4' })
-  */
   // Create a temporary HTML file
   //const tempHtmlPath = path.join(pathReq, 'temp.html')
   //fs.writeFileSync(tempHtmlPath, html, 'utf-8')
 
-  const browser = await puppeteer.launch({ headless: true })
+  /*const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
   //await page.goto(tempHtmlPath)
@@ -258,9 +253,33 @@ async function generatePDFpv(data, pathReq) {
     } else {
       console.log('PDF saved successfully!')
     }
+  })*/
+  var doc = new PDFDocument({ margin: 0, size: 'A4' })
+
+  const writableStream = fs.createWriteStream('public/sortie.pdf')
+
+  // Write some content to the PDF
+  doc.text('PV you human.')
+
+  // End the document
+  doc.end()
+
+  // Pipe the PDF content to the file stream
+  doc.pipe(writableStream)
+
+  // Handle errors
+  writableStream.on('error', (err) => {
+    console.error('Error occurred:', err)
+    return 'Error occured'
   })
 
-  return pdfBuffer
+  // Handle finish event
+  writableStream.on('finish', () => {
+    console.log('PDF saved successfully.')
+    return 'PDF saved successfully'
+  })
+
+  return
 }
 
 async function generatePDFrapport(data, pathReq) {
@@ -430,37 +449,21 @@ async function generatePDFrapport(data, pathReq) {
   </body>
   </html>
   `
-  let html2 = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HTML to PDF</title>
-</head>
-<body>
-  <h1>HTML to PDF Converter</h1>
-  <form action="/generate-pdf" method="POST">
-    <textarea name="html" rows="10" cols="30" placeholder="Enter HTML content here"></textarea>
-    <br>
-    <button type="submit">Generate PDF</button>
-  </form>
-</body>
-</html>`
 
   // Create a temporary HTML file
   /*const tempHtmlPath = path.join(pathReq, 'temp.html')
   fs.writeFileSync(tempHtmlPath, html, 'utf-8')*/
 
-  const browser = await puppeteer.launch({ headless: true })
+  /*const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
   //console.log('tempHtmlPath: ', tempHtmlPath)
   //await page.goto(tempHtmlPath)
 
   // Generate PDF
-  console.log("1")
+  console.log('1')
   const pdfBuffer = await page.pdf()
-  console.log("2")
+  console.log('2')
 
   //let pathPDF = path.join(pathReq, 'sortie.pdf')
   //let file_name = data.numr.toString().concat('.pdf')
@@ -473,8 +476,185 @@ async function generatePDFrapport(data, pathReq) {
     } else {
       console.log('PDF saved successfully!')
     }
+  })*/
+
+  //A4 size: 595.28 x 841.89
+  var doc = new PDFDocument({ margin: 0, size: 'A4' })
+
+  const writableStream = fs.createWriteStream('public/sortie.pdf')
+
+  //fonts
+  const pt_serif_folder = path.join(__dirname, 'fonts', 'PT_Serif')
+  const pt_bold = path.join(pt_serif_folder, 'PTSerif-Bold.ttf')
+  const pt_boldItalic = path.join(pt_serif_folder, 'PTerif-BoldItalic.ttf')
+  const pt_Italic = path.join(pt_serif_folder, 'PTSerif-Italic.ttf')
+  const pt_regular = path.join(pt_serif_folder, 'PTSerif-Regular.ttf')
+
+  const leadingFactor = 1.2
+  const md = 13
+  const leadingmd = md * leadingFactor
+  const lg = 16
+  const leadinglg = lg * leadingFactor
+  const xl = 20
+  const leadingxl = xl * leadingFactor
+
+  //Entete
+  const headerW = 500
+  const headerH = 100
+  const headerX = (doc.page.width - headerW) / 2
+  const headerY = 0
+
+  const ustoLogoDimention = 90
+  doc.rect(headerX, headerY, headerW, headerH)
+
+  pathImages = path.join(__dirname, 'imagesForPDF')
+  const svgData = fs.readFileSync(path.join(pathImages, 'entete.svg'), 'utf8')
+  svgToPdf(doc, svgData, headerX + 120, headerY + 15)
+  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, headerY, {
+    fit: [ustoLogoDimention, ustoLogoDimention]
   })
-  return
+
+  const TitleY = 170
+  doc
+    .font(pt_bold)
+    .fontSize(xl)
+    .text('Rapport pour un conseil de discipline', 0, TitleY, { align: 'center' })
+  doc.fontSize(xl).text("du département d'informatique", 0, TitleY + 30, { align: 'center' })
+  doc.fontSize(lg).text('Date du rapport: ' + data.dateR, 0, TitleY + 66, { align: 'center' })
+
+  //Détails de l'infraction
+  const marginText = 40
+
+  doc.font(pt_regular)
+  const text1i = "En raison de l'infraction suivante : "
+  const text2i = data.motifI
+  const text3i = ', le '
+  const text4i = data.dateI
+  const text5i = ' à '
+  const text6i = data.lieuI
+  const text7i = ", commise par l'étudiant(e) suivant(e): "
+
+  const InfractionY = TitleY + 130
+  doc
+    .font(pt_regular)
+    .fontSize(md)
+    .text(text1i, marginText, InfractionY, {
+      continued: true,
+      align: 'left',
+      width: doc.page.width - marginText * 2
+    })
+
+  doc.font(pt_bold)
+  doc.text(text2i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text3i, { continued: true })
+  doc.font(pt_bold)
+  doc.text(text4i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text5i, { continued: true })
+  doc.font(pt_bold)
+  doc.text(text6i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text7i, { continued: false })
+
+  //Détails de l'étudiant
+  const marginList = 60
+  const StudentDetailsY = doc.y + leadingmd
+
+  doc.text('\u2022 ' + 'Matricule: ', marginList, StudentDetailsY, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.matriculeE}`)
+  doc.font(pt_regular)
+  doc.text('\u2022 ' + 'Nom et prénom: ', marginList, StudentDetailsY + leadingmd, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.nomE} ${data.prenomE}`)
+  doc.font(pt_regular)
+  doc.text('\u2022 ' + "Niveau d'étude: ", marginList, StudentDetailsY + leadingmd * 2, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.niveauE}-S${data.sectionE}G${data.groupeE}`)
+
+  //Détails de plaignant
+  const plaignantDetailsY = doc.y + leadingmd * 3
+  doc.font(pt_regular)
+  doc.text(
+    'Un conseil de discipline est demandé par le plaignant suivant:',
+    marginText,
+    plaignantDetailsY,
+    {
+      align: 'left',
+      width: doc.page.width - marginText * 2
+    }
+  )
+  doc.text('\u2022 ' + 'M./Mme: ', marginList, plaignantDetailsY + leadingmd + 15, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.nomP} ${data.prenomP}`)
+
+  //Signature
+
+  const textSignature = 'M./Mme: '
+  const nomPrenomChef = `${data.nomC} ${data.prenomC}`
+  const text1Signature = 'Chef du département:'
+  const textSignatureW = doc.widthOfString(textSignature, { font: pt_regular, size: md })
+  const nomPrenomChefW = doc.widthOfString(nomPrenomChef, { font: pt_bold, size: md })
+  const text1SignatureW = doc.widthOfString(text1Signature, { font: pt_regular, size: md })
+  const secondLineW = textSignatureW + nomPrenomChefW
+
+  const signatureW = Math.max(text1SignatureW, secondLineW) + 20
+  const signatureH = 100
+  const signatureX = doc.page.width - signatureW
+  const signatureY = 670
+
+  doc.rect(signatureX, signatureY, signatureW, signatureH)
+
+  doc.font(pt_regular)
+  doc.text(text1Signature, signatureX, signatureY, {
+    align: 'center'
+  })
+  doc.text(textSignature, signatureX + (signatureW - secondLineW) / 2, signatureY + 20, {
+    continued: true
+  })
+  doc.font(pt_bold)
+  doc.text(nomPrenomChef)
+
+  const footerHeight = 50
+  doc.image('imagesForPDF/footer.png', 0, doc.page.height - footerHeight, {
+    fit: [doc.page.width, footerHeight],
+    width: doc.page.width
+  })
+
+  // End the document
+  doc.end()
+
+  // Pipe the PDF content to the file stream
+  doc.pipe(writableStream)
+
+  // Handle errors
+  writableStream.on('error', (err) => {
+    console.error('Error occurred:', err)
+    return 'err while generating the pdf'
+  })
+
+  // Handle finish event
+  writableStream.on('finish', () => {
+    console.log('PDF saved successfully.')
+    return 'PDF saved successfully'
+  })
 }
 
 async function generatePDFcd(data, pathReq) {
@@ -742,7 +922,7 @@ async function generatePDFcd(data, pathReq) {
   //const tempHtmlPath = path.join(pathReq, 'temp.html')
   //fs.writeFileSync(tempHtmlPath, html, 'utf-8')
 
-  const browser = await puppeteer.launch({ headless: true })
+  /*const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
   await page.setContent(html)
   //await page.goto(tempHtmlPath)
@@ -780,9 +960,32 @@ async function generatePDFcd(data, pathReq) {
     } else {
       console.log('PDF saved successfully!')
     }
+  })*/
+
+  var doc = new PDFDocument({ margin: 0, size: 'A4' })
+
+  const writableStream = fs.createWriteStream('public/sortie.pdf')
+
+  // Write some content to the PDF
+  doc.text('cd while doint it')
+
+  // End the document
+  doc.end()
+
+  // Pipe the PDF content to the file stream
+  doc.pipe(writableStream)
+
+  // Handle errors
+  writableStream.on('error', (err) => {
+    console.error('Error occurred:', err)
   })
 
-  return pathPDF
+  // Handle finish event
+  writableStream.on('finish', () => {
+    console.log('PDF saved successfully.')
+  })
+
+  return
 }
 
 module.exports = { generatePDFpv, generatePDFrapport, generatePDFcd }
