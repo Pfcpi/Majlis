@@ -5,6 +5,29 @@ const fs = require('fs')
 const svgToPdf = require('svg-to-pdfkit')
 const path = require('path')
 
+//fonts
+const pt_serif_folder = path.join(__dirname, 'fonts', 'PT_Serif')
+const pt_bold = path.join(pt_serif_folder, 'PTSerif-Bold.ttf')
+const pt_boldItalic = path.join(pt_serif_folder, 'PTerif-BoldItalic.ttf')
+const pt_Italic = path.join(pt_serif_folder, 'PTSerif-Italic.ttf')
+const pt_regular = path.join(pt_serif_folder, 'PTSerif-Regular.ttf')
+
+const leadingFactor = 1.2
+const md = 13
+const leadingmd = md * leadingFactor
+const lg = 16
+const leadinglg = lg * leadingFactor
+const xl = 20
+const leadingxl = xl * leadingFactor
+
+const marginList = 60
+const marginText = 40
+const footerHeight = 50
+
+function maj(chaine) {
+  return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
+}
+
 async function generatePDFpv(data, pathReq) {
   let html = `
   <!DOCTYPE html>
@@ -258,8 +281,189 @@ async function generatePDFpv(data, pathReq) {
 
   const writableStream = fs.createWriteStream('public/sortie.pdf')
 
-  // Write some content to the PDF
-  doc.text('PV you human.')
+  //Entete
+  const headerW = 500
+  const headerH = 100
+  const headerX = (doc.page.width - headerW) / 2
+  const headerY = 0
+
+  const ustoLogoDimention = 90
+  doc.rect(headerX, headerY, headerW, headerH)
+
+  pathImages = path.join(__dirname, 'imagesForPDF')
+  const svgData = fs.readFileSync(path.join(pathImages, 'entete.svg'), 'utf8')
+  svgToPdf(doc, svgData, headerX + 120, headerY + 15)
+  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, headerY, {
+    fit: [ustoLogoDimention, ustoLogoDimention]
+  })
+
+  const TitleY = 120
+  doc
+    .font(pt_bold)
+    .fontSize(xl)
+    .text('Procès-Verbal du Conseil de Discipline', 0, TitleY, { align: 'center' })
+  doc.fontSize(xl).text("du Département d'Informatique", 0, TitleY + 30, { align: 'center' })
+  doc.fontSize(lg).text('Date du PV: ' + data.datePV, 0, TitleY + 66, { align: 'center' })
+
+  //Détails de l'infraction
+  doc.font(pt_regular)
+  const text1i = "Suite à l'infraction commise: "
+  const text2i = data.motifI
+  const text3i = ",  un conseil de discipline s'est tenu le "
+  const text4i = data.dateCD
+  const text5i = ', sous la demande de : M./Mme. '
+  const text6i = data.nomP + ' ' + data.prenomP
+  const text7i = ", à l'encontre l'étudiant(e) concerné(e) suivant:"
+
+  const InfractionY = TitleY + 130
+  doc
+    .font(pt_regular)
+    .fontSize(md)
+    .text(text1i, marginText, InfractionY, {
+      continued: true,
+      align: 'left',
+      width: doc.page.width - marginText * 2
+    })
+
+  doc.font(pt_bold)
+  doc.text(text2i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text3i, { continued: true })
+  doc.font(pt_bold)
+  doc.text(text4i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text5i, { continued: true })
+  doc.font(pt_bold)
+  doc.text(text6i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text7i, { continued: false })
+
+  //Détails de l'étudiant
+  const StudentDetailsY = doc.y + leadingmd
+
+  doc.text('\u2022 ' + 'Matricule: ', marginList, StudentDetailsY, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.matriculeE}`)
+  doc.font(pt_regular)
+  doc.text('\u2022 ' + 'Nom et prénom: ', marginList, StudentDetailsY + leadingmd, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.nomE} ${data.prenomE}`)
+  doc.font(pt_regular)
+  doc.text('\u2022 ' + "Niveau d'étude: ", marginList, StudentDetailsY + leadingmd * 2, {
+    continued: true,
+    align: 'left',
+    width: doc.page.width - marginList * 2
+  })
+  doc.font(pt_bold)
+  doc.text(`${data.niveauE}-S${data.sectionE}G${data.groupeE}`)
+
+  //détails des membres présentes
+  const membresdetailsy = doc.y + leadingmd * 1
+  doc.font(pt_regular)
+  doc.text('en présence des membres suivants: ', marginText, membresdetailsy, {
+    align: 'left',
+    width: doc.page.width - marginText * 2
+  })
+
+  const dataArray1 = data.nomM.split(',')
+  const dataArray2 = data.prenomM.split(',')
+
+  doc.y = doc.y + leadingmd
+
+  if (dataArray1.length > 0 && dataArray1[0] !== '') {
+    for (let i = 0; i < dataArray1.length; i++) {
+      doc.font(pt_regular)
+      doc.text('\u2022 ' + 'm./mme: ', marginList, doc.y, {
+        continued: true,
+        align: 'left',
+        width: doc.page.width - marginList * 2
+      })
+      doc.font(pt_bold)
+      doc.text(dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]))
+    }
+  }
+
+  if (data.nomT != null && data.prenomT != null) {
+    //Détails des témoins présentes
+    const temoinsDetailsY = doc.y + leadingmd * 1
+    doc.font(pt_regular)
+    doc.text('En présence des témoins suivants: ', marginText, temoinsDetailsY, {
+      align: 'left',
+      width: doc.page.width - marginText * 2
+    })
+    const dataArrayt1 = data.nomT.split(',')
+    const dataArrayt2 = data.prenomT.split(',')
+
+    doc.y = doc.y + leadingmd
+
+    if (dataArrayt1.length > 0 && dataArrayt1[0] !== '') {
+      for (let i = 0; i < dataArrayt1.length; i++) {
+        doc.font(pt_regular)
+        doc.text('\u2022 ' + 'M./Mme: ', marginList, doc.y, {
+          continued: true,
+          align: 'left',
+          width: doc.page.width - marginList * 2
+        })
+        doc.font(pt_bold)
+        doc.text(dataArrayt1[i].toUpperCase() + ' ' + maj(dataArrayt2[i]))
+      }
+    }
+  }
+  //Décision
+
+  doc.font(pt_regular)
+  doc.text(
+    'Suite à ce conseil, les membres ont tranché sur la décision suivante: ',
+    marginText,
+    doc.y + leadingmd,
+    {
+      align: 'left',
+      continued: true,
+      width: doc.page.width - marginText * 2
+    }
+  )
+  doc.font(pt_bold)
+  doc.text(data.libeleS)
+
+  //Signature
+  const textSignature = 'M./Mme: '
+  const nomPrenomPR = `${data.nomPR} ${data.prenomPR}`
+  const text1Signature = 'Président de la commission:'
+  const textSignatureW = doc.widthOfString(textSignature, { font: pt_regular, size: md })
+  const nomPrenomPRW = doc.widthOfString(nomPrenomPR, { font: pt_bold, size: md })
+  const text1SignatureW = doc.widthOfString(text1Signature, { font: pt_regular, size: md })
+  const secondLineW = textSignatureW + nomPrenomPRW
+
+  const signatureW = Math.max(text1SignatureW, secondLineW) + marginText * 2
+  const signatureH = 100
+  const signatureX = doc.page.width - signatureW
+  const defaultSignatureY = 670
+  const signatureY = doc.y > defaultSignatureY ? doc.y + 10 : defaultSignatureY
+
+  doc.rect(signatureX, signatureY, signatureW, signatureH)
+
+  doc.font(pt_regular)
+  doc.text(text1Signature, signatureX, signatureY, {
+    align: 'center'
+  })
+  doc.text(textSignature, signatureX + (signatureW - secondLineW) / 2, signatureY + 20, {
+    continued: true
+  })
+  doc.font(pt_bold)
+  doc.text(nomPrenomPR)
+
+  doc.image('imagesForPDF/footer.png', 0, doc.page.height - footerHeight, {
+    fit: [doc.page.width, footerHeight],
+    width: doc.page.width
+  })
 
   // End the document
   doc.end()
@@ -483,21 +687,6 @@ async function generatePDFrapport(data, pathReq) {
 
   const writableStream = fs.createWriteStream('public/sortie.pdf')
 
-  //fonts
-  const pt_serif_folder = path.join(__dirname, 'fonts', 'PT_Serif')
-  const pt_bold = path.join(pt_serif_folder, 'PTSerif-Bold.ttf')
-  const pt_boldItalic = path.join(pt_serif_folder, 'PTerif-BoldItalic.ttf')
-  const pt_Italic = path.join(pt_serif_folder, 'PTSerif-Italic.ttf')
-  const pt_regular = path.join(pt_serif_folder, 'PTSerif-Regular.ttf')
-
-  const leadingFactor = 1.2
-  const md = 13
-  const leadingmd = md * leadingFactor
-  const lg = 16
-  const leadinglg = lg * leadingFactor
-  const xl = 20
-  const leadingxl = xl * leadingFactor
-
   //Entete
   const headerW = 500
   const headerH = 100
@@ -523,7 +712,6 @@ async function generatePDFrapport(data, pathReq) {
   doc.fontSize(lg).text('Date du rapport: ' + data.dateR, 0, TitleY + 66, { align: 'center' })
 
   //Détails de l'infraction
-  const marginText = 40
 
   doc.font(pt_regular)
   const text1i = "En raison de l'infraction suivante : "
@@ -558,7 +746,6 @@ async function generatePDFrapport(data, pathReq) {
   doc.text(text7i, { continued: false })
 
   //Détails de l'étudiant
-  const marginList = 60
   const StudentDetailsY = doc.y + leadingmd
 
   doc.text('\u2022 ' + 'Matricule: ', marginList, StudentDetailsY, {
@@ -615,7 +802,7 @@ async function generatePDFrapport(data, pathReq) {
   const text1SignatureW = doc.widthOfString(text1Signature, { font: pt_regular, size: md })
   const secondLineW = textSignatureW + nomPrenomChefW
 
-  const signatureW = Math.max(text1SignatureW, secondLineW) + 20
+  const signatureW = Math.max(text1SignatureW, secondLineW) + marginText * 2
   const signatureH = 100
   const signatureX = doc.page.width - signatureW
   const signatureY = 670
@@ -632,7 +819,6 @@ async function generatePDFrapport(data, pathReq) {
   doc.font(pt_bold)
   doc.text(nomPrenomChef)
 
-  const footerHeight = 50
   doc.image('imagesForPDF/footer.png', 0, doc.page.height - footerHeight, {
     fit: [doc.page.width, footerHeight],
     width: doc.page.width
@@ -966,9 +1152,242 @@ async function generatePDFcd(data, pathReq) {
 
   const writableStream = fs.createWriteStream('public/sortie.pdf')
 
-  // Write some content to the PDF
-  doc.text('cd while doint it')
+  //Entete
+  const headerW = 500
+  const headerH = 100
+  const headerX = (doc.page.width - headerW) / 2
+  const headerY = 0
 
+  const ustoLogoDimention = 90
+  doc.rect(headerX, headerY, headerW, headerH)
+
+  pathImages = path.join(__dirname, 'imagesForPDF')
+  const svgData = fs.readFileSync(path.join(pathImages, 'entete.svg'), 'utf8')
+  svgToPdf(doc, svgData, headerX + 120, headerY + 15)
+  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, headerY, {
+    fit: [ustoLogoDimention, ustoLogoDimention]
+  })
+
+  const TitleY = 170
+  doc
+    .font(pt_bold)
+    .fontSize(xl)
+    .text('Procès-Verbal du Conseil de Discipline', 0, TitleY, { align: 'center' })
+  doc.fontSize(xl).text("du département d'informatique", 0, TitleY + 30, { align: 'center' })
+  doc.fontSize(lg).text('Date du PV: ' + data.datePV, 0, TitleY + 66, { align: 'center' })
+
+  //Détails de l'infraction
+  doc.font(pt_regular)
+  const text1i = 'En ce jour, le '
+  const text2i = data.dateCD
+  const text3i =
+    ", s'est tenue une réunion du conseil de discipline du département d'informatique en présence des membres suivants: "
+
+  const InfractionY = TitleY + 130
+  doc
+    .font(pt_regular)
+    .fontSize(md)
+    .text(text1i, marginText, InfractionY, {
+      continued: true,
+      align: 'left',
+      width: doc.page.width - marginText * 2
+    })
+
+  doc.font(pt_bold)
+  doc.text(text2i, { continued: true })
+  doc.font(pt_regular)
+  doc.text(text3i)
+
+  //détails des membres présentes
+  const membresdetailsy = doc.y + leadingmd * 1
+  doc.font(pt_regular)
+  doc.text('en présence des membres suivants: ', marginText, membresdetailsy, {
+    align: 'left',
+    width: doc.page.width - marginText * 2
+  })
+
+  const dataArray1 = data.nomM.split(',')
+  const dataArray2 = data.prenomM.split(',')
+
+  doc.y = doc.y + leadingmd
+
+  if (dataArray1.length > 0 && dataArray1[0] !== '') {
+    for (let i = 0; i < dataArray1.length; i++) {
+      doc.font(pt_regular)
+      doc.text('\u2022 ' + 'm./mme: ', marginList, doc.y, {
+        continued: true,
+        align: 'left',
+        width: doc.page.width - marginList * 2
+      })
+      doc.font(pt_bold)
+      doc.text(dataArray1[i].toUpperCase() + ' ' + maj(dataArray2[i]))
+    }
+  }
+
+  doc.font(pt_regular)
+  doc.text(
+    "Le tableau ci-dessous résume les cas et les décisions prises pour chacun des étudiants concernés conformément à l'arrêté ministériel n°371.",
+    marginText,
+    doc.y + leadingmd,
+    {
+      align: 'left',
+      width: doc.page.width - marginText * 2
+    }
+  )
+
+  //détails des membres présentes
+  const PVdetailsY = doc.y + leadingmd * 1
+
+  const dataArray1P = data.nomE.split(',')
+  const dataArray2P = data.prenomE.split(',')
+  const dataArray3P = data.niveauE.split(',')
+  const dataArray4P = data.sectionE.split(',')
+  const dataArray5P = data.groupeE.split(',')
+  const dataArray6P = data.motifI.split(',')
+  const dataArray7P = data.nomP.split(',')
+  const dataArray8P = data.prenomP.split(',')
+  const dataArray9P = data.libeleS.split(',')
+
+  doc.y = doc.y + leadingmd
+
+  // Define table properties
+  const tableTop = doc.y + leadingmd
+  const tableLeft = 50
+  const rowHeight = 100
+  const colWidth = 100
+  const pageTop = doc.page.margins.top
+  const pageBottom = doc.page.height - doc.page.margins.bottom - footerHeight
+
+  // Function to draw table headers
+  function drawHeaders(headers, y) {
+    headers.forEach((header, i) => {
+      const x = tableLeft + i * colWidth + 5 // Add padding
+      doc.text(header, x, y + 5, { width: colWidth - 10, align: 'left' })
+    })
+    return y + rowHeight
+  }
+
+  // Function to draw table row
+  function drawRow(row, y) {
+    row.forEach((cell, colIndex) => {
+      const x = tableLeft + colIndex * colWidth + 5 // Add padding
+      doc.text(cell, x, y + 5, { width: colWidth - 10, align: 'left' })
+    })
+    return y + rowHeight
+  }
+
+  // Define table cell content
+  const headers = [
+    'Étudiants concernés',
+    'Faits rapportés',
+    'Plaignants',
+    'Décisions du conseil de discipline'
+  ]
+  const dataPV = [
+    ['Row 1 Col 1', 'Row 1 Col 2', 'Row 1 Col 3'],
+    ['Row 2 Col 1', 'Row 2 Col 2', 'Row 2 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
+    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3']
+  ]
+
+  const numRows = dataPV.length
+  const numCols = 4
+
+  // Draw the table grid
+  for (let i = 0; i <= numRows; i++) {
+    const y = tableTop + i * rowHeight
+    doc
+      .moveTo(tableLeft, y)
+      .lineTo(tableLeft + numCols * colWidth, y)
+      .stroke()
+    if (y + rowHeight > pageBottom) {
+      doc.addPage()
+    }
+  }
+
+  for (let j = 0; j <= numCols; j++) {
+    const x = tableLeft + j * colWidth
+    doc
+      .moveTo(x, tableTop)
+      .lineTo(x, tableTop + numRows * rowHeight)
+      .stroke()
+  }
+
+  // Draw table with pagination
+  let y = doc.y
+  y = drawHeaders(headers, y)
+  let counter = 1
+
+  dataPV.forEach((row, rowIndex) => {
+    if (y + rowHeight > pageBottom) {
+      console.log('it flex the time :', counter)
+      counter += 1
+      doc.addPage()
+      y = pageTop
+      y = drawHeaders(headers, y)
+    }
+    y = drawRow(row, y)
+  })
+
+  for (let i = 0; i < dataArray1P.length; i++) {
+    const cell1 =
+      dataArray1P[i].toUpperCase() +
+      ' ' +
+      maj(dataArray2P[i]) +
+      dataArray3P[i] +
+      '-S' +
+      dataArray4P[i] +
+      'G' +
+      dataArray5P[i]
+
+    const cell2 = dataArray6P[i]
+
+    const plaignant = 'M./Mme. ' + dataArray7P[i].toUpperCase() + ' ' + maj(dataArray8P[i])
+    const cell3 = plaignant
+
+    const cell4 = dataArray9P[i]
+  }
+
+  //Signature
+  const textSignature = 'M./Mme: '
+  const nomPrenomPR = `${data.nomPR} ${data.prenomPR}`
+  const text1Signature = 'Président de la commission:'
+  const textSignatureW = doc.widthOfString(textSignature, { font: pt_regular, size: md })
+  const nomPrenomPRW = doc.widthOfString(nomPrenomPR, { font: pt_bold, size: md })
+  const text1SignatureW = doc.widthOfString(text1Signature, { font: pt_regular, size: md })
+  const secondLineW = textSignatureW + nomPrenomPRW
+
+  const signatureW = Math.max(text1SignatureW, secondLineW) + marginText * 2
+  const signatureH = 100
+  const signatureX = doc.page.width - signatureW
+  const signatureY = 670
+
+  doc.rect(signatureX, signatureY, signatureW, signatureH)
+
+  doc.font(pt_regular)
+  doc.text(text1Signature, signatureX, signatureY, {
+    align: 'center'
+  })
+  doc.text(textSignature, signatureX + (signatureW - secondLineW) / 2, signatureY + 20, {
+    continued: true
+  })
+  doc.font(pt_bold)
+  doc.text(nomPrenomPR)
+
+  doc.image('imagesForPDF/footer.png', 0, doc.page.height - footerHeight, {
+    fit: [doc.page.width, footerHeight],
+    width: doc.page.width
+  })
   // End the document
   doc.end()
 
