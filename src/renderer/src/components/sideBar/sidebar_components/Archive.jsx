@@ -1104,7 +1104,7 @@ function Archive() {
                                 })
                                 .catch((err) => {
                                   console.log(err)
-                                  alert('Vérifier la connexion internet')
+                                  alert("L'email n'a pas été envoyé")
                                 })
                             }
                           })

@@ -237,7 +237,7 @@ WHERE
     }
     console.log(data)
     try {
-      const pdfBuffer = await generatePDFpv(data, reqPath)
+      const pdfBuffer = await generatePDFpv(data, false)
       res.send('worked')
     } catch (err) {
       console.error(err)
@@ -394,16 +394,16 @@ LEFT JOIN
   Infraction i ON r.num_i = i.num_i
 LEFT JOIN
   (SELECT
-      te.num_cd,
-      GROUP_CONCAT(t.nom_t) AS nom_tt,
-      GROUP_CONCAT(t.prenom_t) AS prenom_tt,
-      GROUP_CONCAT(t.role_t) AS role_tt
+      te.num_pv,
+      GROUP_CONCAT(DISTINCT t.nom_t) AS nom_tt,
+      GROUP_CONCAT(DISTINCT t.prenom_t) AS prenom_tt,
+      GROUP_CONCAT(DISTINCT t.role_t) AS role_tt
   FROM
       Temoigne te
   LEFT JOIN
       Temoin t ON te.num_t = t.num_t
-  GROUP BY
-      te.num_cd) AS temoins ON pv.num_cd = temoins.num_cd
+      WHERE num_pv = ?)
+ AS temoins ON pv.num_pv = temoins.num_pv
 LEFT JOIN
   Commission_Presente cp ON pv.num_cd = cp.num_cd
 LEFT JOIN
@@ -411,11 +411,10 @@ LEFT JOIN
 WHERE
   pv.num_pv = ?`
 
-  db.query(sqlquery, req.body.numPV, async (err, result) => {
+  db.query(sqlquery, [values[0], values[0]], async (err, result) => {
     if (err && err.errno != 1065) {
       res.status(400).send(err)
     } else {
-      console.log(result[0])
       const data = {
         matriculeE: result[0].matricule_e,
         nomE: result[0].nom_e.toUpperCase(),
@@ -438,29 +437,34 @@ WHERE
       }
 
       try {
-        const pdfBuffer = await generatePDFpv(data, reqPath)
-        const mailOptions = {
-          from: '"Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
-          to: values[1],
-          subject: `Procès-Verbal du conseil de discipline du ${data.dateCD}.`,
-          html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
-          attachments: [
-            {
-              filename: 'PV.pdf',
-              content: pdfBuffer,
-              contentType: 'application/pdf'
-            }
-          ]
-        }
-        console.log('AAAAAAAA')
-        transporter.sendMail(mailOptions, function (err, info) {
-          if (err) {
-            console.log('Error while sending email' + err)
-          } else {
-            console.log('Email sent')
-            res.sendStatus(204)
+        const pdfBuffer = await generatePDFpv(data, true)
+        console.log('pdfBuffer', pdfBuffer)
+        console.log('before the if statement')
+        if (pdfBuffer) {
+          console.log('after the if statement')
+          const mailOptions = {
+            from: '"Conseil de Discipline" <conseil-discipline@cd-usto.tech>',
+            to: values[1],
+            subject: `Procès-Verbal du conseil de discipline du ${data.dateCD}.`,
+            html: '<body><div style="text-align: center;"><img src="https://i.goopics.net/hmgccm.png" style="width: 100%; max-width: 650px; height: auto;"></div></body>',
+            attachments: [
+              {
+                filename: 'PV.pdf',
+                content: pdfBuffer,
+                contentType: 'application/pdf'
+              }
+            ]
           }
-        })
+          console.log('AAAAAAAA')
+          transporter.sendMail(mailOptions, function (err, info) {
+            if (err) {
+              console.log('Error while sending email' + err)
+            } else {
+              console.log('Email sent')
+              res.sendStatus(204)
+            }
+          })
+        }
       } catch (err) {
         console.error(err)
         res.status(400).send('An error occurred while generating the PDF')
