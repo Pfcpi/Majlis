@@ -45,10 +45,15 @@ function AjouterRapport() {
     "Détérioration de biens de l'établissement",
     'autres...'
   ]
+  const degre = ['1', '2']
+
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
   const [dropMotif, setDropMotif] = useState(false)
   const [dropMotifValue, setDropMotifValue] = useState('')
+  const [dropDegre, setDropDegre] = useState(false)
+  const [dropDegreValue, setDropDegreValue] = useState('')
+
   const [etudiants, setEtudiants] = useState([])
   const [errorsStep1, setErrorsStep1] = useState({
     matriculeError: '',
@@ -158,6 +163,10 @@ function AjouterRapport() {
   }, [dropNiveauValue])
 
   useEffect(() => {
+    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
+  }, [dropDegreValue])
+
+  useEffect(() => {
     if (dropMotifValue != 'autres...') {
       setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
     } else {
@@ -195,6 +204,22 @@ function AjouterRapport() {
           onClick={() => {
             setdropNiveau(false)
             setdropNiveauValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropDegredownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {degre.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropDegre(false)
+            setDropDegreValue(n)
           }}
         >
           {n}
@@ -411,6 +436,7 @@ function AjouterRapport() {
               onClick={() => {
                 setStep(1)
                 setdropNiveauValue('')
+                setDropDegreValue('')
                 setDropMotifValue('')
                 setRapport({})
               }}
@@ -423,6 +449,7 @@ function AjouterRapport() {
                 addLoadingBar()
                 setStep(1)
                 setdropNiveauValue('')
+                setDropDegreValue('')
                 setDropMotifValue('')
                 setRapport({})
                 const tache = await axios
@@ -714,17 +741,41 @@ function AjouterRapport() {
                 {dropMotif && dropMotifdownItems}
               </div>
               <div className="container_input_rapport">
-                <input
-                  className="input_dossier"
-                  name="degreI"
-                  id="degreI"
-                  onChange={handleInputChange}
-                  value={motif2.includes(rapport.motifI) ? '2' : '1'}
-                  required
-                ></input>
-                <label className="label_rapport" htmlFor="degreI">
+                <div className="flex items-center gap-4">
+                  <input
+                    className="input_dossier"
+                    name="degreI"
+                    id="degreI"
+                    onChange={(e) => {
+                      if (dropMotifValue == 'autres...') {
+                        handleInputChange(e)
+                      }
+                    }}
+                    value={
+                      dropMotifValue == 'autres...'
+                        ? rapport.degreI
+                        : motif2.includes(rapport.motifI)
+                          ? '2'
+                          : '1'
+                    }
+                    required
+                  ></input>
+                  {dropMotifValue == 'autres...' && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setDropDegre((prev) => !prev)
+                      }}
+                      className="bg-blue h-full aspect-square rounded-md flex items-center justify-center"
+                    >
+                      {dropDegre ? ChoiceUp : ChoiceDown}
+                    </button>
+                  )}
+                </div>
+                <label className="label_rapport_fix" htmlFor="degreI">
                   Degré
                 </label>
+                {dropDegre && dropDegredownItems}
               </div>
               <div className="container_input_rapport">
                 <textarea
@@ -766,6 +817,7 @@ function AjouterRapport() {
                   degreI: 1
                 })
                 setdropNiveauValue('')
+                setDropDegreValue('')
               }
               setTimeout(() => {
                 setErrorsStep1({

@@ -35,7 +35,11 @@ function Archive() {
     'Exclusion pour deux ans',
     'Exclusion définitive'
   ]
-  const roles = ['Administrateur', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
+  const roles = ['Administration', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
+  const degre = ['1', '2']
+
+  const [dropDegre, setDropDegre] = useState(false)
+  const [dropDegreValue, setDropDegreValue] = useState('1')
 
   const [dropSanction, setDropSanction] = useState(false)
   const [dropSanctionValue, setDropSanctionValue] = useState('')
@@ -248,6 +252,11 @@ function Archive() {
   }, [currentViewedEtudiant.niveau_e])
 
   useEffect(() => {
+    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
+    setCurrentViewedEtudiant((prev) => ({ ...prev, degreI: dropDegreValue }))
+  }, [dropDegreValue])
+
+  useEffect(() => {
     setRapport((prev) => ({
       ...prev,
       degreI: motif2.includes(currentViewedEtudiant.motif_i) ? '2' : '1'
@@ -287,6 +296,22 @@ function Archive() {
           onClick={() => {
             setDropSanction(false)
             setDropSanctionValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropDegredownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {degre.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropDegre(false)
+            setDropDegreValue(n)
           }}
         >
           {n}
@@ -1307,6 +1332,7 @@ function Archive() {
                   onClick={() => {
                     setStep(1)
                     setModify(false)
+                    setDropMotifValue('')
                   }}
                   className="flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red"
                 >
@@ -1316,6 +1342,7 @@ function Archive() {
                   onClick={async () => {
                     setStep(1)
                     setModify(false)
+                    setDropMotifValue('')
                     addLoadingBar()
                     const tache1 = await axios
                       .patch(api + '/rapport/edit', rapport)
@@ -1655,16 +1682,49 @@ function Archive() {
                     {dropMotif && dropMotifdownItems}
                   </div>
                   <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="degreI"
-                      id="degreI"
-                      value={motif2.includes(rapport.motifI) ? '2' : '1'}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="degreI">
+                    <div className="flex items-center gap-4">
+                      <input
+                        className="input_dossier"
+                        name="degreI"
+                        id="degreI"
+                        onChange={(e) => {
+                          if (dropMotifValue == 'autres...' || dropMotifValue == '') {
+                            handleInputChange(e)
+                            setCurrentViewedEtudiant((prev) => ({
+                              ...prev,
+                              degre_i: dropDegreValue
+                            }))
+                          }
+                        }}
+                        value={
+                          dropMotifValue == 'autres...'
+                            ? dropDegreValue
+                            : dropMotifValue == ''
+                              ? rapport.degreI
+                              : motif2.includes(rapport.motifI)
+                                ? '2'
+                                : '1'
+                        }
+                        required
+                      ></input>
+                      {/* Complete from here --------------------------------------------- */}
+                      {(dropMotifValue == 'autres...' ||
+                        (!motif1.includes(rapport.motifI) && !motif2.includes(rapport.motifI))) && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setDropDegre((prev) => !prev)
+                          }}
+                          className="bg-blue h-full aspect-square rounded-md flex items-center justify-center"
+                        >
+                          {dropDegre ? ChoiceUp : ChoiceDown}
+                        </button>
+                      )}
+                    </div>
+                    <label className="label_rapport_fix" htmlFor="degreI">
                       Degré
                     </label>
+                    {dropDegre && dropDegredownItems}
                   </div>
                   <div className="container_input_rapport">
                     <textarea

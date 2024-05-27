@@ -62,6 +62,10 @@ function Archive() {
     "Détérioration de biens de l'établissement",
     'autres...'
   ]
+  const degre = ['1', '2']
+
+  const [dropDegre, setDropDegre] = useState(false)
+  const [dropDegreValue, setDropDegreValue] = useState('1')
   const [dropNiveau, setdropNiveau] = useState(false)
   const [dropNiveauValue, setdropNiveauValue] = useState('')
   const [dropMotif, setDropMotif] = useState(false)
@@ -187,6 +191,11 @@ function Archive() {
   }, [currentViewedEtudiant.motif_i])
 
   useEffect(() => {
+    setRapport((prev) => ({ ...prev, degreI: dropDegreValue }))
+    setCurrentViewedEtudiant((prev) => ({ ...prev, degreI: dropDegreValue }))
+  }, [dropDegreValue])
+
+  useEffect(() => {
     setRapport((prev) => ({ ...prev, niveauE: dropNiveauValue }))
   }, [dropNiveauValue])
 
@@ -252,6 +261,22 @@ function Archive() {
           onClick={() => {
             setdropNiveau(false)
             setdropNiveauValue(n)
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  )
+
+  const dropDegredownItems = (
+    <div className="absolute w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+      {degre.map((n) => (
+        <div
+          className="border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray"
+          onClick={() => {
+            setDropDegre(false)
+            setDropDegreValue(n)
           }}
         >
           {n}
@@ -334,7 +359,7 @@ function Archive() {
                         RemoveLoadingBar()
                         setCurrentViewedEtudiant(res.data[0])
                         console.log(res.data[0])
-                        setRapport((prev) => ({
+                        setRapport({
                           degreI: res.data[0].degre_i,
                           matriculeE: res.data[0].matricule_e,
                           nomE: res.data[0].nom_e,
@@ -350,7 +375,7 @@ function Archive() {
                           motifI: res.data[0].motif_i,
                           descI: res.data[0].description_i,
                           numR: etudiant.num_r
-                        }))
+                        })
                       })
                       .catch((err) => {
                         console.log(err)
@@ -1124,16 +1149,49 @@ function Archive() {
                     {dropMotif && dropMotifdownItems}
                   </div>
                   <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="degreI"
-                      id="degreI"
-                      value={motif2.includes(rapport.motifI) ? '2' : '1'}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="degreI">
+                    <div className="flex items-center gap-4">
+                      <input
+                        className="input_dossier"
+                        name="degreI"
+                        id="degreI"
+                        onChange={(e) => {
+                          if (dropMotifValue == 'autres...' || dropMotifValue == '') {
+                            handleInputChange(e)
+                            setCurrentViewedEtudiant((prev) => ({
+                              ...prev,
+                              degre_i: dropDegreValue
+                            }))
+                          }
+                        }}
+                        value={
+                          dropMotifValue == 'autres...'
+                            ? dropDegreValue
+                            : dropMotifValue == ''
+                              ? rapport.degreI
+                              : motif2.includes(rapport.motifI)
+                                ? '2'
+                                : '1'
+                        }
+                        required
+                      ></input>
+                      {/* Complete from here --------------------------------------------- */}
+                      {(dropMotifValue == 'autres...' ||
+                        (!motif1.includes(rapport.motifI) && !motif2.includes(rapport.motifI))) && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setDropDegre((prev) => !prev)
+                          }}
+                          className="bg-blue h-full aspect-square rounded-md flex items-center justify-center"
+                        >
+                          {dropDegre ? ChoiceUp : ChoiceDown}
+                        </button>
+                      )}
+                    </div>
+                    <label className="label_rapport_fix" htmlFor="degreI">
                       Degré
                     </label>
+                    {dropDegre && dropDegredownItems}
                   </div>
                   <div className="container_input_rapport">
                     <textarea
