@@ -371,7 +371,7 @@ function AjouterPV() {
 
     console.log('data: ', data)
     if (data.dateCd.length == 0) {
-      errors.dateCd = 'date est vide!'
+      errors.dateCd = 'Ce champ est obligatoire'
       setError((prev) => ({ ...prev, dateCdError: errors.dateCd }))
       return errors
     } else if (data.dateCd > currentDate) {
@@ -392,7 +392,7 @@ function AjouterPV() {
       setPvError((prev) => ({ ...prev, sanctionError: '' }))
     } else {
       if (data.libeleS.length == 0) {
-        errors.sanction = 'sanction est vide!'
+        errors.sanction = ' Ce champ est obligatoire'
         setPvError((prev) => ({ ...prev, sanctionError: errors.sanction }))
         return errors
       } else {
@@ -407,24 +407,41 @@ function AjouterPV() {
     //nomT: '', prenomT: '', roleT: '
     console.log('data: ', data)
     if (data.nomT.length == 0) {
-      errors.nom = 'nom est vide!'
+      errors.nom = 'Ce champ est obligatoire'
+      setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomT.length < 3) {
+      errors.nom = 'Nom invalide'
+      setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
+      return errors
+    } else if (data.nomT.search(/^[a-zA-Z]*$/g)) {
+      errors.nom = "Nom invalide(pas d'éspace)"
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
       setTemoinsError((prev) => ({ ...prev, nomError: '' }))
     }
     if (data.prenomT.length == 0) {
-      errors.prenom = 'prenom est vide!'
+      errors.prenom = 'Ce champ est obligatoire'
+      setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomT.length < 3) {
+      errors.prenom = 'Prénom invalide'
+      setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
+      return errors
+    } else if (data.prenomT.search(/^[a-zA-Z\s]*$/g)) {
+      errors.prenom = 'Prénom invalide'
       setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else {
       setTemoinsError((prev) => ({ ...prev, prenomError: '' }))
     }
+
     if (dropRoleValue != '' && dropRoleValue != 'autres...') {
       setTemoinsError((prev) => ({ ...prev, roleError: '' }))
     } else {
       if (data.roleT.length == 0) {
-        errors.role = 'role est vide!'
+        errors.role = 'Ce champ est obligatoire'
         setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
         return errors
       } else {

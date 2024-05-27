@@ -15,9 +15,6 @@
 - vérifie si un témoin est doublé modifierpv
 - try modifying a member (all inputs)
 
-- degré editible
-  - modify report archive
-
 - remove multiple select in archive
 
 ## Backend

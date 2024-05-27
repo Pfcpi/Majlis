@@ -428,11 +428,15 @@ function Archive() {
 
     const que_les_nombres_regex = /^[0-9]+$/
     if (data.matriculeE.length == 0) {
-      errors.matricule = 'matricule est vide!'
+      errors.matricule = 'Ce champ est obligatoire'
       setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
       return errors
     } else if (!que_les_nombres_regex.test(data.matriculeE)) {
-      errors.matricule = 'Uniquement les nombres'
+      errors.matricule = 'Matricule invalide'
+      setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
+      return errors
+    } else if (data.matriculeE.length < 8 || data.matriculeE.length > 16) {
+      errors.matricule = 'Matricule invalide'
       setErrorsStep1((prev) => ({ ...prev, matriculeError: errors.matricule }))
       return errors
     } else {
@@ -440,15 +444,15 @@ function Archive() {
     }
 
     if (data.nomE.length == 0) {
-      errors.nom = 'nom est vide!'
+      errors.nom = 'Ce champ est obligatoire'
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomE.length < 3) {
-      errors.nom = 'la longueur doit etre > 3'
+      errors.nom = 'Nom invalide'
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomE.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Uniquement les caractères (pas d'espace)"
+      errors.nom = "Nom invalide(pas d'éspace)"
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -456,15 +460,15 @@ function Archive() {
     }
 
     if (data.prenomE.length == 0) {
-      errors.prenom = 'Prenom est vide!'
+      errors.prenom = 'Ce champ est obligatoire'
       setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else if (data.prenomE.length < 3) {
-      errors.prenom = 'la longueur doit etre > 3'
+      errors.prenom = 'Prénom invalide'
       setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else if (data.prenomE.search(/^[a-zA-Z\s]*$/g)) {
-      errors.prenom = 'Uniquement les caractères'
+      errors.prenom = 'Prénom invalide'
       setErrorsStep1((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else {
@@ -472,19 +476,19 @@ function Archive() {
     }
     console.log(data.email, rapport)
     if (data.email.length == 0) {
-      errors.email = 'email est vide!'
+      errors.email = 'Ce champ est obligatoire'
       console.log(errors.email)
       setErrorsStep1((prev) => ({ ...prev, emailError: errors.email }))
       return errors
     } else if (data.email.search(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/gm)) {
-      errors.email = 'Format d’e-mail non valide'
+      errors.email = 'Email invalide'
       setErrorsStep1((prev) => ({ ...prev, emailError: errors.email }))
       return errors
     } else {
       setErrorsStep1((prev) => ({ ...prev, emailError: '' }))
     }
     if (data.niveauE.length == 0) {
-      errors.niveau = 'Niveau est vide!'
+      errors.niveau = 'Ce champ est obligatoire'
       setErrorsStep1((prev) => ({ ...prev, niveauError: errors.niveau }))
       return errors
     } else {
@@ -492,11 +496,11 @@ function Archive() {
     }
 
     if (data.groupeE.length == 0) {
-      errors.groupe = 'groupe est vide!'
+      errors.groupe = 'Ce champ est obligatoire'
       setErrorsStep1((prev) => ({ ...prev, groupeError: errors.groupe }))
       return errors
     } else if (!que_les_nombres_regex.test(data.groupeE)) {
-      errors.groupe = 'Uniquement les nombres'
+      errors.groupe = 'Groupe invalide'
       setErrorsStep1((prev) => ({ ...prev, groupeError: errors.groupe }))
       return errors
     } else {
@@ -504,11 +508,11 @@ function Archive() {
     }
 
     if (data.sectionE == null || data.sectionE.length == 0) {
-      errors.section = 'section est vide!'
+      errors.section = 'Ce champ est obligatoire'
       setErrorsStep1((prev) => ({ ...prev, sectionError: errors.section }))
       return errors
     } else if (!que_les_nombres_regex.test(data.sectionE)) {
-      errors.section = 'Uniquement les nombres'
+      errors.section = 'Section invalide'
       setErrorsStep1((prev) => ({ ...prev, sectionError: errors.section }))
       return errors
     } else {
@@ -521,15 +525,15 @@ function Archive() {
     let errors = {}
 
     if (data.nomP.length == 0) {
-      errors.nom = 'nom est vide!'
+      errors.nom = 'Ce champ est obligatoire'
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomP.length < 3) {
-      errors.nom = 'la longueur doit etre > 3'
+      errors.nom = 'Nom invalide'
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomP.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Uniquement les caractères (pas d'espace)"
+      errors.nom = "Nom invalide(pas d'éspace"
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -537,15 +541,15 @@ function Archive() {
     }
 
     if (data.prenomP.length == 0) {
-      errors.prenom = 'Prenom est vide!'
+      errors.prenom = 'Ce champ est obligatoire'
       setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else if (data.prenomP.length < 3) {
-      errors.prenom = 'la longueur doit etre > 3'
+      errors.prenom = 'Prénom invalide'
       setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else if (data.prenomP.search(/^[a-zA-Z\s]*$/g)) {
-      errors.prenom = 'Uniquement les caractères'
+      errors.prenom = 'Prénom invalide'
       setErrorsStep2((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
     } else {
@@ -558,9 +562,8 @@ function Archive() {
   const validateFormStep3 = (data) => {
     let errors = {}
 
-    console.log('data: ', data)
     if (data.lieuI.length == 0) {
-      errors.lieu = 'lieu est vide!'
+      errors.lieu = 'Ce champ est obligatoire'
       setErrorsStep3((prev) => ({ ...prev, lieuError: errors.lieu }))
       return errors
     } else {
@@ -569,7 +572,7 @@ function Archive() {
 
     console.log('data.motifI', data.motifI)
     if (data.motifI.length == 0) {
-      errors.motif = 'motif est vide!'
+      errors.motif = 'Ce champ est obligatoire'
       setErrorsStep3((prev) => ({ ...prev, motifError: errors.motif }))
       return errors
     } else {

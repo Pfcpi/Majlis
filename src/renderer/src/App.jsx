@@ -531,15 +531,6 @@ function App() {
                   <div
                     className={`flex w-3/5 justify-center items-center gap-3 ${ChangePassword ? '*:w-1/2' : '*:w-full'}`}
                   >
-                    <input
-                      className="py-3 px-5 border rounded-[10px] outline-none focus:border-blue border-auth-border-gray hover:bg-blue/15"
-                      placeholder={ChangePassword ? 'Nouveau' : 'Mot de passe'}
-                      onChange={(e) => {
-                        setPassword(e.target.value)
-                      }}
-                      value={password}
-                      type="password"
-                    ></input>
                     {ChangePassword && (
                       <input
                         className="py-3 px-5 border rounded-[10px] outline-none focus:border-blue border-auth-border-gray hover:bg-blue/15"
@@ -551,6 +542,15 @@ function App() {
                         type="password"
                       ></input>
                     )}
+                    <input
+                      className="py-3 px-5 border rounded-[10px] outline-none focus:border-blue border-auth-border-gray hover:bg-blue/15"
+                      placeholder={ChangePassword ? 'Nouveau' : 'Mot de passe'}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                      }}
+                      value={password}
+                      type="password"
+                    ></input>
                   </div>
                 )}
                 <button
