@@ -16,16 +16,17 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-router.post('/getActiveCommissionAndMembersByData', (req, res) => {
-  let { date } = req.body
-  let sqlquery = `SELECT c.num_c FROM Commission c WHERE c.date_debut_c <= ? AND c.date_fin_c >= ?;`
-  db.query(sqlquery, [date, date], (err, result) => {
+router.get('/getActiveCommissionAndMembersByData', (req, res) => {
+  let sqlquery = 'SELECT num_c FROM Commission WHERE actif_c = 1'
+  db.query(sqlquery, (err, result) => {
     if (err) {
+      console.log(err)
       res.status(400).send(err)
     } else {
-      let members = `SELECT * FROM Membre m WHERE m.num_c = ?;`
-      db.query(members, result[0].num_c, (err, result) => {
+      sqlquery = 'SELECT * FROM Membre WHERE num_c = ?'
+      db.query(sqlquery, result[0].num_c, (err, result) => {
         if (err) {
+          console.log(err)
           res.status(400).send(err)
         } else {
           res.send(result)

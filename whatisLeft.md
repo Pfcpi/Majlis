@@ -16,7 +16,6 @@
 
 - les membres de la commission archivé
 - remove multiple select in archive
-- overflow problem in cd pdf.
 
 ## Backend
 

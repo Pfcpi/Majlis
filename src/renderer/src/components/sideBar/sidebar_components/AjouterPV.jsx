@@ -234,15 +234,16 @@ function AjouterPV() {
     })
   }
 
-  const handleAnuuler = (e) => {
+  function handleAnuuler(e) {
     e.preventDefault()
     setCd({ id: '', dateCd: '' })
     setCurrentSelectedRapports([])
     setMembers([])
   }
 
-  const handleAjouter = async (e) => {
+  async function handleAjouter(e) {
     e.preventDefault()
+    setDropSanctionValue('')
     let numpv
     const newErrors = validateFormPV(pv)
     if (Object.keys(newErrors).length === 0) {
@@ -262,6 +263,16 @@ function AjouterPV() {
           temoin: temoinArray
         })
         .then(async (res) => {
+          const tache1 = await axios
+            .get(api + '/rapport/get')
+            .then((res) => {
+              setRapports(res.data)
+              console.log('Updated')
+            })
+            .catch((err) => {
+              console.log(err)
+              alert('Vérifier la connexion internet\nPour avoir les rapport restants')
+            })
           RemoveLoadingBar()
           removeCover()
           console.log(res)
@@ -285,7 +296,7 @@ function AjouterPV() {
         for (const m of members) {
           console.log('email on top of the loop: ', m)
           const tache = await axios
-            .post(api + '/archive/mail', {
+            .post(apiPDF + 'mail', {
               numPV: Number(numpv),
               email: m.email_m
             })
@@ -299,13 +310,6 @@ function AjouterPV() {
       } else {
         alert("Vérifier la connexion internet \n le pv n'a pas été creé")
       }
-
-      const tache1 = await axios
-        .get(api + '/rapport/get')
-        .then((res) => {
-          setRapports(res.data)
-        })
-        .catch((err) => console.log(err))
     }
     setTimeout(() => {
       setPvError({ sanctionError: '' })
@@ -440,20 +444,8 @@ function AjouterPV() {
                 <input
                   className="input_dossier"
                   name="dateCd"
-                  onChange={async (e) => {
+                  onChange={(e) => {
                     setCd((prev) => ({ ...prev, dateCd: e.target.value }))
-                    addLoadingBar()
-                    const tache = await axios
-                      .post(api + '/pv/getActiveCommissionAndMembersByData', {
-                        date: e.target.value
-                      })
-                      .then((res) => {
-                        setMembers(res.data)
-                        setPv((prev) => ({ ...prev, numC: res.data[0].num_c }))
-                        console.log('members: ', res.data)
-                      })
-                      .catch((err) => console.log(err))
-                    RemoveLoadingBar()
                   }}
                   value={cd.dateCd}
                   type="date"
@@ -683,6 +675,7 @@ function AjouterPV() {
                         setTemoinArray((prev) => [...prev, temoinBuffer])
                         setIsAddingTemoin(false)
                         setTemoinBuffer({ nomT: '', prenomT: '', roleT: '' })
+                        setDropRoleValue('')
                       }
                       setTimeout(() => {
                         setTemoinsError({ nomError: '', prenomError: '', roleError: '' })
@@ -721,14 +714,18 @@ function AjouterPV() {
             <div className="flex justify-between py-4 w-5/6">
               <button
                 className="button_dossier text-red border-red hover:bg-red/25"
-                onClick={handleAnuuler}
+                onClick={(e) => {
+                  handleAnuuler(e)
+                }}
               >
                 Annuler
               </button>
               <button
                 className="button_dossier text-blue border-blue hover:bg-blue/25"
                 type="submit"
-                onClick={handleAjouter}
+                onClick={(e) => {
+                  handleAjouter(e)
+                }}
               >
                 Ajouter
               </button>
@@ -769,13 +766,24 @@ function AjouterPV() {
                     ? 'flex border py-2 px-4 rounded-xl gap-2 border-blue text-blue bg-blue/25 duration-100'
                     : 'flex border py-2 px-4 rounded-xl gap-2 border-table-border-white-theme-color text-dark-gray/25 dark:text-white/25 dark:border-white/25 cursor-not-allowed'
                 }
-                onClick={() => {
+                onClick={async () => {
                   if (currentSelectedRapports.length > 0) {
                     setCreerConseildState(true)
+                    addLoadingBar()
+                    const tache = await axios
+                      .get(api + '/pv/getActiveCommissionAndMembersByData')
+                      .then((res) => setMembers(res.data))
+                      .catch((err) => {
+                        console.log(err)
+                        alert(
+                          'Vérifier la connexion internet\nLes membres de commission introuvable!'
+                        )
+                      })
+                    RemoveLoadingBar()
                   }
                 }}
               >
-                Créer un conseil
+                Créer une session
               </button>
               <button
                 className={

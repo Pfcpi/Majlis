@@ -104,7 +104,7 @@ async function generatePDFpv(data, isSendingEmail) {
     doc.font(pt_bold)
     doc.text(`${data.matriculeE}`)
     doc.font(pt_regular)
-    doc.text('\u2022 ' + 'Nom et prénom: ', marginList, StudentDetailsY + leadingmd, {
+    doc.text('\u2022 ' + 'Nom et prénom: ', marginList, doc.y, {
       continued: true,
       align: 'left',
       width: doc.page.width - marginList * 2
@@ -112,7 +112,7 @@ async function generatePDFpv(data, isSendingEmail) {
     doc.font(pt_bold)
     doc.text(`${data.nomE} ${data.prenomE}`)
     doc.font(pt_regular)
-    doc.text('\u2022 ' + "Niveau d'étude: ", marginList, StudentDetailsY + leadingmd * 2, {
+    doc.text('\u2022 ' + "Niveau d'étude: ", marginList, doc.y, {
       continued: true,
       align: 'left',
       width: doc.page.width - marginList * 2
@@ -313,6 +313,7 @@ async function generatePDFrapport(data, pathReq) {
 
   //Détails de l'étudiant
   const StudentDetailsY = doc.y + leadingmd
+  const StringHmd = doc.heightOfString('A')
 
   doc.text('\u2022 ' + 'Matricule: ', marginList, StudentDetailsY, {
     continued: true,
@@ -322,7 +323,7 @@ async function generatePDFrapport(data, pathReq) {
   doc.font(pt_bold)
   doc.text(`${data.matriculeE}`)
   doc.font(pt_regular)
-  doc.text('\u2022 ' + 'Nom et prénom: ', marginList, StudentDetailsY + leadingmd, {
+  doc.text('\u2022 ' + 'Nom et prénom: ', marginList, doc.y, {
     continued: true,
     align: 'left',
     width: doc.page.width - marginList * 2
@@ -330,7 +331,7 @@ async function generatePDFrapport(data, pathReq) {
   doc.font(pt_bold)
   doc.text(`${data.nomE} ${data.prenomE}`)
   doc.font(pt_regular)
-  doc.text('\u2022 ' + "Niveau d'étude: ", marginList, StudentDetailsY + leadingmd * 2, {
+  doc.text('\u2022 ' + "Niveau d'étude: ", marginList, doc.y, {
     continued: true,
     align: 'left',
     width: doc.page.width - marginList * 2
@@ -585,16 +586,13 @@ async function generatePDFcd(data, pathReq) {
         doc.heightOfString(cell, {
           width: colIndex !== 1 ? colWidth - 5 : 2 * colWidth - 5
         }) / StringHmd
-      console.log('nbLinesPerPhrase: ', nbLinesPerPhrase)
       let centerV = y + (rowHeight - nbLinesPerPhrase * StringHmd) / 2
-      console.log('CenterV: ', centerV)
 
       doc.text(cell, x, centerV, {
         width: colIndex !== 1 ? colWidth - 5 : 2 * colWidth - 5,
         align: 'left'
       })
     })
-    console.log('---------------------------------------------')
     return y + rowHeight
   }
 
@@ -657,6 +655,9 @@ async function generatePDFcd(data, pathReq) {
   const signatureH = 100
   const signatureX = doc.page.width - signatureW
   const signatureY = 670
+  if (doc.y > signatureY) {
+    doc.addPage()
+  }
 
   doc.rect(signatureX, signatureY, signatureW, signatureH)
 
