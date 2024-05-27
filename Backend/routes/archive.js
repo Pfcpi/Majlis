@@ -412,7 +412,6 @@ GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
     if (err) {
       res.status(400).send(err)
     } else {
-      console.log('/getcommission:', result)
       res.send(result)
     }
   })
@@ -1028,7 +1027,6 @@ WHERE num_cd NOT IN(SELECT num_cd FROM PV)
     if (err) {
       res.status(400).send(err)
     } else {
-      console.log(result)
       const deleteUnrefrenced2 = `
             DELETE FROM Conseil_Discipline
             WHERE num_cd NOT IN(SELECT num_cd FROM PV)`

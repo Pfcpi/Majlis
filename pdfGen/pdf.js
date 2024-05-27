@@ -4,6 +4,7 @@ const PDFDocument = require('pdfkit')
 const fs = require('fs')
 const svgToPdf = require('svg-to-pdfkit')
 const path = require('path')
+const { cloneElement } = require('react')
 
 //fonts
 const pt_serif_folder = path.join(__dirname, 'fonts', 'PT_Serif')
@@ -23,6 +24,12 @@ const leadingxl = xl * leadingFactor
 const marginList = 60
 const marginText = 40
 const footerHeight = 50
+
+const ustoLogoDimention = 70
+const headerW = 500
+const headerH = 100
+const headerY = 0
+const pdTop = headerY + 10
 
 function maj(chaine) {
   return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
@@ -282,18 +289,14 @@ async function generatePDFpv(data, pathReq) {
   const writableStream = fs.createWriteStream('public/sortie.pdf')
 
   //Entete
-  const headerW = 500
-  const headerH = 100
   const headerX = (doc.page.width - headerW) / 2
-  const headerY = 0
 
-  const ustoLogoDimention = 90
   doc.rect(headerX, headerY, headerW, headerH)
 
   pathImages = path.join(__dirname, 'imagesForPDF')
   const svgData = fs.readFileSync(path.join(pathImages, 'entete.svg'), 'utf8')
   svgToPdf(doc, svgData, headerX + 120, headerY + 15)
-  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, headerY, {
+  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, pdTop, {
     fit: [ustoLogoDimention, ustoLogoDimention]
   })
 
@@ -381,7 +384,7 @@ async function generatePDFpv(data, pathReq) {
   if (dataArray1.length > 0 && dataArray1[0] !== '') {
     for (let i = 0; i < dataArray1.length; i++) {
       doc.font(pt_regular)
-      doc.text('\u2022 ' + 'm./mme: ', marginList, doc.y, {
+      doc.text('\u2022 ' + 'm./Mme: ', marginList, doc.y, {
         continued: true,
         align: 'left',
         width: doc.page.width - marginList * 2
@@ -688,18 +691,14 @@ async function generatePDFrapport(data, pathReq) {
   const writableStream = fs.createWriteStream('public/sortie.pdf')
 
   //Entete
-  const headerW = 500
-  const headerH = 100
   const headerX = (doc.page.width - headerW) / 2
-  const headerY = 0
 
-  const ustoLogoDimention = 90
   doc.rect(headerX, headerY, headerW, headerH)
 
   pathImages = path.join(__dirname, 'imagesForPDF')
   const svgData = fs.readFileSync(path.join(pathImages, 'entete.svg'), 'utf8')
   svgToPdf(doc, svgData, headerX + 120, headerY + 15)
-  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, headerY, {
+  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, pdTop, {
     fit: [ustoLogoDimention, ustoLogoDimention]
   })
 
@@ -1153,28 +1152,27 @@ async function generatePDFcd(data, pathReq) {
   const writableStream = fs.createWriteStream('public/sortie.pdf')
 
   //Entete
-  const headerW = 500
-  const headerH = 100
   const headerX = (doc.page.width - headerW) / 2
-  const headerY = 0
 
-  const ustoLogoDimention = 90
   doc.rect(headerX, headerY, headerW, headerH)
 
   pathImages = path.join(__dirname, 'imagesForPDF')
   const svgData = fs.readFileSync(path.join(pathImages, 'entete.svg'), 'utf8')
   svgToPdf(doc, svgData, headerX + 120, headerY + 15)
-  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, headerY, {
+  doc.image('imagesForPDF/ustoLogo.jpg', headerX + 10, pdTop, {
     fit: [ustoLogoDimention, ustoLogoDimention]
   })
 
-  const TitleY = 170
-  doc
-    .font(pt_bold)
-    .fontSize(xl)
-    .text('Procès-Verbal du Conseil de Discipline', 0, TitleY, { align: 'center' })
-  doc.fontSize(xl).text("du département d'informatique", 0, TitleY + 30, { align: 'center' })
-  doc.fontSize(lg).text('Date du PV: ' + data.datePV, 0, TitleY + 66, { align: 'center' })
+  const TitleY = 120
+  doc.font(pt_bold).fontSize(xl)
+  console.log("doc.heightOfString('A'): ", doc.heightOfString('A'))
+  doc.text('Procès-Verbal du Conseil de Discipline', 0, TitleY, { align: 'center' })
+  doc.text("du département d'informatique", 0, TitleY + doc.heightOfString('A'), {
+    align: 'center'
+  })
+  doc.fontSize(lg).text('Date du PV: ' + data.datePV, 0, TitleY + 3 * doc.heightOfString('A'), {
+    align: 'center'
+  })
 
   //Détails de l'infraction
   doc.font(pt_regular)
@@ -1198,14 +1196,6 @@ async function generatePDFcd(data, pathReq) {
   doc.font(pt_regular)
   doc.text(text3i)
 
-  //détails des membres présentes
-  const membresdetailsy = doc.y + leadingmd * 1
-  doc.font(pt_regular)
-  doc.text('en présence des membres suivants: ', marginText, membresdetailsy, {
-    align: 'left',
-    width: doc.page.width - marginText * 2
-  })
-
   const dataArray1 = data.nomM.split(',')
   const dataArray2 = data.prenomM.split(',')
 
@@ -1214,7 +1204,7 @@ async function generatePDFcd(data, pathReq) {
   if (dataArray1.length > 0 && dataArray1[0] !== '') {
     for (let i = 0; i < dataArray1.length; i++) {
       doc.font(pt_regular)
-      doc.text('\u2022 ' + 'm./mme: ', marginList, doc.y, {
+      doc.text('\u2022 ' + 'M./Mme: ', marginList, doc.y, {
         continued: true,
         align: 'left',
         width: doc.page.width - marginList * 2
@@ -1250,32 +1240,7 @@ async function generatePDFcd(data, pathReq) {
 
   doc.y = doc.y + leadingmd
 
-  // Define table properties
-  const tableTop = doc.y + leadingmd
-  const tableLeft = 50
-  const rowHeight = 100
-  const colWidth = 100
-  const pageTop = doc.page.margins.top
-  const pageBottom = doc.page.height - doc.page.margins.bottom - footerHeight
-
-  // Function to draw table headers
-  function drawHeaders(headers, y) {
-    headers.forEach((header, i) => {
-      const x = tableLeft + i * colWidth + 5 // Add padding
-      doc.text(header, x, y + 5, { width: colWidth - 10, align: 'left' })
-    })
-    return y + rowHeight
-  }
-
-  // Function to draw table row
-  function drawRow(row, y) {
-    row.forEach((cell, colIndex) => {
-      const x = tableLeft + colIndex * colWidth + 5 // Add padding
-      doc.text(cell, x, y + 5, { width: colWidth - 10, align: 'left' })
-    })
-    return y + rowHeight
-  }
-
+  doc.font(pt_bold)
   // Define table cell content
   const headers = [
     'Étudiants concernés',
@@ -1283,67 +1248,14 @@ async function generatePDFcd(data, pathReq) {
     'Plaignants',
     'Décisions du conseil de discipline'
   ]
-  const dataPV = [
-    ['Row 1 Col 1', 'Row 1 Col 2', 'Row 1 Col 3'],
-    ['Row 2 Col 1', 'Row 2 Col 2', 'Row 2 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-    ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3']
-  ]
-
-  const numRows = dataPV.length
-  const numCols = 4
-
-  // Draw the table grid
-  for (let i = 0; i <= numRows; i++) {
-    const y = tableTop + i * rowHeight
-    doc
-      .moveTo(tableLeft, y)
-      .lineTo(tableLeft + numCols * colWidth, y)
-      .stroke()
-    if (y + rowHeight > pageBottom) {
-      doc.addPage()
-    }
-  }
-
-  for (let j = 0; j <= numCols; j++) {
-    const x = tableLeft + j * colWidth
-    doc
-      .moveTo(x, tableTop)
-      .lineTo(x, tableTop + numRows * rowHeight)
-      .stroke()
-  }
-
-  // Draw table with pagination
-  let y = doc.y
-  y = drawHeaders(headers, y)
-  let counter = 1
-
-  dataPV.forEach((row, rowIndex) => {
-    if (y + rowHeight > pageBottom) {
-      console.log('it flex the time :', counter)
-      counter += 1
-      doc.addPage()
-      y = pageTop
-      y = drawHeaders(headers, y)
-    }
-    y = drawRow(row, y)
-  })
+  let dataPV = []
 
   for (let i = 0; i < dataArray1P.length; i++) {
     const cell1 =
       dataArray1P[i].toUpperCase() +
       ' ' +
       maj(dataArray2P[i]) +
+      '\n' +
       dataArray3P[i] +
       '-S' +
       dataArray4P[i] +
@@ -1356,6 +1268,117 @@ async function generatePDFcd(data, pathReq) {
     const cell3 = plaignant
 
     const cell4 = dataArray9P[i]
+    dataPV = [...dataPV, [cell1, cell2, cell3, cell4]]
+  }
+
+  const padding = 20
+
+  doc.fontSize(md)
+  doc.font(pt_bold)
+  const StringHmd = doc.heightOfString('A')
+
+  // Define table properties
+  const numRows = dataPV.length
+  const numCols = headers.length
+  const rowHeight = 4 * StringHmd + padding
+  const colWidth = 105
+  const tableTop = doc.y + leadingmd
+  const tableLeft = (doc.page.width - (numCols * colWidth + colWidth)) / 2
+  const pageTop = doc.page.margins.top
+  const pageBottom = doc.page.height - doc.page.margins.bottom - 20
+
+  const maxWordPerHeader = 3
+  const TableHeaderHeight = maxWordPerHeader * StringHmd + padding
+
+  // Function to draw table headers
+  function drawHeaders(headers, y) {
+    doc.font(pt_bold)
+    headers.forEach((header, i) => {
+      if (i > 1) i += 1
+      const x = tableLeft + i * colWidth
+
+      const nbLinesPerPhrase =
+        doc.heightOfString(header, {
+          width: i !== 1 ? colWidth : 2 * colWidth
+        }) / StringHmd
+      let centerV = y + (TableHeaderHeight - nbLinesPerPhrase * StringHmd) / 2
+
+      doc.text(header, x, centerV, {
+        width: i !== 1 ? colWidth : 2 * colWidth,
+        align: 'center'
+      })
+    })
+    return y + TableHeaderHeight
+  }
+
+  // Function to draw table row
+  function drawRow(row, y) {
+    doc.font(pt_regular)
+    row.forEach((cell, colIndex) => {
+      if (colIndex > 1) colIndex += 1
+      const x = tableLeft + colIndex * colWidth + 5 // Add padding
+
+      const nbLinesPerPhrase =
+        doc.heightOfString(cell, {
+          width: colIndex !== 1 ? colWidth - 5 : 2 * colWidth - 5
+        }) / StringHmd
+      console.log('nbLinesPerPhrase: ', nbLinesPerPhrase)
+      let centerV = y + (rowHeight - nbLinesPerPhrase * StringHmd) / 2
+      console.log('CenterV: ', centerV)
+
+      doc.text(cell, x, centerV, {
+        width: colIndex !== 1 ? colWidth - 5 : 2 * colWidth - 5,
+        align: 'left'
+      })
+    })
+    console.log('---------------------------------------------')
+    return y + rowHeight
+  }
+
+  function DrowHorizontalLine(y) {
+    doc
+      .moveTo(tableLeft, y)
+      .lineTo(tableLeft + numCols * colWidth + colWidth, y)
+      .stroke()
+  }
+  function DrowVerticalLines(y, height) {
+    for (let j = 0; j <= numCols; j++) {
+      let s = j > 1 ? j + 1 : j
+      const x = tableLeft + s * colWidth
+      doc
+        .moveTo(x, y)
+        .lineTo(x, y + height)
+        .stroke()
+    }
+  }
+
+  function DrowFourHorizontalRect(y, height) {
+    DrowHorizontalLine(y)
+    DrowVerticalLines(y, height)
+    DrowHorizontalLine(y + height)
+  }
+
+  let y = tableTop
+  DrowFourHorizontalRect(y, TableHeaderHeight)
+  y = drawHeaders(headers, y)
+
+  // Draw the table grid
+  let UpdateY = y
+  let j = 0
+  for (let i = 0; i < numRows; i++) {
+    let y = UpdateY + j * rowHeight
+    j += 1
+    DrowFourHorizontalRect(y, rowHeight)
+
+    y = drawRow(dataPV[i], y)
+    if (y + rowHeight > pageBottom && i != numRows - 1) {
+      doc.addPage()
+      j = 0
+      y = footerHeight
+      DrowFourHorizontalRect(y, TableHeaderHeight)
+      y = drawHeaders(headers, y)
+      UpdateY = y
+    }
   }
 
   //Signature

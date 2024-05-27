@@ -6,11 +6,6 @@
 
 - date always removes one day.
 
-- filtre for pv:
-
-  - sanction
-  - date
-
 - limite the date to only today and active date of the commission.
 
   - modify mem
@@ -25,5 +20,4 @@
 
 - before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
 - date always removes one day.
-
 - verify the mem finish date.
