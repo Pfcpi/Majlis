@@ -23,7 +23,8 @@ function AjouterPV() {
     'Blâme',
     'Exclusion pour un semestre ou une année',
     'Exclusion pour deux ans',
-    'Exclusion définitive'
+    'Exclusion définitive',
+    'autres...'
   ]
   const roles = ['Administrateur', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
 

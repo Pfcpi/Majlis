@@ -795,6 +795,7 @@ function Archive() {
               </button>
               <div className="flex gap-0">
                 <button
+                title='Ajouter un membre'
                   className={
                     membres.length < 10
                       ? 'button_active_blue rounded-r-none'
@@ -809,6 +810,7 @@ function Archive() {
                   {ajouterImage}
                 </button>
                 <button
+                title='Modifier le membre'
                   className={
                     currentSelectedMembres.length == 1
                       ? 'button_active_blue rounded-none'
@@ -819,6 +821,7 @@ function Archive() {
                   {ModifierImage}
                 </button>
                 <button
+                title='Supprimer le(s) membre(s)'
                   className={
                     currentSelectedMembres.length != 0
                       ? 'button_active_red rounded-l-none'

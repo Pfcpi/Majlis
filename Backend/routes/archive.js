@@ -396,7 +396,7 @@ router.get('/getcommission', (req, res) => {
   let sqlquery = `SELECT
   c.num_c, c.date_debut_c, c.date_fin_c,
   GROUP_CONCAT(DISTINCT m.nom_m) AS nomM,
-  GROUP_CONCAT(DISTINCT m.prenom_m) AS roleM,
+  GROUP_CONCAT(DISTINCT m.prenom_m) AS prenomM,
   GROUP_CONCAT(DISTINCT m.role_m) AS roleM
 FROM
 Commission c

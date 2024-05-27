@@ -155,7 +155,7 @@ router.patch('/archivecom', (req, res) => {
     if (err) {
       res.status(200).send(err)
     } else {
-      let setAllmemberstoInactive = `UPDATE Membre SET est_actif = FALSE WHERE est_actif = TRUE`
+      let setAllmemberstoInactive = `UPDATE Membre SET est_actif = FALSE, date_fin_m = NOW() WHERE est_actif = TRUE`
       db.query(setAllmemberstoInactive, (err, result) => {
         if (err) {
           res.status(200).send(err)

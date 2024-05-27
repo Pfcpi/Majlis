@@ -51,6 +51,7 @@ function Archive() {
   const [commissions, setCommissions] = useState([])
   const [selectedMem, setSelectedMem] = useState([])
   const [currentViewedCOM, setCurrentViewedCOM] = useState({})
+  const [currentViewedMembers, setCurrentViewedMembers] = useState([])
   const [queryCom, setQueryCom] = useState('')
 
   const [PVs, setPVs] = useState([])
@@ -204,7 +205,7 @@ function Archive() {
       .get(api + '/archive/getcommission')
       .then((res) => {
         setCommissions(res.data)
-        console.log(res.data)
+        console.log('/archive/getcommission', res.data)
       })
       .catch((err) => {
         console.log(err)
@@ -1141,6 +1142,12 @@ function Archive() {
                   onClick={() => {
                     if (selectedMem.length == 1) {
                       handleViewCOM()
+                      console.log(selectedMem)
+                      const array1 = selectedMem[0].nomM.split(',')
+                      const array2 = selectedMem[0].prenomM.split(',')
+                      for (let i = 0; i < array1.length; i++) {
+                        setCurrentViewedMembers((prev) => [...prev, [array1[i], array2[i]]])
+                      }
                       setView(true)
                     }
                   }}
@@ -1246,7 +1253,7 @@ function Archive() {
                   {currentWindow == win[2] && (
                     <>
                       <th className="w-1/5">
-                        <div>N° Membre</div>
+                        <div>N° Commission</div>
                       </th>
                       <th className="w-1/5 ">
                         <div>Date de debut</div>
@@ -2142,6 +2149,7 @@ function Archive() {
               onClick={() => {
                 setView(false)
                 setSelectedMem([])
+                setCurrentViewedMembers([])
                 setCurrentViewedCOM({})
               }}
             >
@@ -2161,12 +2169,24 @@ function Archive() {
                     {selectedMem[0].date_fin_c ? selectedMem[0].date_fin_c.slice(0, 10) : ''}
                   </p>
                   <div>
+                    Membres :{' '}
+                    <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
+                      {Array.isArray(currentViewedMembers) &&
+                        currentViewedMembers.length != 0 &&
+                        currentViewedMembers.map((t) => (
+                          <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                            <div>{t[0] + ' ' + t[1]}</div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                  <div>
                     Conseils :{' '}
                     <div className="w-full h-fit flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-20">
                       {Array.isArray(currentViewedCOM) &&
                         currentViewedCOM.length != 0 &&
                         currentViewedCOM.map((t) => (
-                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                             <div>{t.date_cd.slice(0, 10)}</div>
                           </div>
                         ))}
@@ -2205,7 +2225,7 @@ function Archive() {
                       {Array.isArray(currentViewedCD.membres) &&
                         currentViewedCD.membres.length != 0 &&
                         currentViewedCD.membres.map((t) => (
-                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                             <div>{t}</div>
                           </div>
                         ))}
@@ -2217,7 +2237,7 @@ function Archive() {
                       {Array.isArray(currentViewedCD.etudiants) &&
                         currentViewedCD.etudiants.length != 0 &&
                         currentViewedCD.etudiants.map((t) => (
-                          <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
                             <div>{t}</div>
                           </div>
                         ))}

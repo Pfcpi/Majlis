@@ -13,12 +13,10 @@
 
 - vérifie si un témoin est doublé addpv
 - vérifie si un témoin est doublé modifierpv
+- try modifying a member (all inputs)
 
-- les membres de la commission archivé
 - remove multiple select in archive
 
 ## Backend
 
-- before getting the cds, make sure in the backend to clear out all the cds that have the pv null.
 - date always removes one day.
-- verify the mem finish date.
