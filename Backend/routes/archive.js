@@ -698,6 +698,7 @@ GROUP BY
       console.log('err executing /archive/getspv:', err)
       res.status(400).send(err)
     } else {
+      console.log('data in /archive/getspv: ', result)
       const data = {
         numR: result[0].num_r,
         matriculeE: result[0].matricule_e,

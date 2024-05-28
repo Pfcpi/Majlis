@@ -537,7 +537,7 @@ function Archive() {
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomP.search(/^[a-zA-Z\s]*$/g)) {
-      errors.nom = "Nom invalide"
+      errors.nom = 'Nom invalide'
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -718,7 +718,7 @@ function Archive() {
                     }}
                     className="button_active_blue "
                   >
-                    <img src={ImprimerSVG}></img>PDF
+                    <img src={PdfSVG}></img>PDF
                   </button>
                 </div>
               </div>

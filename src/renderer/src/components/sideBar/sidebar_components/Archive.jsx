@@ -13,9 +13,6 @@ import ModifierDossierSVG from './../../../assets/ModifierDossier.svg'
 import ModifierDossierGraySVG from './../../../assets/BlueSvgs/ModifierDossierGray.svg'
 import PdfSVG from './../../../assets/pdf.svg'
 import WarningSVG from './../../../assets/warning.svg'
-import SupprimerSVG from './../../../assets/supprimer.svg'
-import EnvoyerSVG from './../../../assets/Envoyer.svg'
-import EnvoyerGraySVG from './../../../assets/BlueSvgs/EnvoyerGray.svg'
 import GOBackSVG from './../../../assets/GoBack.svg'
 import GOBackGraySVG from './../../../assets/BlueSvgs/GoBackGray.svg'
 import successmarkSVG from './../../../assets/success_mark.svg'
@@ -547,30 +544,30 @@ function Archive() {
     let errors = {}
     //nomT: '', prenomT: '', roleT: '
     console.log('data: ', data)
-    if (data.nomT.length == 0) {
+    if (data.nom.length == 0) {
       errors.nom = 'Ce champ est obligatoire'
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomT.length < 3) {
+    } else if (data.nom.length < 3) {
       errors.nom = 'Nom invalide'
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomT.search(/^[a-zA-Z\s]*$/g)) {
-      errors.nom = "Nom invalide"
+    } else if (data.nom.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = 'Nom invalide'
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
       setTemoinsError((prev) => ({ ...prev, nomError: '' }))
     }
-    if (data.prenomT.length == 0) {
+    if (data.prenom.length == 0) {
       errors.prenom = 'Ce champ est obligatoire'
       setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
-    } else if (data.prenomT.length < 3) {
+    } else if (data.prenom.length < 3) {
       errors.prenom = 'Prénom invalide'
       setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
-    } else if (data.prenomT.search(/^[a-zA-Z\s]*$/g)) {
+    } else if (data.prenom.search(/^[a-zA-Z\s]*$/g)) {
       errors.prenom = 'Prénom invalide'
       setTemoinsError((prev) => ({ ...prev, prenomError: errors.prenom }))
       return errors
@@ -580,7 +577,7 @@ function Archive() {
     if (dropRoleValue != '' && dropRoleValue != 'autres...') {
       setTemoinsError((prev) => ({ ...prev, roleError: '' }))
     } else {
-      if (data.roleT.length == 0) {
+      if (data.role.length == 0) {
         errors.role = 'Ce champ est obligatoire'
         setTemoinsError((prev) => ({ ...prev, roleError: errors.role }))
         return errors
@@ -755,7 +752,7 @@ function Archive() {
               <img src={VoirDossierSVG} alt=""></img>
             </button>
             <button
-              title="Modifier le rapport"
+              title={account == 'chef' ? 'Modifier le rapport' : 'Changer le motif'}
               onClick={() => {
                 handleModifyRapport(m.num_r)
               }}
@@ -786,16 +783,12 @@ function Archive() {
     filteredPVs.map((m) => (
       <tr
         className={
-          selectedPVs.findIndex((el) => el == m) == -1
+          selectedPVs[0] != m
             ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
             : 'border-y duration-150 ease-linear bg-blue/25'
         }
         onClick={() => {
-          const found = selectedPVs.findIndex((el) => el == m)
-          if (found == -1) setSelectedPVs((prev) => [...prev, m])
-          else {
-            setSelectedPVs((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
-          }
+          setSelectedPVs([m])
         }}
       >
         <td>
@@ -825,16 +818,12 @@ function Archive() {
     filteredMembers.map((m) => (
       <tr
         className={
-          selectedMem.findIndex((el) => el == m) == -1
+          selectedMem[0] != m
             ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
             : 'border-y duration-150 ease-linear bg-blue/25'
         }
         onClick={() => {
-          const found = selectedMem.findIndex((el) => el == m)
-          if (found == -1) setSelectedMem((prev) => [...prev, m])
-          else {
-            setSelectedMem((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
-          }
+          setSelectedMem([m])
         }}
       >
         <td>
@@ -861,16 +850,12 @@ function Archive() {
     filteredCons.map((m) => (
       <tr
         className={
-          selectedCon.findIndex((el) => el == m) == -1
+          selectedCon[0] != m
             ? 'border-y duration-150 ease-linear hover:bg-side-bar-white-theme-color dark:hover:bg-dark-gray'
             : 'border-y duration-150 ease-linear bg-blue/25'
         }
         onClick={() => {
-          const found = selectedCon.findIndex((el) => el == m)
-          if (found == -1) setSelectedCon((prev) => [...prev, m])
-          else {
-            setSelectedCon((prev) => prev.slice(0, found).concat(prev.slice(found + 1)))
-          }
+          setSelectedCon([m])
         }}
       >
         <td>
@@ -912,7 +897,7 @@ function Archive() {
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomE.search(/^[a-zA-Z\s]*$/g)) {
-      errors.nom = "Nom invalide"
+      errors.nom = 'Nom invalide'
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -1939,7 +1924,7 @@ function Archive() {
                         required
                       ></input>
                       <label className="label_rapport" htmlFor="nom">
-                        nom
+                        Nom
                       </label>
                       {temoinsError.nomError && (
                         <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -1960,7 +1945,7 @@ function Archive() {
                         required
                       ></input>
                       <label className="label_rapport" htmlFor="prenom">
-                        Prenom
+                        Prénom
                       </label>
                       {temoinsError.prenomError && (
                         <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -1980,7 +1965,7 @@ function Archive() {
                               handleInputTemoinChange(e)
                             }
                           }}
-                          value={dropRoleValue == 'autres...' ? temoinBuffer.roleT : dropRoleValue}
+                          value={dropRoleValue == 'autres...' ? temoinBuffer.role : dropRoleValue}
                           required
                         ></input>
                         <button
@@ -1994,7 +1979,7 @@ function Archive() {
                         </button>
                       </div>
                       <label className="label_rapport_fix" htmlFor="role">
-                        Role
+                        Rôle
                       </label>
                       {temoinsError.roleError && (
                         <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -2030,17 +2015,20 @@ function Archive() {
                   <h2>Témoins</h2>
                   <div className="w-full h-[99px] overflow-auto flex top-[62px] flex-col border border-light-gray/50 [&>*:first-child]:border-none [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl rounded-xl bg-white dark:bg-dark-gray z-0">
                     {temoinArray.map((t) => (
-                      <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                        <div>{t.role}</div>
-                        <div>{t.nom}</div>
-                        <div>{t.prenom}</div>
+                      <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                        <div className="w-1/3">{t.role}</div>
+                        <div className="w-1/3">{t.nom}</div>
+                        <div className="w-1/4">{t.prenom}</div>
                         <button
+                          className="flex justify-end 1/12"
                           onClick={(e) => {
                             e.preventDefault()
                             setTemoinArray(temoinArray.filter((item) => item !== t))
                           }}
                         >
-                          {supprimerImage}
+                          <div className="bg-red h-6 flex justify-center items-center aspect-square rounded-md text-white">
+                            X
+                          </div>
                         </button>
                       </div>
                     ))}

@@ -121,8 +121,8 @@ async function getUrl() {
   })
 
   const url = path.join(app.getPath('sessionData'), 'sortie.pdf')
-  await window.loadURL('http://localhost:3000/sortie.pdf')
-  //await window.loadURL('https://usto.madjria.com/sortie.pdf')
+  //await window.loadURL('http://localhost:3000/sortie.pdf')
+  await window.loadURL('https://usto.madjria.com/sortie.pdf')
   console.log('passed from here under window.loadURL')
 
   //const page = await pie.getPage(browser, window)

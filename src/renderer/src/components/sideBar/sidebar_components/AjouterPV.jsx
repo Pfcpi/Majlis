@@ -26,7 +26,7 @@ function AjouterPV() {
     'Exclusion définitive',
     'autres...'
   ]
-  const roles = ['Administrateur', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
+  const roles = ['Administration', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
 
   const [dropSanction, setDropSanction] = useState(false)
   const [dropSanctionValue, setDropSanctionValue] = useState('')
@@ -415,7 +415,7 @@ function AjouterPV() {
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else if (data.nomT.search(/^[a-zA-Z\s]*$/g)) {
-      errors.nom = "Nom invalide"
+      errors.nom = 'Nom invalide'
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -618,7 +618,7 @@ function AjouterPV() {
                         required
                       ></input>
                       <label className="label_rapport" htmlFor="nomT">
-                        nom
+                        Nom
                       </label>
                       {temoinsError.nomError && (
                         <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -639,7 +639,7 @@ function AjouterPV() {
                         required
                       ></input>
                       <label className="label_rapport" htmlFor="prenomT">
-                        Prenom
+                        Prénom
                       </label>
                       {temoinsError.prenomError && (
                         <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -673,7 +673,7 @@ function AjouterPV() {
                         </button>
                       </div>
                       <label className="label_rapport_fix" htmlFor="roleT">
-                        Role
+                        Rôle
                       </label>
                       {temoinsError.roleError && (
                         <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
@@ -711,17 +711,20 @@ function AjouterPV() {
                     {Array.isArray(temoinArray) &&
                       temoinArray.length != 0 &&
                       temoinArray.map((t) => (
-                        <div className="flex justify-between *:w-1/3 border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          <div>{t.roleT}</div>
-                          <div>{t.nomT}</div>
-                          <div>{t.prenomT}</div>
+                        <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
+                          <div className='w-1/3'>{t.roleT}</div>
+                          <div className='w-1/4'>{t.nomT}</div>
+                          <div className='w-1/4'>{t.prenomT}</div>
                           <button
+                          className='flex justify-end w-1/12'
                             onClick={(e) => {
                               e.preventDefault()
                               setTemoinArray(temoinArray.filter((item) => item !== t))
                             }}
                           >
-                            {supprimerImage}
+                            <div className="bg-red flex justify-center items-center h-6 aspect-square rounded-md text-white">
+                              X
+                            </div>
                           </button>
                         </div>
                       ))}
