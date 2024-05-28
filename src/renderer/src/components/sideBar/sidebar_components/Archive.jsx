@@ -270,6 +270,10 @@ function Archive() {
   useEffect(() => {
     if (dropMotifValue != 'autres...') {
       setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+      setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: dropMotifValue }))
+      const degrePick = motif2.includes(dropMotifValue) ? '2' : '1'
+      setRapport((prev) => ({ ...prev, degreI: degrePick }))
+      setCurrentViewedEtudiant((prev) => ({ ...prev, degreI: degrePick }))
     } else {
       setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: '' }))
       setRapport((prev) => ({ ...prev, motifI: '' }))
@@ -551,8 +555,8 @@ function Archive() {
       errors.nom = 'Nom invalide'
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomT.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Nom invalide(pas d'éspace)"
+    } else if (data.nomT.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = "Nom invalide"
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -636,6 +640,7 @@ function Archive() {
 
   function handleModifyRapport(num_r) {
     setModify(true)
+    if (account == 'president') setStep(3)
     addLoadingBar()
     axios
       .post(api + '/rapport/gets', { numR: num_r })
@@ -749,11 +754,14 @@ function Archive() {
             >
               <img src={VoirDossierSVG} alt=""></img>
             </button>
-            {account == 'chef' && (
-              <button title="Modifier le rapport" onClick={() => handleModifyRapport(m.num_r)}>
-                <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
-              </button>
-            )}
+            <button
+              title="Modifier le rapport"
+              onClick={() => {
+                handleModifyRapport(m.num_r)
+              }}
+            >
+              <img src={!dark ? ModifierDossierGraySVG : ModifierDossierSVG} alt=""></img>
+            </button>
           </div>
         </td>
       </tr>
@@ -903,8 +911,8 @@ function Archive() {
       errors.nom = 'Nom invalide'
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomE.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Nom invalide(pas d'éspace)"
+    } else if (data.nomE.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = "Nom invalide"
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -984,7 +992,7 @@ function Archive() {
       errors.nom = 'Nom invalide'
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomP.search(/^[a-zA-Z]*$/g)) {
+    } else if (data.nomP.search(/^[a-zA-Z\s]*$/g)) {
       errors.nom = "Nom invalide(pas d'éspace"
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
@@ -1327,19 +1335,21 @@ function Archive() {
       )}
       {modify && currentWindow == win[0] && (
         <div className="h-full w-full flex flex-col justify-center items-center gap-6">
-          <div className="w-full flex flex-col items-center justify-center">
-            <div className="flex w-5/6 h-2 stretch-0 bg-[#D9D9D9] justify-evenly items-center [&>div]: [&>div]:h-8 [&>div]:aspect-square [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:rounded-full [&>div]:z-10">
-              <div className={step >= 2 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>1</div>
-              <div className={step >= 3 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>2</div>
-              <div className={step >= 4 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>3</div>
+          {account == 'chef' && (
+            <div className="w-full flex flex-col items-center justify-center">
+              <div className="flex w-5/6 h-2 stretch-0 bg-[#D9D9D9] justify-evenly items-center [&>div]: [&>div]:h-8 [&>div]:aspect-square [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:rounded-full [&>div]:z-10">
+                <div className={step >= 2 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>1</div>
+                <div className={step >= 3 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>2</div>
+                <div className={step >= 4 ? 'bg-blue text-white' : 'text-blue bg-[#D9D9D9]'}>3</div>
+              </div>
+              <div className="w-5/6 h-2 mt-[-8px] flex items-center">
+                <div className={step >= 1 ? 'w-1/4 bg-blue h-2' : ''}></div>
+                <div className={step >= 2 ? 'w-1/4 bg-blue h-2' : ''}></div>
+                <div className={step >= 3 ? 'w-1/4 bg-blue h-2' : ''}></div>
+                <div className={step >= 4 ? 'w-1/4 bg-blue h-2' : ''}></div>
+              </div>
             </div>
-            <div className="w-5/6 h-2 mt-[-8px] flex items-center">
-              <div className={step >= 1 ? 'w-1/4 bg-blue h-2' : ''}></div>
-              <div className={step >= 2 ? 'w-1/4 bg-blue h-2' : ''}></div>
-              <div className={step >= 3 ? 'w-1/4 bg-blue h-2' : ''}></div>
-              <div className={step >= 4 ? 'w-1/4 bg-blue h-2' : ''}></div>
-            </div>
-          </div>
+          )}
           {step === 4 && <div className="fullBgBlock"></div>}
           {step === 4 && (
             <div className="absolute flex flex-col justify-evenly text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
@@ -1361,8 +1371,9 @@ function Archive() {
                     setModify(false)
                     setDropMotifValue('')
                     addLoadingBar()
+                    let data = account == 'chef' ? rapport : { rapport, isEmailing: true }
                     const tache1 = await axios
-                      .patch(api + '/rapport/edit', rapport)
+                      .patch(api + '/rapport/edit', data)
                       .then((res) => console.log(res, res.data.sql ? res.data.sql : ''))
                       .catch((err) => console.log(err))
                     const tache2 = await axios
@@ -1383,7 +1394,7 @@ function Archive() {
           <form className="overflow-y-auto flex flex-col justify-center items-center rounded-xl bg-side-bar-white-theme-color dark:bg-dark-gray w-1/2 max-h-[84vh] min-w-[500px] ">
             <h1 className="text-[36px] py-4">Detail du rapport</h1>
             <hr className="w-full dark:text-gray"></hr>
-            {step == 1 && (
+            {step == 1 && account == 'chef' && (
               <div className="flex flex-col w-5/6">
                 <label className="label_dossier">Etudiant</label>
                 <div className="flex flex-col w-full gap-6 mb-4 max-h-[38vh] overflow-auto pt-4">
@@ -1555,7 +1566,7 @@ function Archive() {
                 </div>
               </div>
             )}
-            {step == 2 && (
+            {step == 2 && account == 'chef' && (
               <div className="flex flex-col w-5/6 my-2">
                 <label className="label_dossier">Plaignant</label>
                 <div className="flex flex-col w-full gap-6 mb-4">
@@ -1610,49 +1621,59 @@ function Archive() {
               <div className="flex flex-col w-5/6 my-2">
                 <label className="label_dossier">Informations globales</label>
                 <div className="flex flex-col w-full gap-6 mb-4">
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="dateI"
-                      id="dateI"
-                      type="date"
-                      max={date}
-                      onChange={(e) => {
-                        handleInputChange(e)
-                        setCurrentViewedEtudiant((prev) => ({ ...prev, date_i: e.target.value }))
-                      }}
-                      value={currentViewedEtudiant.date_i.substring(0, 10)}
-                      required
-                    ></input>
-                    <label
-                      className="absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent"
-                      htmlFor="dateI"
-                    >
-                      Date
-                    </label>
-                  </div>
-                  <div className="container_input_rapport">
-                    <input
-                      className="input_dossier"
-                      name="lieuI"
-                      id="lieuI"
-                      onChange={(e) => {
-                        handleInputChange(e)
-                        setCurrentViewedEtudiant((prev) => ({ ...prev, lieu_i: e.target.value }))
-                      }}
-                      value={currentViewedEtudiant.lieu_i}
-                      required
-                    ></input>
-                    <label className="label_rapport" htmlFor="lieuI">
-                      Lieu
-                    </label>
-                    {errorsStep3.lieuError && (
-                      <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
-                        <img height="16" width="16" src={WarningSVG}></img>
-                        {errorsStep3.lieuError}
-                      </p>
-                    )}
-                  </div>
+                  {account == 'chef' && (
+                    <>
+                      <div className="container_input_rapport">
+                        <input
+                          className="input_dossier"
+                          name="dateI"
+                          id="dateI"
+                          type="date"
+                          max={date}
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            setCurrentViewedEtudiant((prev) => ({
+                              ...prev,
+                              date_i: e.target.value
+                            }))
+                          }}
+                          value={currentViewedEtudiant.date_i.substring(0, 10)}
+                          required
+                        ></input>
+                        <label
+                          className="absolute -translate-x-4 -translate-y-9 scale-90 z-10 ml-4 mt-[13px]  text-dark-gray cursor-text dark:text-white h-fit w-fit bg-transparent"
+                          htmlFor="dateI"
+                        >
+                          Date
+                        </label>
+                      </div>
+                      <div className="container_input_rapport">
+                        <input
+                          className="input_dossier"
+                          name="lieuI"
+                          id="lieuI"
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            setCurrentViewedEtudiant((prev) => ({
+                              ...prev,
+                              lieu_i: e.target.value
+                            }))
+                          }}
+                          value={currentViewedEtudiant.lieu_i}
+                          required
+                        ></input>
+                        <label className="label_rapport" htmlFor="lieuI">
+                          Lieu
+                        </label>
+                        {errorsStep3.lieuError && (
+                          <p className="absolute flex gap-2 text-yellow-700 px-4 py-2 bg-[#FFED8F]/50 top-7 left-3 animate-badInput z-10">
+                            <img height="16" width="16" src={WarningSVG}></img>
+                            {errorsStep3.lieuError}
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  )}
                   <div className="container_input_rapport">
                     <div className="flex gap-4 items-center">
                       <input
@@ -1724,7 +1745,6 @@ function Archive() {
                         }
                         required
                       ></input>
-                      {/* Complete from here --------------------------------------------- */}
                       {(dropMotifValue == 'autres...' ||
                         (!motif1.includes(rapport.motifI) && !motif2.includes(rapport.motifI))) && (
                         <button
@@ -1769,6 +1789,9 @@ function Archive() {
               <button
                 className="button_dossier text-red min-w-fit  hover:bg-0.36-red"
                 onClick={(e) => {
+                  if (account == 'president') {
+                    setModify(false)
+                  }
                   e.preventDefault()
                   if (step == 1) {
                     setModify(false)
@@ -1796,7 +1819,7 @@ function Archive() {
                   }, 2000)
                 }}
               >
-                {step >= 2 ? 'Précédent' : 'annuler'}
+                {account == 'chef' ? (step >= 2 ? 'Précédent' : 'Annuler') : 'Annuler'}
               </button>
               <button
                 className="button_dossier text-blue min-w-fit hover:bg-0.08-blue"
@@ -2119,9 +2142,6 @@ function Archive() {
             >
               <img src={PdfSVG}></img>
               PDF
-            </button>
-            <button className="modify_rapport_button">
-              <img src={dark ? EnvoyerSVG : EnvoyerGraySVG}></img>Envoyer
             </button>
           </div>
         </div>

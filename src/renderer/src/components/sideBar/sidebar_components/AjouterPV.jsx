@@ -414,8 +414,8 @@ function AjouterPV() {
       errors.nom = 'Nom invalide'
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomT.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Nom invalide(pas d'éspace)"
+    } else if (data.nomT.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = "Nom invalide"
       setTemoinsError((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {

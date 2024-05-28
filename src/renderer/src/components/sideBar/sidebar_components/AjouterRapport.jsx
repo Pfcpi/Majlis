@@ -283,8 +283,8 @@ function AjouterRapport() {
       errors.nom = 'Nom invalide'
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomE.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Nom invalide(pas d'éspace)"
+    } else if (data.nomE.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = "Nom invalide"
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
@@ -364,8 +364,8 @@ function AjouterRapport() {
       errors.nom = 'Nom invalide'
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomP.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Nom invalide(pas d'éspace"
+    } else if (data.nomP.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = "Nom invalide"
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {

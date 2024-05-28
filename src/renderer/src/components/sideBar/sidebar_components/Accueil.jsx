@@ -202,6 +202,10 @@ function Archive() {
   useEffect(() => {
     if (dropMotifValue != 'autres...') {
       setRapport((prev) => ({ ...prev, motifI: dropMotifValue }))
+      setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: dropMotifValue }))
+      const degrePick = motif2.includes(dropMotifValue) ? '2' : '1'
+      setRapport((prev) => ({ ...prev, degreI: degrePick }))
+      setCurrentViewedEtudiant((prev) => ({ ...prev, degreI: degrePick }))
     } else {
       setCurrentViewedEtudiant((prev) => ({ ...prev, motif_i: '' }))
       setRapport((prev) => ({ ...prev, motifI: '' }))
@@ -451,7 +455,7 @@ function Archive() {
       errors.nom = 'Nom invalide'
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomE.search(/^[a-zA-Z]*$/g)) {
+    } else if (data.nomE.search(/^[a-zA-Z\s]*$/g)) {
       errors.nom = "Nom invalide(pas d'éspace)"
       setErrorsStep1((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
@@ -532,8 +536,8 @@ function Archive() {
       errors.nom = 'Nom invalide'
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
-    } else if (data.nomP.search(/^[a-zA-Z]*$/g)) {
-      errors.nom = "Nom invalide(pas d'éspace"
+    } else if (data.nomP.search(/^[a-zA-Z\s]*$/g)) {
+      errors.nom = "Nom invalide"
       setErrorsStep2((prev) => ({ ...prev, nomError: errors.nom }))
       return errors
     } else {
