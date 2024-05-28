@@ -425,6 +425,7 @@ GROUP BY c.num_c, c.date_debut_c, c.date_fin_c
 */
 router.post('/getscommission', (req, res) => {
   let numC = req.body.numC
+  console.log('numC: ', numC)
   let sqlquery = `SELECT DISTINCT
   CD.num_cd,
   CD.date_cd
@@ -439,6 +440,7 @@ WHERE
     if (err) {
       res.status(400).send(err)
     } else {
+      console.log(result)
       res.send(result)
     }
   })

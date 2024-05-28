@@ -712,11 +712,11 @@ function AjouterPV() {
                       temoinArray.length != 0 &&
                       temoinArray.map((t) => (
                         <div className="flex justify-between border-t border-light-gray/50 py-1 px-4 hover:font-semibold hover:bg-side-bar-white-theme-color dark:hover:bg-gray">
-                          <div className='w-1/3'>{t.roleT}</div>
-                          <div className='w-1/4'>{t.nomT}</div>
-                          <div className='w-1/4'>{t.prenomT}</div>
+                          <div className="w-1/3">{t.roleT}</div>
+                          <div className="w-1/4">{t.nomT}</div>
+                          <div className="w-1/4">{t.prenomT}</div>
                           <button
-                          className='flex justify-end w-1/12'
+                            className="flex justify-end w-1/12"
                             onClick={(e) => {
                               e.preventDefault()
                               setTemoinArray(temoinArray.filter((item) => item !== t))
@@ -793,7 +793,11 @@ function AjouterPV() {
                     addLoadingBar()
                     const tache = await axios
                       .get(api + '/pv/getActiveCommissionAndMembersByData')
-                      .then((res) => setMembers(res.data))
+                      .then((res) => {
+                        setMembers(res.data.data)
+                        console.log(res.data)
+                        setPv((prev) => ({ ...prev, numC: res.data.numC }))
+                      })
                       .catch((err) => {
                         console.log(err)
                         alert(

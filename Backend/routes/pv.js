@@ -29,7 +29,7 @@ router.get('/getActiveCommissionAndMembersByData', (req, res) => {
           console.log(err)
           res.status(400).send(err)
         } else {
-          res.send(result)
+          res.send({ data: result, numC: result[0].num_c })
         }
       })
     }
@@ -193,7 +193,7 @@ router.post('/addCD', (req, res) => {
 */
 router.post('/addPV', (req, res) => {
   let { numCD, libeleS, temoin, numR, numC } = req.body
-  console.log(req.body)
+  console.log('Ajouter pv', req.body)
   let pvId,
     sent = false
   let temoinErrBuffer = []

@@ -30,7 +30,8 @@ function Archive() {
     'Blâme',
     'Exclusion pour un semestre ou une année',
     'Exclusion pour deux ans',
-    'Exclusion définitive'
+    'Exclusion définitive',
+    'autres...'
   ]
   const roles = ['Administration', 'Agent', 'Enseignant', 'Étudiant', 'autres...']
   const degre = ['1', '2']
@@ -204,7 +205,7 @@ function Archive() {
 
     const tache3 = await axios
       .get(api + '/archive/getcommission')
-      .then((res) => {
+      .then(async (res) => {
         setCommissions(res.data)
         console.log('/archive/getcommission', res.data)
       })
@@ -1174,7 +1175,7 @@ function Archive() {
               <button className="text-blue">
                 <div
                   className={selectedMem.length == 1 ? 'button_active_blue' : 'button_inactive'}
-                  onClick={() => {
+                  onClick={async () => {
                     if (selectedMem.length == 1) {
                       handleViewCOM()
                       console.log(selectedMem)
@@ -1183,6 +1184,7 @@ function Archive() {
                       for (let i = 0; i < array1.length; i++) {
                         setCurrentViewedMembers((prev) => [...prev, [array1[i], array2[i]]])
                       }
+
                       setView(true)
                     }
                   }}
