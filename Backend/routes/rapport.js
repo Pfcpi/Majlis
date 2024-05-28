@@ -5,6 +5,10 @@ const router = express.Router()
 const { db } = require('../config/db')
 const nodemailer = require('nodemailer')
 
+function maj(chaine) {
+  return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
+}
+
 // List of rapport that is short (Acceuil)
 router.get('/get', (req, res) => {
   let sqlquery = `SELECT r.num_r, e.nom_e, e.prenom_e, i.date_i
@@ -99,14 +103,14 @@ router.patch('/edit', (req, res) => {
   WHERE r.num_r = ?`
   let values = [
     object.matriculeE,
-    object.nomE.replace(/ /g, '\u00A0'),
-    object.prenomE.replace(/ /g, '\u00A0'),
+    object.nomE.replace(/ /g, '\u00A0').toUppercase(),
+    maj(object.prenomE.replace(/ /g, '\u00A0')),
     object.niveauE,
     object.groupeE,
     object.sectionE,
     object.email,
-    object.nomP.replace(/ /g, '\u00A0'),
-    object.prenomP.replace(/ /g, '\u00A0'),
+    object.nomP.replace(/ /g, '\u00A0').toUppercase(),
+    maj(object.prenomP.replace(/ /g, '\u00A0')),
     object.dateI,
     object.lieuI,
     object.motifI,
@@ -288,8 +292,8 @@ router.post('/add', (req, res) => {
     sqlqueryE,
     [
       object.matriculeE,
-      object.nomE.replace(/ /g, '\u00A0'),
-      object.prenomE.replace(/ /g, '\u00A0'),
+      object.nomE.replace(/ /g, '\u00A0').toUpperCase(),
+      maj(object.prenomE.replace(/ /g, '\u00A0')),
       object.niveauE,
       object.groupeE,
       object.sectionE,
@@ -302,7 +306,7 @@ router.post('/add', (req, res) => {
       } else {
         db.query(
           sqlqueryP,
-          [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')],
+          [object.nomP.replace(/ /g, '\u00A0').toUpperCase(), maj(object.prenomP.replace(/ /g, '\u00A0'))],
           (err, result) => {
             if (err) {
               // Check for duplicate
@@ -311,7 +315,7 @@ router.post('/add', (req, res) => {
               if (result[0] == null) {
                 db.query(
                   sqlqueryP2,
-                  [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')],
+                  [object.nomP.replace(/ /g, '\u00A0').toUpperCase(), maj(object.prenomP.replace(/ /g, '\u00A0'))],
                   (err, result) => {
                     if (err) {
                       console.log(err)
@@ -454,7 +458,7 @@ router.post('/add', (req, res) => {
               } else {
                 db.query(
                   sqlqueryP,
-                  [object.nomP.replace(/ /g, '\u00A0'), object.prenomP.replace(/ /g, '\u00A0')],
+                  [object.nomP.replace(/ /g, '\u00A0').toUpperCase(), maj(object.prenomP.replace(/ /g, '\u00A0'))],
                   (err, result) => {
                     if (err) {
                       console.log(err)

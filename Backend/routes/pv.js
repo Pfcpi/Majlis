@@ -5,6 +5,10 @@ const router = express.Router()
 const { db } = require('../config/db')
 const nodemailer = require('nodemailer')
 
+function maj(chaine) {
+  return chaine.charAt(0).toUpperCase().concat(chaine.slice(1))
+}
+
 // Automatic mailling setup
 const transporter = nodemailer.createTransport({
   host: 'smtp.zoho.com',
@@ -219,13 +223,13 @@ router.post('/addPV', (req, res) => {
               console.log(sent, 'temoins', temoin, ', if is an array : ', Array.isArray(temoin))
               temoin.map((t) => {
                 console.log(t)
-                db.query(sqlqueryT, [t.nomT, t.prenomT, t.roleT], (err, result) => {
+                db.query(sqlqueryT, [t.nomT.replace(/ /g, '\u00A0').toUpperCase(), maj(t.prenomT.replace(/ /g, '\u00A0')), t.roleT], (err, result) => {
                   if (err) {
                     if (err.errno == 1062) {
                       console.log('tuple duplicated')
                       let getIndex =
                         'SELECT num_t FROM Temoin WHERE nom_t = ? AND prenom_t = ? AND role_t = ?'
-                      db.query(getIndex, [t.nomT, t.prenomT, t.roleT], (err, result) => {
+                      db.query(getIndex, [t.nomT.replace(/ /g, '\u00A0').toUpperCase(), maj(t.prenomT.replace(/ /g, '\u00A0')), t.roleT], (err, result) => {
                         if (err) {
                           console.log(err)
                           temoinErrBuffer.push(err)
