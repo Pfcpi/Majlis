@@ -544,7 +544,6 @@ async function generatePDFcd(data, pathReq) {
   // Define table properties
   const numRows = dataPV.length
   const numCols = headers.length
-  const rowHeight = 4 * StringHmd + padding
   const colWidth = 105
   const tableTop = doc.y + leadingmd
   const tableLeft = (doc.page.width - (numCols * colWidth + colWidth)) / 2
@@ -576,7 +575,7 @@ async function generatePDFcd(data, pathReq) {
   }
 
   // Function to draw table row
-  function drawRow(row, y) {
+  function drawRow(row, y, height) {
     doc.font(pt_regular)
     row.forEach((cell, colIndex) => {
       if (colIndex > 1) colIndex += 1
@@ -586,14 +585,14 @@ async function generatePDFcd(data, pathReq) {
         doc.heightOfString(cell, {
           width: colIndex !== 1 ? colWidth - 5 : 2 * colWidth - 5
         }) / StringHmd
-      let centerV = y + (rowHeight - nbLinesPerPhrase * StringHmd) / 2
+      let centerV = y + (height - nbLinesPerPhrase * StringHmd) / 2
 
       doc.text(cell, x, centerV, {
         width: colIndex !== 1 ? colWidth - 5 : 2 * colWidth - 5,
         align: 'left'
       })
     })
-    return y + rowHeight
+    return y + height
   }
 
   function DrowHorizontalLine(y) {
@@ -627,11 +626,22 @@ async function generatePDFcd(data, pathReq) {
   let UpdateY = y
   let j = 0
   for (let i = 0; i < numRows; i++) {
-    let y = UpdateY + j * rowHeight
+    //definition of height
+    let rowHeight = 0
+
+    dataPV[i].forEach((cell, i) => {
+      const nbLinesPerPhrase =
+        doc.heightOfString(cell, {
+          width: i !== 1 ? colWidth : 2 * colWidth
+        }) / StringHmd
+      const heightCalculated = nbLinesPerPhrase * StringHmd + padding
+      if (heightCalculated > rowHeight) rowHeight = heightCalculated
+    })
+
     j += 1
     DrowFourHorizontalRect(y, rowHeight)
 
-    y = drawRow(dataPV[i], y)
+    y = drawRow(dataPV[i], y, rowHeight)
     if (y + rowHeight > pageBottom && i != numRows - 1) {
       doc.addPage()
       j = 0
