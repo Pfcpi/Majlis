@@ -1,12 +1,17 @@
 'use strict'
 
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+const axios = require('axios')
 const ExpressApp = require('../../Backend/ExpressApp.js')
 import icon from '../../resources/icon.png?asset'
+const portfinder = require('portfinder')
 
-function createWindow() {
+const pie = require('puppeteer-in-electron')
+const puppeteer = require('puppeteer-core')
+
+async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -22,6 +27,15 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.maximize()
+  })
+
+  let used_port = await handlePort()
+  ipcMain.handle('get-Port', async (ev, args) => {
+    return used_port
+  })
+
+  ipcMain.handle('get-Path', async (ev, args) => {
+    return app.getPath('sessionData')
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -52,11 +66,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  createWindow()
+  ipcMain.handle('get-url', getUrl)
 
-  ExpressApp.listen(3000, () => {
-    console.log('Express server running on port 3000')
-  })
+  createWindow()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -65,6 +77,58 @@ app.whenReady().then(() => {
   })
 })
 
+async function initialize() {
+  await pie.initialize(app)
+}
+initialize()
+
+async function handlePort() {
+  try {
+    const port = await portfinder.getPortPromise()
+
+    // Listen on the port returned by portfinder
+    ExpressApp.listen(port, () => {
+      console.log(`Server is running on port ${port}`)
+    })
+
+    // Update the global_port variable with the obtained port
+
+    return port
+  } catch (err) {
+    console.error('Error finding an available port:', err)
+    // Return the original global_port if an error occurs
+    return 3000
+  }
+}
+
+async function getUrl() {
+  //const browser = await pie.connect(app, puppeteer)
+
+  const window = new BrowserWindow({
+    width: 900,
+    height: 670,
+    show: false,
+    autoHideMenuBar: true,
+    ...(process.platform === 'linux' ? { icon } : {}),
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false
+    }
+  })
+
+  window.on('ready-to-show', () => {
+    window.maximize()
+  })
+
+  const url = path.join(app.getPath('sessionData'), 'sortie.pdf')
+  //await window.loadURL('http://localhost:3000/sortie.pdf')
+  await window.loadURL('https://usto.madjria.com/sortie.pdf')
+  console.log('passed from here under window.loadURL')
+
+  //const page = await pie.getPage(browser, window)
+  return
+}
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
@@ -72,69 +136,4 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
-
-//handle print
-const printOptions = {
-  silent: false,
-  printBackground: true,
-  color: true,
-  margin: {
-    marginType: 'printableArea'
-  },
-  landscape: false,
-  pagesPerSheet: 1,
-  collate: false,
-  copies: 1,
-  header: 'Page header',
-  footer: 'Page footer'
-}
-
-ipcMain.handle('printComponent', (event, url) => {
-  let win = new BrowserWindow({ show: false })
-  win.loadURL(url)
-
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.print(printOptions, (success, failureReason) => {
-      console.log('Print Initiated in Main...')
-      if (!success) console.log(failureReason)
-    })
-  })
-  return 'done with main'
-})
-
-//handle preview
-ipcMain.handle('previewComponent', async (event, url) => {
-  let win = new BrowserWindow({
-    title: 'Print Preview',
-    show: false,
-    autoHideMenuBar: true
-  })
-
-  win.webContents.once('did-finish-load', () => {
-    win.webContents
-      .printToPDF(printOptions)
-      .then((data) => {
-        const buf = Buffer.from(data)
-        data = buf.toString('base64')
-        const url = 'data:application/pdf;base64,' + data
-
-        win.webContents.on('ready-to-show', () => {
-          win.once('page-title-updated', (e) => e.preventDefault())
-          win.show()
-        })
-
-        win.webContents.on('closed', () => (win = null))
-        win.loadURL(url)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  })
-
-  await win.loadURL(url)
-  return 'shown preview window'
 })

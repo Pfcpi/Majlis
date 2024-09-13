@@ -1,25 +1,42 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
-const Database = require('mysql')
+const Database = require('mysql2')
 
 // Aws rds database login
-const db = Database.createConnection({
-  host: 'projet.c9ewe6uqqsev.eu-west-3.rds.amazonaws.com',
-  port: '3306',
-  user: 'admin',
+const dbConfig = {
+  host: 'eris-shared-g1.dzsecurity.net',
+  user: 'madjri81_admin',
   password: 'pfcpiprojet',
-  database: 'projet'
-})
+  database: 'madjri81_projet'
+}
 
-// Connect to the aws rds database
-db.connect((err) => {
-  if (err) {
-    console.error('Error connecting to MySQL RDS: ' + err.message)
-    console.error(err.stack)
-    return
-  }
-  console.log('Connected to MySQL RDS as ID ' + db.threadId)
-})
+// Function to connect to the database with retry mechanism
+function connectToDB() {
+  const db = Database.createPool(dbConfig)
 
-// Export the database connection
-module.exports = { db }
+  db.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to MySQL RDS: ' + err.message)
+      console.error(err.stack)
+      // Retry connecting after a delay (e.g., 5 seconds)
+      setTimeout(connectToDB, 5000)
+      return
+    }
+    console.log('Connected to MySQL RDS as ID ' + connection.threadId)
+    connection.release()
+  })
+
+  // Handle unexpected disconnections
+  /*db.on('error', (err) => {
+    console.error('Database connection error:', err)
+    db.destroy()
+    // Retry connecting after a delay (e.g., 5 seconds)
+    setTimeout(connectToDB, 5000)
+  })*/
+
+  // Export the database connection
+  module.exports = { db }
+}
+
+// Initial connection attempt
+connectToDB()

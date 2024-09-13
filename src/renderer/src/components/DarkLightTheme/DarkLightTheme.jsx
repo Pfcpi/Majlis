@@ -27,7 +27,7 @@ function DarkLightTheme() {
         toggleTheme()
         DarkLight()
       }}
-      className="w-7 p-1 rounded-md aspect-square flex items-center justify-center border border-blue"
+      className="w-full p-1 rounded-md aspect-square flex items-center justify-center border border-blue bg-blue"
     >
       <img src={dark ? MoonSVG : SunSVG}></img>
     </button>

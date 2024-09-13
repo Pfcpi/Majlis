@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import axios from 'axios'
 
 import Accueil from './sidebar_components/Accueil'
 import Commission from './sidebar_components/Commission'
@@ -32,56 +31,91 @@ import ArchiveWhiteSVG from './../../assets/BlueSvgs/ArchiveWhite.svg'
 import DocumentationWhiteSVG from './../../assets/BlueSvgs/DocumentationWhite.svg'
 import LogOutWhiteSVG from './../../assets/BlueSvgs/LogOutWhite.svg'
 
-import USTOLogo from './../../assets/USTO-MB_logo2.svg'
+import applogo from './../../../../../build/icon.png'
 
 import useCliped from './../../zustand/cliped'
 import useAuth from '../../zustand/auth'
+import useAccount from '../../zustand/account'
 import useDark from '../../zustand/dark'
 
 import './SideBarcss.css'
 
 function SideBar() {
   const [nav, setNav] = useState('Accueil')
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const { cliped, setCliped } = useCliped()
-  const { auth, authentificate, logOut } = useAuth()
+  const { logOut } = useAuth()
   const { dark } = useDark()
+  const { account } = useAccount()
+
+  const ref = useRef(null)
+
+  useEffect(() => {
+    var defaultPage = ref.current
+
+    defaultPage.click()
+  }, [])
 
   return (
     <div className="flex h-full w-full">
+      {isLoggingOut && (
+        <div className="fullBgBlock">
+          <div className="flex flex-col justify-evenly px-4 text-xl items-center h-40 w-1/3 z-30 rounded-xl text-white dark:text-black bg-dark-gray dark:bg-white">
+            Êtes-vous sûr de vouloir vous déconnecter ?
+            <div className="flex w-full justify-between px-8">
+              <button
+                onClick={() => setIsLoggingOut(false)}
+                className="flex justify-center items-center border rounded-xl text-red py-2 px-4 bg-0.36-red"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={logOut}
+                className="flex justify-center items-center border rounded-xl text-blue py-2 px-4 bg-0.08-blue"
+              >
+                Oui
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Router>
         <div
           className={
             cliped
-              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[10%] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
-              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[10%] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
+              ? 'flex flex-col shrink-0 w-24 h-full pt-[20px] gap-[60px] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
+              : 'flex flex-col shrink-0 w-[244px] h-full pt-[20px] gap-[60px] justify-start items-center bg-side-bar-white-theme-color dark:bg-dark-gray'
           }
         >
           <div className="flex flex-col w-full h-fit justify-center items-center gap-5">
             <div
-              className="flex mb-10 w-full justify-evenly px-6 items-center"
+              className="flex mb-10 w-full justify-evenly px-6 h-14 items-center"
               onClick={() => {
                 setCliped()
               }}
             >
-              {!cliped && (
-                <p className="font-cutive w-36 dark:text-white text-center">Conseil Descipline</p>
-              )}
               <img
                 data-cliped={cliped}
-                className="p-0 w-1/3 aspect-square data-[cliped=true]:w-full"
-                src={USTOLogo}
+                className="p-0 w-1/3 aspect-square rounded-[10px] data-[cliped=true]:w-full"
+                src={applogo}
                 alt="Outil pour le conseil Discipline"
               />
+              {!cliped && (
+                <p className="font-cutive w-36 text-xl dark:text-white text-center">
+                  Conseil Discipline
+                </p>
+              )}
             </div>
             <Link
               data-cliped={cliped}
               className={
                 nav === 'Accueil'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/"
-              onClick={(e) => {
+              ref={ref}
+              onClick={() => {
                 setNav('Accueil')
               }}
             >
@@ -95,7 +129,7 @@ function SideBar() {
               className={
                 nav === 'Commission'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/Commission"
               onClick={() => {
@@ -113,54 +147,58 @@ function SideBar() {
               ></img>
               {!cliped && <p>Commission</p>}
             </Link>
-            <Link
-              data-cliped={cliped}
-              className={
-                nav === 'AjouterRapport'
-                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
-              }
-              to="/AjouterRapport"
-              onClick={() => {
-                setNav('AjouterRapport')
-              }}
-            >
-              <img
-                src={
+            {account == 'chef' && (
+              <Link
+                data-cliped={cliped}
+                className={
                   nav === 'AjouterRapport'
-                    ? AjouterRapportBlueSVG
-                    : dark
-                      ? AjouterRapportWhiteSVG
-                      : AjouterRapportSVG
+                    ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                    : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
                 }
-              ></img>
-              {!cliped && <p>Ajouter Rapport</p>}
-            </Link>
-            <Link
-              data-cliped={cliped}
-              className={
-                nav === 'AjouterPV'
-                  ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
-              }
-              to="/AjouterPV"
-              onClick={() => {
-                setNav('AjouterPV')
-              }}
-            >
-              <img
-                src={
-                  nav === 'AjouterPV' ? AjouterPVBlueSVG : dark ? AjouterPVWhiteSVG : AjouterPVSVG
+                to="/AjouterRapport"
+                onClick={() => {
+                  setNav('AjouterRapport')
+                }}
+              >
+                <img
+                  src={
+                    nav === 'AjouterRapport'
+                      ? AjouterRapportBlueSVG
+                      : dark
+                        ? AjouterRapportWhiteSVG
+                        : AjouterRapportSVG
+                  }
+                ></img>
+                {!cliped && <p>Ajouter Rapport</p>}
+              </Link>
+            )}
+            {account == 'president' && (
+              <Link
+                data-cliped={cliped}
+                className={
+                  nav === 'AjouterPV'
+                    ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
+                    : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
                 }
-              ></img>
-              {!cliped && <p>Ajouter PV</p>}
-            </Link>
+                to="/AjouterPV"
+                onClick={() => {
+                  setNav('AjouterPV')
+                }}
+              >
+                <img
+                  src={
+                    nav === 'AjouterPV' ? AjouterPVBlueSVG : dark ? AjouterPVWhiteSVG : AjouterPVSVG
+                  }
+                ></img>
+                {!cliped && <p>Ajouter PV</p>}
+              </Link>
+            )}
             <Link
               data-cliped={cliped}
               className={
                 nav === 'Archive'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/Archive"
               onClick={() => {
@@ -179,7 +217,7 @@ function SideBar() {
               className={
                 nav === 'Documentation'
                   ? 'link_btn link_button_clicked data-[cliped=true]:link_btn_cliped'
-                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped'
+                  : 'link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped'
               }
               to="/Documentation"
               onClick={() => {
@@ -187,17 +225,25 @@ function SideBar() {
               }}
             >
               <img
-                src={nav === 'Documentation' ? DocumentationBlueSVG : dark ? DocumentationWhiteSVG : DocumentationSVG}
+                src={
+                  nav === 'Documentation'
+                    ? DocumentationBlueSVG
+                    : dark
+                      ? DocumentationWhiteSVG
+                      : DocumentationSVG
+                }
               ></img>
               {!cliped && <p>Documentation</p>}
             </Link>
             <button
               data-cliped={cliped}
-              onClick={logOut}
-              className="link_btn dark:link_btn_dark dark:link_button_not_clicked dark:link_button_hover data-[cliped=true]:link_btn_cliped"
+              onClick={() => {
+                setIsLoggingOut(true)
+              }}
+              className="link_btn dark:link_btn_dark dark:link_button_not_clicked link_button_hover data-[cliped=true]:link_btn_cliped"
             >
               <img src={dark ? LogOutWhiteSVG : LogOutSVG}></img>
-              {!cliped && <p>Se deconnecter</p>}
+              {!cliped && <p>Se déconnecter</p>}
             </button>
           </div>
         </div>

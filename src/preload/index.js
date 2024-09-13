@@ -20,12 +20,15 @@ if (process.contextIsolated) {
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
- printComponent: async (url, callback) => {
-  let response = await ipcRenderer.invoke('printComponent', url);
-  callback(response);
- },
- previewComponent: async (url, callback) => {
-    let response = await ipcRenderer.invoke("previewComponent", url);
-    callback(response);
+  printComponent: async (url, callback) => {
+    let response = await ipcRenderer.invoke('printComponent', url)
+    callback(response)
   },
-});
+  previewComponent: async (url, callback) => {
+    let response = await ipcRenderer.invoke('previewComponent', url)
+    callback(response)
+  },
+  getUrl: async () => await ipcRenderer.invoke('get-url'),
+  getPort: async () => await ipcRenderer.invoke('get-Port'),
+  getPath: async () => await ipcRenderer.invoke('get-Path')
+})

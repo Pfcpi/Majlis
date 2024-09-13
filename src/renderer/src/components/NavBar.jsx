@@ -1,27 +1,37 @@
-import BellSVG from '../assets/Bell.svg'
-import BulbSVG from '../assets/BulbOutlined.svg'
-import SettingSVG from '../assets/SettingOutlined.svg'
-import SearchSVG from '../assets/Search.svg'
-
+import useAccount from '../zustand/account'
 import DarkLightTheme from '../components/DarkLightTheme/DarkLightTheme'
+import useHelp from '../zustand/help'
+import { useRef } from 'react'
 
 function NavBar() {
-  return (
-    <div className="h-[44px] w-full flex items-center justify-between bg-[#DADADA] dark:bg-[#333333] px-5">
-      <div className="flex w-[20%]"></div>
-      <label htmlFor='RechercherDossier' className='flex items-center justify-center px-6 w-[440px] h-6 rounded-xl bg-white dark:bg-[#1C1E24] dark:text-white font-poppins text-[13px]'>
-        <img src={SearchSVG}></img>
-        <input
-          className="outline-none w-full dark:bg-[#1C1E24]"
-          type="search"
-          id='RechercherDossier'
-          placeholder="Rechercher un dossier"
-        ></input>
-      </label>
+  const { account } = useAccount()
+  const { help, setHelp, ExitHelp } = useHelp()
 
-      <div className="flex gap-[30px] w-[20%] justify-end">
-        <img src={SettingSVG}></img>
-        <DarkLightTheme></DarkLightTheme>
+  return (
+    <div className="h-[44px] w-full flex items-center justify-between bg-[#DADADA] dark:bg-side-bar-dark-theme-color px-5">
+      <div></div>
+      <h2 className="w-fit text-blue bg-white dark:bg-side-bar-dark-theme-color h-7 flex justify-center items-center px-4 rounded-md shadow-sm">
+        {[
+          'Bienvenue, M./Mme. ',
+          account == 'chef' ? 'Chef de département' : 'Président du conseil'
+        ]}
+      </h2>
+      <div className="flex gap-2 w-fit *:w-8 *:h-8 *:shadow-lg">
+        <div className="flex justify-end ">
+          <DarkLightTheme></DarkLightTheme>
+        </div>
+        <button
+          onClick={() => {
+            if (help) {
+              ExitHelp()
+            } else {
+              setHelp()
+            }
+          }}
+          className="bg-blue text-white z-30 rounded-md"
+        >
+          ?
+        </button>
       </div>
     </div>
   )
